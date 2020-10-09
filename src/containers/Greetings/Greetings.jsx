@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import icon from '../../assets/img/icon-128.png';
+import icon from '../../assets/img/icon-34.png';
+import './Greetings.css';
+
 
 class GreetingComponent extends Component {
   state = {
@@ -9,8 +11,8 @@ class GreetingComponent extends Component {
   render() {
     return (
       <div>
-        <p>Hello, {this.state.name}!</p>
-        <img src={icon} alt="extension icon" />
+        <img class="topleft" src={icon} alt="extension icon" />
+        <p>Welcome to Social Buy Plugin!</p>
       </div>
     );
   }
