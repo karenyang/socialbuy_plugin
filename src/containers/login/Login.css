@@ -33,3 +33,5 @@ input[type=submit] {
   cursor: pointer;
   font-size: 20px;
 }
+
+button.link { background:none;border:none; }
