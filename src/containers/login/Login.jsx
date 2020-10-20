@@ -84,7 +84,7 @@ class Login extends React.Component {
 						<input
 							type="text"
 							name="user_name"
-							placeholder="Enter Login Name"
+							placeholder="Enter Username"
 							value={this.state.user_name}
 							onChange={this.handleInputChange}
 							required
@@ -106,7 +106,9 @@ class Login extends React.Component {
 					</div>
 				</form>
 			</div>
-			<Link to="/admin/registe" className="btn btn-primary">Sign Up</Link>
+			<p>Create new account?</p>
+
+			<Link to="/admin/register" className="btn btn-primary">Sign Up</Link>
 		</div>
 		);
 		}

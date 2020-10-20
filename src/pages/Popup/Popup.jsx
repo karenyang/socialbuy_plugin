@@ -41,7 +41,7 @@ class Popup extends React.Component {
       <HashRouter>
         <div className="App">
             <Switch>
-              <Route path="/admin/register"
+              <Route path="/user"
                       render={(props) => <Register {...props} />}
                    />
               <Route path="/admin/login"

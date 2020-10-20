@@ -4,7 +4,6 @@ import {
 } from '@material-ui/core';
 import './Register.css';
 import axios from 'axios';
-import Login from '../login/Login';
 
 import {
 	Link
@@ -16,6 +15,7 @@ class Register extends React.Component {
 		this.state = {
 			login_name: "",
 			password: "",
+			new_password_repeat: "",
 			user_id: "",
 			isRegister: true,
 		};
@@ -45,23 +45,12 @@ class Register extends React.Component {
 		let request = {
 			login_name: this.state.new_login_name,
 			password: this.state.new_password,
-			first_name: this.state.new_first_name,
-			last_name: this.state.new_last_name,
-			location: this.state.new_location,
-			occupation: this.state.new_occupation,
-			description: this.state.new_description,
 		};
 
 		// clear the register form
 		this.setState({
-			new_first_name: "",
-			new_last_name: "",
 			new_login_name: "",
 			new_password: "",
-			new_password_repeat: "",
-			new_location: "",
-			new_occupation: "",
-			new_description: "",
 		});
 
 		axios.post('/user', request, {
@@ -128,7 +117,18 @@ class Register extends React.Component {
 								required
 							/>
 						</div>
-								<input type="submit" value="Continue"/>
+						<div>
+							<label>Repeat Password: </label>
+							<input
+								type="password"
+								name="new_password_repeat"
+								placeholder="Repeat Above Password"
+								value={this.state.new_password_repeat}
+								onChange={this.handleInputChange}
+								required
+							/>
+						</div>
+						<input type="submit" value="Continue"/>
 					</form>
 					<p>Already a member?</p>
 					<Link to="/admin/login" className="btn btn-primary">Log In</Link>
