@@ -24,16 +24,16 @@ class Popup extends React.Component {
 
   onLoggedIn = (data) => {
     this.setState({
-        user_name: data.username,
+        user_name: data.user_name,
         user_id: data._id,
     });
   }
 
   isLoggedIn = () => {
-    if (this.state.user_id != "") {
-      return true;
-    }
-    return false;
+      if (this.state.user_id) {
+          return true;
+      }
+      return false;
   }
 
   render() {
@@ -41,7 +41,7 @@ class Popup extends React.Component {
       <HashRouter>
         <div className="App">
             <Switch>
-              <Route path="/user"
+              <Route path="/admin/register"
                       render={(props) => <Register {...props} />}
                    />
               <Route path="/admin/login"

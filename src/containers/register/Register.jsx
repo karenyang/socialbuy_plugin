@@ -13,8 +13,10 @@ class Register extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			login_name: "",
+			user_name: "",
 			password: "",
+			new_user_name: "",
+			new_password: "",
 			new_password_repeat: "",
 			user_id: "",
 			isRegister: true,
@@ -43,31 +45,34 @@ class Register extends React.Component {
 		}
 
 		let request = {
-			login_name: this.state.new_login_name,
+			user_name: this.state.new_user_name,
 			password: this.state.new_password,
 		};
 
 		// clear the register form
 		this.setState({
-			new_login_name: "",
+			new_user_name: "",
 			new_password: "",
+			new_password_repeat: "",
+
 		});
 
-		axios.post('/user', request, {
+		axios.post('http://localhost:8080/admin/register', request, {
 				headers: {
 					'content-type': 'application/json',
 				}
 			})
 			.then(res => {
-				if (res.status === 200) {
-					alert("Registered succeeded. You can log in now.");
-				} else if (res.status === 400) {
-					alert(res.data + " Please try again.");
-					throw new Error(res.data);
-				} else {
-					alert(res.data + " Register failed for other reasons. Please try again.");
-					throw new Error(res.data);
-				}
+				console.log('Register receives reply from server: ', res.data);
+				// if (res.status === 200) {
+				// 	alert("Registered succeeded. You can log in now.");
+				// } else if (res.status === 400) {
+				// 	alert(res.data + " Please try again.");
+				// 	throw new Error(res.data);
+				// } else {
+				// 	alert(res.data + " Register failed for other reasons. Please try again.");
+				// 	throw new Error(res.data);
+				// }
 			})
 			.catch(err => {
 				console.error(err)
@@ -99,9 +104,9 @@ class Register extends React.Component {
 							<label>Username: </label>
 							<input
 								type="text"
-								name="new_login_name"
+								name="new_user_name"
 								placeholder="Enter Username"
-								value={this.state.new_login_name}
+								value={this.state.new_user_name}
 								onChange={this.handleInputChange}
 								required
 							/>

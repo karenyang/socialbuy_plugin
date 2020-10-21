@@ -38,25 +38,28 @@ class Login extends React.Component {
 			password: this.state.password,
 		};
 
-
-		axios.post('/admin/login', request, {
+		this.setState({
+			user_name: "",
+			password: "",
+		});
+		axios.post('http://localhost:8080/admin/login', request, {
 				headers: {
 					'content-type': 'application/json',
 				}
 			})
 			.then(res => {
 				if (res.status === 200) {
+					console.log('Login receives reply from server: ', res.data);
 					this.setState({
-						user_id: res.data._id
+						user_id: res.data._id,
+						user_name: res.data.user_name
 					});
-					let redirect_path = "/users/" + res.data._id.toString();
+					// let redirect_path = "/users/" + res.data._id.toString();
 					this.props.onLoggedIn({
 						_id: res.data._id,
 						user_name: this.state.user_name,
-						first_name: res.data.first_name,
-						last_name: res.data.last_name,
 					})
-					this.props.history.push(redirect_path);
+					// this.props.history.push(redirect_path);
 				}
 				else{
 					throw(new Error(res.data));
@@ -84,7 +87,7 @@ class Login extends React.Component {
 						<input
 							type="text"
 							name="user_name"
-							placeholder="Enter Username"
+							placeholder="Enter Login Name"
 							value={this.state.user_name}
 							onChange={this.handleInputChange}
 							required
@@ -106,9 +109,7 @@ class Login extends React.Component {
 					</div>
 				</form>
 			</div>
-			<p>Create new account?</p>
-
-			<Link to="/admin/register" className="btn btn-primary">Sign Up</Link>
+			<Link to="/admin/register" className="btn btn-primary">Create new account</Link>
 		</div>
 		);
 		}
