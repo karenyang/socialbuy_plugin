@@ -30,8 +30,44 @@ app.use(session({
 	resave: false,
 	saveUninitialized: false
 }));
-app.use(bodyParser.json());
 
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(session({
+    key: 'user_id',
+    secret: 'somerandonstuffs',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+		maxAge: 1000 * 60 * 60 * 2,
+		sameSite: true,
+		secure: process.env.NODE_ENV === 'production'
+    }
+}));
+
+
+// var redirectLogin = (request, response, next) => {
+// 	console.log("In redirectLogin: ", request.session)
+//     if (request.session.user_id) {
+// 		console.log("In redirectLogin, conditions met, should go to greetings" );
+//         response.redirect('https://www.example.com', 302);
+//     } else {
+//         next();
+//     }    
+// };
+
+app.get('/user/info', function(request, response) {
+	console.log('server receives GET request /');
+	if (request.session.user_id) {
+		let output = {
+			user_id: request.session.user_id,
+			user_name: request.session.user_name,
+		};
+		response.status(200).send(JSON.stringify(output));
+	} else {
+		response.status(201).send("No user in session cookie.");	
+	}
+});
 
 app.post('/admin/login', function(request, response) {
     console.log('server receives POST request /admin/login : ', request.body);
@@ -54,18 +90,39 @@ app.post('/admin/login', function(request, response) {
 			return;
 		}
 		request.session.user_id = user._id;
-		request.session.user_name = user_name;
+		request.session.user_name = user_name; 
 		delete request.body.password; //make it safe
 
 		let output = {
 			_id: user._id,
 			user_name: user_name,
 		};
+
 		response.status(200).send(JSON.stringify(output));
 	});
 	return;
 
 });
+
+
+// logout
+app.post('/admin/logout', function(request, response) {
+	if (request.session) {
+		console.log('Destroying session');
+		request.session.destroy(
+			function(err) {
+				console.error(err);
+				response.clearCookie("user_id");
+				response.clearCookie("user_name");
+			});
+		response.status(200).send("Logged out.");
+	} else {
+		console.error("Not user is logged in.");
+		response.status(400).send("Not user is logged in.");
+	}
+	return;
+});
+
 
 app.post('/admin/register', function(request, response) {
     const newUser = request.body;

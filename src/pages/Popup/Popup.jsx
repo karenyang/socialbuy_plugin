@@ -10,48 +10,58 @@ import {
 import Greetings from '../../containers/greetings/Greetings';
 import Register from '../../containers/register/Register';
 import Login from '../../containers/login/Login';
+import axios from 'axios';
 
 import './Popup.css';
 
 class Popup extends React.Component {
   constructor(props) {
-		super(props);
-		this.state = {
-			user_name: "testuser",
-			user_id: "",
-		};
-	}
+    super(props);
+    this.state = {
+      user_name: "",
+      user_id: "",
+    };
+  }
+
 
   onLoggedIn = (data) => {
     this.setState({
-        user_name: data.user_name,
-        user_id: data._id,
+      user_name: data.user_name,
+      user_id: data.user_id,
     });
   }
 
   isLoggedIn = () => {
-      if (this.state.user_id) {
-          return true;
-      }
-      return false;
+    console.log("Inside isLonggedIn, ", this.state.user_id);
+    if (this.state.user_id) {
+      console.log("Inside isLonggedIn, should render greetings for ", this.state.user_name);
+      return true;
+    }
+    return false;
   }
+
 
   render() {
     return (
       <HashRouter>
         <div className="App">
-            <Switch>
-              <Route path="/admin/register"
-                      render={(props) => <Register {...props} />}
+          <Switch>
+            <Route path="/admin/register"
+              render={(props) => <Register {...props} onLoggedIn={this.onLoggedIn} />}
+            />
+            <Route path="/admin/login"
+              render={(props) => <Login {...props} onLoggedIn={this.onLoggedIn} />}
+            />
+            <Route path="/greetings"
+                    render ={(props) => <Greetings {...props}  user_name={this.state.user_name} user_id={this.state.user_id}/>}
                    />
-              <Route path="/admin/login"
-                     render={(props) => <Login {...props} onLoggedIn={this.onLoggedIn}/>}
-                  />
-            {this.isLoggedIn()?
-              <Greetings user_name={this.state.user_name}/>
+            {this.isLoggedIn() ?
+              <Route path="/greetings"
+                    render ={(props) => <Greetings {...props}  user_name={this.state.user_name} user_id={this.state.user_id}/>}
+                   />
               :
-              <Redirect to="/admin/register"/>}
-            </Switch>
+              <Redirect to="/admin/register" />}
+          </Switch>
         </div>
 
       </HashRouter>

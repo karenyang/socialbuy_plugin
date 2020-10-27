@@ -10,9 +10,23 @@ class Greetings extends Component {
     super(props);
     this.state = {
       user_name: this.props.user_name,
+      user_id: this.props.user_id,
     }
     console.log(this.state);
   }
+
+  componentDidUpdate(prevProps) {
+		if (prevProps.user_name !== this.props.user_name) {
+			this.setState({
+				user_name: this.props.user_name
+			});
+    }
+    if (prevProps.user_id !== this.props.user_id) {
+			this.setState({
+				user_id: this.props.user_id
+			});
+		}
+	}
 
   render() {
     return (
