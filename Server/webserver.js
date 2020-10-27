@@ -2,9 +2,8 @@
 process.env.BABEL_ENV = 'development';
 process.env.NODE_ENV = 'development';
 
-
 // *************************************************************
-// Server Side API
+// Configure
 // *************************************************************
 const express = require('express');
 const app = express();
@@ -45,6 +44,43 @@ app.use(session({
     }
 }));
 
+// *************************************************************
+// Server API
+// *************************************************************
+
+app.post('/user/add_products', function (request, response) {
+    console.log('server receives GET request /user/add_product', request.body);
+    if (request.session.user_id) {
+        let output = {
+            user_id: request.session.user_id,
+        };
+        response.status(200).send(JSON.stringify(output));
+        // const response = {
+        //     statusCode: 200,
+        //     headers: {
+        //         "Access-Control-Allow-Headers": "Content-Type",
+        //         "Access-Control-Allow-Origin": "https://www.amazon.com",
+        //         "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+        //     },
+        //     body: JSON.stringify(output),
+        // };
+        // return response;
+
+    } else {
+        response.status(400).send('Not logged in yet.');
+        // const response = {
+        //     statusCode: 400,
+        //     headers: {
+        //         "Access-Control-Allow-Headers": "Content-Type",
+        //         "Access-Control-Allow-Origin": "https://www.amazon.com",
+        //         "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+        //     },
+        //     body: JSON.stringify("Not logged in yet."),
+        // };
+        // return response;
+    }
+});
+
 
 app.get('/user/info', function (request, response) {
     console.log('server receives GET request /user/info');
@@ -60,6 +96,7 @@ app.get('/user/info', function (request, response) {
         response.status(201).send("No user in session cookie.");
     }
 });
+
 
 app.post('/admin/login', function (request, response) {
     console.log('server receives POST request /admin/login : ', request.body);

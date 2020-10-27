@@ -45,7 +45,8 @@ class Greetings extends Component {
                 <Typography variant="h5" color="inherit">
                     Welcome! {this.state.user_name}
                 </Typography>
-                <Button variant="h5" className="bottom" onClick={this.props.onLogOut}>
+            
+                <Button className="bottom" onClick={this.props.onLogOut}>
                     Log Out
 				</Button>
             </div>

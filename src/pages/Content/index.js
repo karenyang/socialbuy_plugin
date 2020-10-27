@@ -1,10 +1,100 @@
-import { printLine } from './modules/print';
+import axios from 'axios';
 
+console.log("================================================================================================");
 var url = window.location.href;
-
-console.log('Content script works!');
-console.log('Must reload extension for modifications to take effect.');
+console.log('In Content script started.');
 console.log('Current URL: ', url);
 
+let productsToBeAdded = [];
 
-printLine("Using the 'printLine' function from the Print Module");
+if (url.includes('amazon.com/gp/cart')) {
+    let domain = "www.amazon.com";
+    let img_query_string = " > div.sc-list-item-content > div > div.a-column.a-span10 > div > div > div.a-fixed-left-grid-col.a-float-left.sc-product-image-desktop.a-col-left > a";
+    let content = document.querySelectorAll("#activeCartViewForm > div.a-row.a-spacing-mini.sc-list-body.sc-java-remote-feature >  div.a-row.sc-list-item.sc-list-item-border.sc-java-remote-feature");
+    // console.log("content: " , content);
+
+    for (let i = 0; i < content.length - 1; i++) { //content.length - 1 because last block is alexa ads
+        let product = content[i];
+        // console.log('product ', i, " ", product);
+        // console.log(product.innerText.split("\n"));
+        let cleanedUpValues = product.innerText.split("\n");
+        let item = {};
+        item.product_title = cleanedUpValues[0];
+        console.log("product_title: ", item.product_title)
+
+        item.product_cost = cleanedUpValues[cleanedUpValues.length - 1];
+        console.log("product_cost: ", item.product_cost)
+
+        let img = document.querySelector("#" + product.id + img_query_string);
+        item.product_link = domain + img.getAttribute("href");
+        console.log("product_link:  ", item.product_link);
+        item.product_imgurl = img.firstElementChild.getAttribute("src");
+        console.log("product_imgurl:  ", item.product_imgurl);
+        item.product_by = "Amazon";
+        fetchMoreProductInfo(item);
+    }
+
+
+}
+
+function fetchMoreProductInfo(item) {
+    if (url.includes('amazon.com/gp/cart')) {
+        axios.get(item.product_link.split('amazon.com')[1])
+            .then(
+                response => {
+                    let page = document.createElement('html');
+                    page.innerHTML = response.data;
+                    let summary_list = page.querySelectorAll("#feature-bullets > ul > li > span");
+                    let product_summary = "";
+                    for (let i = 0; i < summary_list.length; i++) {
+                        if (!summary_list[i].innerHTML.includes("</")) {
+                            product_summary += summary_list[i].innerHTML;
+                        }
+                    }
+                    item.product_summary = product_summary;
+                    // console.log("product_summary: ", product_summary);
+                    let variation_imgs = page.querySelectorAll("button > div > div > img");
+                    let product_variations = [];
+                    for (let i = 0; i < variation_imgs.length; i++) {
+                        let imgurl = variation_imgs[i].getAttribute('src');
+                        let name = variation_imgs[i].getAttribute('alt');
+                        product_variations.push({ "name": name, "imgurl": imgurl });
+                    }
+                    // console.log('product_variations: ',product_variations);
+                    item.product_variations = product_variations;
+                    productsToBeAdded.push(item);
+
+
+                })
+            .catch(
+                error => {
+                    console.log(error);
+                });
+    }
+}
+
+setTimeout(function () {
+    if (productsToBeAdded.length > 0) {
+        sendToBackground("productsToBeAdded", productsToBeAdded);
+    }
+},
+    5000); //update every 5 sec
+
+function sendToBackground(eventName, eventData, callback) {
+    console.log("sending to background.");
+    chrome.runtime.sendMessage({ type: eventName, data: eventData },
+        function (response) {
+            console.log('this is the response from the background page for the ' + eventName + ' Event: ', response);
+            if (response.status === 200) {
+                console.log("add_product succeeded.", response.data);
+                productsToBeAdded = []; //clear
+            } else {
+                console.log("add_product failed.", response.data);
+            }
+
+        }
+    );
+}
+
+
+console.log("================================================================================================");
