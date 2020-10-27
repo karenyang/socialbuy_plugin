@@ -28,7 +28,7 @@ class Register extends React.Component {
 		console.log("[Register] sending /user/info request to server");
 		axios.get('http://localhost:8080/user/info').then(
 			res => {
-				if (res.status == 200 && res.data) {
+				if (res.status == 200 && res.data.user_id != "") {
 					console.log("server response data: ", res.data, res.data.user_name, res.data.user_id);
 					this.props.onLoggedIn({
 						user_id: res.data.user_id,

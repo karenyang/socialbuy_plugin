@@ -29,15 +29,37 @@ class Popup extends React.Component {
       user_name: data.user_name,
       user_id: data.user_id,
     });
+    
   }
 
   isLoggedIn = () => {
     console.log("Inside isLonggedIn, ", this.state.user_id);
-    if (this.state.user_id) {
+    if (this.state.user_id && this.state.user_id != "") {
       console.log("Inside isLonggedIn, should render greetings for ", this.state.user_name);
       return true;
     }
     return false;
+    
+  }
+
+  onLogOut = () => {
+    console.log("about to log out");
+    axios.post('http://localhost:8080/admin/logout')
+      .then(res => {
+        if (res.status === 200) {
+          this.setState({
+            user_id: "",
+            username: "",
+          });
+        }
+        else {
+          alert(res.data);
+          throw (new Error(res.data));
+        }
+      })
+      .catch(err => {
+        console.error(err)
+      })
   }
 
 
@@ -53,14 +75,13 @@ class Popup extends React.Component {
               render={(props) => <Login {...props} onLoggedIn={this.onLoggedIn} />}
             />
             <Route path="/greetings"
-                    render ={(props) => <Greetings {...props}  user_name={this.state.user_name} user_id={this.state.user_id}/>}
-                   />
+              render={(props) => <Greetings {...props} user_name={this.state.user_name} user_id={this.state.user_id} onLogOut={this.onLogOut} />}
+            />
             {this.isLoggedIn() ?
-              <Route path="/greetings"
-                    render ={(props) => <Greetings {...props}  user_name={this.state.user_name} user_id={this.state.user_id}/>}
-                   />
+              <Redirect to= "/greetings"/>
               :
-              <Redirect to="/admin/register" />}
+              <Redirect to="/admin/register" />
+            }
           </Switch>
         </div>
 

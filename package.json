@@ -6,7 +6,7 @@
   "scripts": {
     "build": "node Server/build.js",
     "start": "node Server/webserver.js",
-    "prettier": "prettier --write '**/*.{js,jsx,css,html}'"
+    "prettier": "prettier --write '**/*.{js,jsx,css,html}' --tab-width 4"
   },
   "dependencies": {
     "@hot-loader/react-dom": "^16.13.0",
