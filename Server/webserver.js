@@ -10,7 +10,9 @@ const app = express();
 var session = require('express-session');
 
 var bodyParser = require('body-parser');
-var passwordsalt = require('./passwordsalt.js');
+var passwordsalt = require('./utils/passwordsalt.js');
+var async = require('async');
+
 var User = require('./schema/user.js');
 
 
@@ -49,35 +51,112 @@ app.use(session({
 // *************************************************************
 
 app.post('/user/add_products', function (request, response) {
-    console.log('server receives GET request /user/add_product', request.body);
+    console.log('server receives GET request /user/add_product');
     if (request.session.user_id) {
+        let products = request.body;
+        User.findOne({
+            user_id: request.session.user_id,
+        }, function (err, user) {
+            if (!user) {
+                console.error('User with username:' + request.session.user_name + ' not found .');
+                response.status(400).send('User not found');
+                return;
+            }
+
+            // fetch comments for each photo
+            async.each(products, function (product, callback) {
+                let newProduct = new Product();
+                Object.assign(newProduct, product);
+                // add product if it is not product list, add user to products' buyer list if it is already there
+                Product.findOne({
+                    'product_link': newProduct.product_link
+                }, function (err, product) {
+                    if (err) {
+                        // Query returned an error.  We pass it back to the browser with an Internal Service
+                        // Error (500) error code.
+                        console.error('Server error in /user/add_products', err);
+                        response.status(500).send(JSON.stringify(err));
+                        return;
+                    }
+                    if (product) {
+                        response.status(400).send('product_link already exists: ' + product.product_link);
+                        let new_buyer_list = product.buyer_list;
+                        new_buyer_list.push(request.session.user_id);
+                        Object.assign(product, { "buyer_list": new_buyer_list }); //add current user to buyer list
+                        product.save();
+                    } else {
+                        let new_buyer_list = [];
+                        new_buyer_list.push(request.session.user_id);
+                        Object.assign(newProduct, { "buyer_list": new_buyer_list }); //add current user to buyer list
+                        Product.create(newProduct,
+                            function (err, productObj) {
+                                if (err) {
+                                    response.status(500).send(JSON.stringify(err));
+                                }
+                                console.log("new productObj created: ", productObj)
+                                productObj.save()
+                            })
+                    }
+                })
+
+            },
+                function (err) { //callback
+                    if (err) {
+                        console.error(err);
+                        response.status(500).send(JSON.stringify(err));
+                    }
+                    else{
+                        response.status(200).send("Processed all products from user " + request.session.user_name);
+                    }
+                });
+        });
+
+        // for (let i = 0; i < products.length; i++) {
+        //     let newProduct = new Product();
+        //     Object.assign(newProduct, products[i]);
+        //     // add product if it is not product list, add user to products' buyer list if it is already there
+
+        //     Product.findOne({
+        //         'product_link': newProduct.product_link
+        //     }, function (err, product) {
+        //         if (err) {
+        //             // Query returned an error.  We pass it back to the browser with an Internal Service
+        //             // Error (500) error code.
+        //             console.error('Server error in /user/add_products', err);
+        //             response.status(500).send(JSON.stringify(err));
+        //             return;
+        //         }
+        //         if (product) {
+        //             response.status(400).send('product_link already exists: ' + product.product_link);
+        //             let new_buyer_list = product.buyer_list;
+        //             new_buyer_list.push(request.session.user_id);
+        //             Object.assign(product, { "buyer_list": new_buyer_list }); //add current user to buyer list
+        //             product.save();
+        //             response.status(200).send('Product existed. Add user to buyer list');
+        //         } else {
+        //             let new_buyer_list = [];
+        //             new_buyer_list.push(request.session.user_id);
+        //             Object.assign(newProduct, { "buyer_list": new_buyer_list }); //add current user to buyer list
+        //             Product.create(newProduct,
+        //                 function (err, productObj) {
+        //                     if (err) {
+        //                         response.status(500).send(JSON.stringify(err));
+        //                     }
+        //                     console.log("new productObj created: ", productObj)
+        //                     productObj.save()
+        //                     response.status(200).send('New product added');
+        //                 })
+        //         }
+        //     })
+        // }
+
         let output = {
             user_id: request.session.user_id,
         };
-        response.status(200).send(JSON.stringify(output));
-        // const response = {
-        //     statusCode: 200,
-        //     headers: {
-        //         "Access-Control-Allow-Headers": "Content-Type",
-        //         "Access-Control-Allow-Origin": "https://www.amazon.com",
-        //         "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-        //     },
-        //     body: JSON.stringify(output),
-        // };
-        // return response;
 
+        response.status(200).send(JSON.stringify(output));
     } else {
         response.status(400).send('Not logged in yet.');
-        // const response = {
-        //     statusCode: 400,
-        //     headers: {
-        //         "Access-Control-Allow-Headers": "Content-Type",
-        //         "Access-Control-Allow-Origin": "https://www.amazon.com",
-        //         "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-        //     },
-        //     body: JSON.stringify("Not logged in yet."),
-        // };
-        // return response;
     }
 });
 
@@ -168,7 +247,6 @@ app.post('/admin/register', function (request, response) {
         response.status(400).send("Password cannot be empty string.");
         return;
     }
-
     let passwordEntry = passwordsalt.makePasswordEntry(newUser.password); // add salt and make hash
     Object.assign(newUser, {
         salt: passwordEntry.salt,
@@ -217,6 +295,7 @@ var WebpackDevServer = require('webpack-dev-server'),
     config = require('../webpack.config'),
     env = require('./env'),
     path = require('path');
+const Product = require('./schema/product.js');
 
 var options = config.chromeExtensionBoilerplate || {};
 var excludeEntriesToHotReload = options.notHotReload || [];
