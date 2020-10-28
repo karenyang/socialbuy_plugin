@@ -65,7 +65,7 @@ app.post('/user/add_products', function (request, response) {
             }
             if (user === null) {
                 console.error('User with username:' + request.session.user_name + ' not found.');
-                response.status(400).send('User not found.');
+                response.status(401).send('User not found.');
                 return;
             }
             // fetch comments for each photo
@@ -86,8 +86,10 @@ app.post('/user/add_products', function (request, response) {
                     }
                     if (product) {
                         console.log("product existed: ", product);
-                        product.buyer_list.push(user.user_id);
-                        product.save();
+                        if (!product.buyer_list.includes(user._id)){
+                            product.buyer_list.push(user._id);
+                            product.save();
+                        }
                         if (!user.product_list.includes(product.product_link)) {
                             user.product_list.push(product.product_link);
                         }
@@ -145,12 +147,12 @@ app.post('/admin/login', function (request, response) {
         }
         if (!user) {
             console.error('User with user_name:' + user_name + ' not found.');
-            response.status(400).send('User of this user_name not registered: ' + user_name);
+            response.status(250).send('User of this user_name not registered: ' + user_name);
             return;
         }
         if (!passwordsalt.doesPasswordMatch(user.password_digest, user.salt, request.body.password)) {
             console.error('Wrong password');
-            response.status(400).send('Wrong password.');
+            response.status(250).send('Wrong password.');
             return;
         }
         request.session.user_id = user._id;
@@ -192,15 +194,15 @@ app.post('/admin/register', function (request, response) {
     const newUser = request.body;
     console.log('receive request for new user', newUser)
     if (!newUser) {
-        response.status(400).send("New User cannot be empty.");
+        response.status(250).send("New User cannot be empty.");
         return;
     }
     if (!newUser.user_name) {
-        response.status(400).send("user_name cannot be empty string.");
+        response.status(250).send("user_name cannot be empty string.");
         return;
     }
     if (!newUser.password) {
-        response.status(400).send("Password cannot be empty string.");
+        response.status(250).send("Password cannot be empty string.");
         return;
     }
     let passwordEntry = passwordsalt.makePasswordEntry(newUser.password); // add salt and make hash
@@ -215,7 +217,8 @@ app.post('/admin/register', function (request, response) {
     },
         function (err, user) {
             if (user !== null) {
-                response.status(400).send('user_name already exists: ' + user.user_name);
+                console.log("User already existed before register.");
+                response.status(250).send('user_name already exists');
             } else {
                 User.create(newUser,
                     function (err, userObj) {
