@@ -55,7 +55,8 @@ app.post('/user/add_products', function (request, response) {
     if (request.session.user_id) {
         console.log('request.session.user_id: ', request.session.user_id);
 
-        let products = request.body;
+        let products = request.body.data;
+
         User.findOne({
             _id: request.session.user_id,
         }, function (err, user) {
@@ -67,10 +68,13 @@ app.post('/user/add_products', function (request, response) {
                 response.status(400).send('User not found.');
                 return;
             }
-            console.log("current user product list: ", user.product_list);
-
             // fetch comments for each photo
-            async.each(products, function (item, callback) {
+            console.log("products: ", products);
+
+            for (let i = 0; i < products.length; i++) {
+                let item = products[i];
+                user.product_list.push(item.product_link);
+                user.save();
                 // add product if it is not product list, add user to products' buyer list if it is already there
                 // Object.assign(item, {"buyer_list": [request.session.user_id]});
                 // console.log("item's buyer_list:", item.buyer_list );
@@ -78,53 +82,39 @@ app.post('/user/add_products', function (request, response) {
                     'product_link': item.product_link
                 }, function (err, product) {
                     if (err) {
-                        console.error('Server error in /user/add_products', err);
+                        console.error(err);
                     }
                     if (product) {
                         console.log("product existed: ", product);
                         product.buyer_list.push(user.user_id);
                         product.save();
-                        if (!user.product_list.includes(product._id)) {
-                            user.product_list.push(product._id);
+                        if (!user.product_list.includes(product.product_link)) {
+                            user.product_list.push(product.product_link);
                         }
-                        console.log("User current product list " + user.product_list);
                         console.log("Add buyer to an existing product, " + product.product_title);
                     }
                     else {
-                        Object.assign(item, {"buyer_list": [request.session.user_id]});
+                        Object.assign(item, { "buyer_list": [request.session.user_id] });
                         Product.create(item,
                             function (err, newProduct) {
                                 if (err) {
-                                    response.status(500).send(JSON.stringify(err));
+                                    console.error(err);
                                 }
-                                user.product_list.push(newProduct._id);
-                                user.save();
                                 console.log("new newProduct created, ", newProduct);
                             })
                     }
                 })
-
-            },
-                function (err) { //callback
-                    if (err) {
-                        console.error(err);
-                        response.status(500).send(JSON.stringify(err));
-                        return;
-                    }
-                    else {
-                        console.log("User current product list :", user.product_list);
-                        response.status(200).send("Success in adding products");
-                        return;
-                    }
-                });
-        });
-
-
-    } else {
+            }
+            response.status(200).send("Success in adding products");
+            return;
+        })
+    }
+    else {
         response.status(400).send('Not logged in yet.');
         return;
     }
 });
+
 
 
 app.get('/user/info', function (request, response) {
