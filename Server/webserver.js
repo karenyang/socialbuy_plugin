@@ -117,24 +117,6 @@ app.post('/user/add_products', function (request, response) {
     }
 });
 
-
-
-app.get('/user/info', function (request, response) {
-    console.log('server receives GET request /user/info');
-    if (request.session.user_id) {
-        let output = {
-            user_id: request.session.user_id,
-            user_name: request.session.user_name,
-        };
-        console.log('Session already active, bypass Login.');
-        response.status(200).send(JSON.stringify(output));
-
-    } else {
-        response.status(201).send("No user in session cookie.");
-    }
-});
-
-
 app.post('/admin/login', function (request, response) {
     console.log('server receives POST request /admin/login : ', request.body);
     const user_name = request.body.user_name;

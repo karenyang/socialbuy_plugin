@@ -23,23 +23,23 @@ class Popup extends React.Component {
     }
 
     componentDidMount = () => {
-        console.log("[Popup] sending /user/info request to server");
+        console.log("[Popup] sending /user/info request to background");
         let onLoggedIn = this.onLoggedIn;
         chrome.runtime.sendMessage({ type: "onPopupInit" },
             function (response) {
                 console.log('this is the response from the background page for onPopupInit message', response);
-                if (response.status === 201){
+                if (response === undefined || response === null) {
                     console.log("Not logged in before. Need login or register");
                     onLoggedIn({
                         user_id: "",
                         user_name: "",
                     });
                 }
-                else if (response.status === 200 && response.data.user_id !== "") {
+                else if (response.user_id) {
                     console.log("Already logged in before");
                     onLoggedIn({
-                        user_id: response.data.user_id,
-                        user_name: response.data.user_name,
+                        user_id: response.user_id,
+                        user_name: response.user_name,
                     });
                 }
             });
@@ -49,7 +49,7 @@ class Popup extends React.Component {
         this.setState({
             user_name: data.user_name,
             user_id: data.user_id,
-            done_fetch: true, 
+            done_fetch: true,
         });
         console.log("State set to, ", this.state);
     }
@@ -58,7 +58,7 @@ class Popup extends React.Component {
         this.setState({
             user_name: "",
             user_id: "",
-            done_fetch: true, 
+            done_fetch: true,
         });
         console.log("State reset to, ", this.state);
     }
@@ -69,11 +69,11 @@ class Popup extends React.Component {
         chrome.runtime.sendMessage({ type: "onLogout" },
             function (res) {
                 console.log('this is the response from the background page for onLogout', res);
-                if (res.status === 200 ) {
+                if (res.status === 200) {
                     console.log("Logging out.", res.data);
                     reset_state();
                 }
-                else{
+                else {
                     alert(res.data);
                     throw (new Error(res.data));
                 }
@@ -85,28 +85,28 @@ class Popup extends React.Component {
         console.log("done fetch? ", this.state.done_fetch);
         return (
             this.state.done_fetch === true ?
-            (<HashRouter>
-                <div className="App">
-                    <Switch>
-                        <Route path="/greetings"
-                            render={(props) => <Greetings {...props} user_name={this.state.user_name} user_id={this.state.user_id} onLogOut={this.onLogOut} />}
-                        />
-                        <Route path="/admin/register"
-                            render={(props) => <Register {...props}/>}
-                        />
-                        <Route path="/admin/login"
-                            render={(props) => <Login {...props} onLoggedIn={this.onLoggedIn} />}
-                        />
-                        {this.state.user_id ?
-                            <Redirect to="/greetings" />
-                            :
-                            <Redirect to="/admin/register" />
-                        }
-                    </Switch>
-                </div>
-            </HashRouter>)
-            :
-            (null)
+                (<HashRouter>
+                    <div className="App">
+                        <Switch>
+                            <Route path="/greetings"
+                                render={(props) => <Greetings {...props} user_name={this.state.user_name} user_id={this.state.user_id} onLogOut={this.onLogOut} />}
+                            />
+                            <Route path="/admin/register"
+                                render={(props) => <Register {...props} />}
+                            />
+                            <Route path="/admin/login"
+                                render={(props) => <Login {...props} onLoggedIn={this.onLoggedIn} />}
+                            />
+                            {this.state.user_id ?
+                                <Redirect to="/greetings" />
+                                :
+                                <Redirect to="/admin/register" />
+                            }
+                        </Switch>
+                    </div>
+                </HashRouter>)
+                :
+                (null)
         );
     }
 };
