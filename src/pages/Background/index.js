@@ -34,7 +34,7 @@ chrome.runtime.onMessage.addListener(
                     .then(res => {
                         console.log('Background onRegister receives reply from server: ', res.data);
                         if (res.status === 200) {
-                            console.log("Registered succeeded. Proceed.");
+                            console.log("Register succeeded. Proceed.");
                             sendResponse(res);
                         } else {
                             console.error(res);
@@ -64,6 +64,22 @@ chrome.runtime.onMessage.addListener(
                     })
                     .catch(err => {
                         console.error(err);
+                    })
+                return true;
+            case "onLogout":
+                axios.post('http://localhost:8080/admin/logout')
+                    .then(res => {
+                        console.log('Background onLogout receives reply from server: ', res.data);
+                        if (res.status === 200) {
+                            console.log("onLogout succeeded. Proceed.");
+                            sendResponse(res);
+                        } else {
+                            console.error(res);
+                            sendResponse(res);
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err)
                     })
                 return true;
             case 'productsToBeAdded':

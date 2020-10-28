@@ -3,8 +3,6 @@ import {
     Typography,
 } from '@material-ui/core';
 import './Login.css';
-import axios from 'axios';
-
 import {
     Link
 } from 'react-router-dom';

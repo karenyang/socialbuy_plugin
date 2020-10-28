@@ -10,8 +10,6 @@ import {
 import Greetings from '../../containers/greetings/Greetings';
 import Register from '../../containers/register/Register';
 import Login from '../../containers/login/Login';
-import axios from 'axios';
-
 import './Popup.css';
 
 class Popup extends React.Component {
@@ -56,24 +54,30 @@ class Popup extends React.Component {
         console.log("State set to, ", this.state);
     }
 
+    reset_state = () => {
+        this.setState({
+            user_name: "",
+            user_id: "",
+            done_fetch: true, 
+        });
+        console.log("State reset to, ", this.state);
+    }
+
     onLogOut = () => {
         console.log("about to log out");
-        axios.post('http://localhost:8080/admin/logout')
-            .then(res => {
-                if (res.status === 200) {
-                    this.setState({
-                        user_id: "",
-                        username: "",
-                    });
+        let reset_state = this.reset_state;
+        chrome.runtime.sendMessage({ type: "onLogout" },
+            function (res) {
+                console.log('this is the response from the background page for onLogout', res);
+                if (res.status === 200 ) {
+                    console.log("Logging out.", res.data);
+                    reset_state();
                 }
-                else {
+                else{
                     alert(res.data);
                     throw (new Error(res.data));
                 }
-            })
-            .catch(err => {
-                console.error(err)
-            })
+            });
     }
 
 
