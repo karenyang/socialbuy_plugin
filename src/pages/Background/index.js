@@ -17,6 +17,7 @@ chrome.runtime.onMessage.addListener(
                             sendResponse(res);
                         } else{
                             console.log(res);
+                            sendResponse(res);
                         }
                     }).catch(
                         error => {

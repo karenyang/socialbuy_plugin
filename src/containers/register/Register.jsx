@@ -9,7 +9,6 @@ import {
     Link
 } from 'react-router-dom';
 
-console.log("In register page now. ")
 class Register extends React.Component {
     constructor(props) {
         super(props);
@@ -21,26 +20,6 @@ class Register extends React.Component {
             new_password_repeat: "",
             user_id: "",
         };
-    }
-
-    componentDidMount = () => {
-        console.log("[Register] sending /user/info request to server");
-        let onLoggedIn = this.props.onLoggedIn;
-        let history = this.props.history;
-        chrome.runtime.sendMessage({ type: "onPopupInit" },
-            function (response) {
-                console.log('this is the response from the background page for onPopupInit message', response);
-                if (response.status === 200 && response.data.user_id !== "") {
-                    console.log("Already logged in before");
-                    console.log("Register.props.", Register.props);
-                    onLoggedIn({
-                        user_id: response.data.user_id,
-                        user_name: response.data.user_name,
-                    });
-                    let redirect_path = "/greetings";
-                    history.push(redirect_path);
-                }
-            });
     }
 
     handleInputChange = (event) => {
@@ -115,6 +94,8 @@ class Register extends React.Component {
 
 
     render() {
+        console.log("render register page now. ")
+
         return (
             <div className="container">
                 <div className='register-form'>
