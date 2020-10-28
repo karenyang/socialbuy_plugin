@@ -11,8 +11,10 @@ var userSchema = new mongoose.Schema({
     user_name: String,  //unique login name
     password_digest: String,  //the digest of user set password
     salt: String,  //8byte hex string salt to concat to the user set password
-    // TODO: Add products
-});
+    product_list: [String]
+},
+    { timestamps: true }
+);
 
 // the schema is useless so far
 // we need to create a model using it

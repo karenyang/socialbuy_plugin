@@ -51,50 +51,55 @@ app.use(session({
 // *************************************************************
 
 app.post('/user/add_products', function (request, response) {
-    console.log('server receives GET request /user/add_product');
+    console.log('server receives GET request /user/add_product ');
     if (request.session.user_id) {
+        console.log('request.session.user_id: ', request.session.user_id);
+
         let products = request.body;
         User.findOne({
-            user_id: request.session.user_id,
+            _id: request.session.user_id,
         }, function (err, user) {
-            if (!user) {
-                console.error('User with username:' + request.session.user_name + ' not found .');
-                response.status(400).send('User not found');
+            if (err) {
+                console.error(err);
+            }
+            if (user === null) {
+                console.error('User with username:' + request.session.user_name + ' not found.');
+                response.status(400).send('User not found.');
                 return;
             }
+            console.log("current user product list: ", user.product_list);
 
             // fetch comments for each photo
-            async.each(products, function (product, callback) {
-                let newProduct = new Product();
-                Object.assign(newProduct, product);
+            async.each(products, function (item, callback) {
                 // add product if it is not product list, add user to products' buyer list if it is already there
+                // Object.assign(item, {"buyer_list": [request.session.user_id]});
+                // console.log("item's buyer_list:", item.buyer_list );
                 Product.findOne({
-                    'product_link': newProduct.product_link
+                    'product_link': item.product_link
                 }, function (err, product) {
                     if (err) {
-                        // Query returned an error.  We pass it back to the browser with an Internal Service
-                        // Error (500) error code.
                         console.error('Server error in /user/add_products', err);
-                        response.status(500).send(JSON.stringify(err));
-                        return;
                     }
                     if (product) {
-                        response.status(400).send('product_link already exists: ' + product.product_link);
-                        let new_buyer_list = product.buyer_list;
-                        new_buyer_list.push(request.session.user_id);
-                        Object.assign(product, { "buyer_list": new_buyer_list }); //add current user to buyer list
+                        console.log("product existed: ", product);
+                        product.buyer_list.push(user.user_id);
                         product.save();
-                    } else {
-                        let new_buyer_list = [];
-                        new_buyer_list.push(request.session.user_id);
-                        Object.assign(newProduct, { "buyer_list": new_buyer_list }); //add current user to buyer list
-                        Product.create(newProduct,
-                            function (err, productObj) {
+                        if (!user.product_list.includes(product._id)) {
+                            user.product_list.push(product._id);
+                        }
+                        console.log("User current product list " + user.product_list);
+                        console.log("Add buyer to an existing product, " + product.product_title);
+                    }
+                    else {
+                        Object.assign(item, {"buyer_list": [request.session.user_id]});
+                        Product.create(item,
+                            function (err, newProduct) {
                                 if (err) {
                                     response.status(500).send(JSON.stringify(err));
                                 }
-                                console.log("new productObj created: ", productObj)
-                                productObj.save()
+                                user.product_list.push(newProduct._id);
+                                user.save();
+                                console.log("new newProduct created, ", newProduct);
                             })
                     }
                 })
@@ -104,59 +109,20 @@ app.post('/user/add_products', function (request, response) {
                     if (err) {
                         console.error(err);
                         response.status(500).send(JSON.stringify(err));
+                        return;
                     }
-                    else{
-                        response.status(200).send("Processed all products from user " + request.session.user_name);
+                    else {
+                        console.log("User current product list :", user.product_list);
+                        response.status(200).send("Success in adding products");
+                        return;
                     }
                 });
         });
 
-        // for (let i = 0; i < products.length; i++) {
-        //     let newProduct = new Product();
-        //     Object.assign(newProduct, products[i]);
-        //     // add product if it is not product list, add user to products' buyer list if it is already there
 
-        //     Product.findOne({
-        //         'product_link': newProduct.product_link
-        //     }, function (err, product) {
-        //         if (err) {
-        //             // Query returned an error.  We pass it back to the browser with an Internal Service
-        //             // Error (500) error code.
-        //             console.error('Server error in /user/add_products', err);
-        //             response.status(500).send(JSON.stringify(err));
-        //             return;
-        //         }
-        //         if (product) {
-        //             response.status(400).send('product_link already exists: ' + product.product_link);
-        //             let new_buyer_list = product.buyer_list;
-        //             new_buyer_list.push(request.session.user_id);
-        //             Object.assign(product, { "buyer_list": new_buyer_list }); //add current user to buyer list
-        //             product.save();
-        //             response.status(200).send('Product existed. Add user to buyer list');
-        //         } else {
-        //             let new_buyer_list = [];
-        //             new_buyer_list.push(request.session.user_id);
-        //             Object.assign(newProduct, { "buyer_list": new_buyer_list }); //add current user to buyer list
-        //             Product.create(newProduct,
-        //                 function (err, productObj) {
-        //                     if (err) {
-        //                         response.status(500).send(JSON.stringify(err));
-        //                     }
-        //                     console.log("new productObj created: ", productObj)
-        //                     productObj.save()
-        //                     response.status(200).send('New product added');
-        //                 })
-        //         }
-        //     })
-        // }
-
-        let output = {
-            user_id: request.session.user_id,
-        };
-
-        response.status(200).send(JSON.stringify(output));
     } else {
         response.status(400).send('Not logged in yet.');
+        return;
     }
 });
 
@@ -234,7 +200,7 @@ app.post('/admin/logout', function (request, response) {
 
 app.post('/admin/register', function (request, response) {
     const newUser = request.body;
-    // console.log('receive request for new user', newUser)
+    console.log('receive request for new user', newUser)
     if (!newUser) {
         response.status(400).send("New User cannot be empty.");
         return;
@@ -250,7 +216,7 @@ app.post('/admin/register', function (request, response) {
     let passwordEntry = passwordsalt.makePasswordEntry(newUser.password); // add salt and make hash
     Object.assign(newUser, {
         salt: passwordEntry.salt,
-        password_digest: passwordEntry.hash
+        password_digest: passwordEntry.hash,
     });
     delete newUser.password; //delete the password
 
@@ -258,19 +224,17 @@ app.post('/admin/register', function (request, response) {
         'user_name': newUser.user_name
     },
         function (err, user) {
-            if (user) {
-                response.status(400).send('user_name already exists: ' + user_name);
-                return;
+            if (user !== null) {
+                response.status(400).send('user_name already exists: ' + user.user_name);
             } else {
                 User.create(newUser,
                     function (err, userObj) {
                         if (err) {
                             response.status(500).send(JSON.stringify(err));
                         }
-                        // console.log("new userObj created, ", userObj)
-                        userObj.save()
+                        console.log("new userObj created, ", userObj);
+                        userObj.save();
                         response.status(200).send('New user registered');
-                        return;
                     })
             }
         })

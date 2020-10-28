@@ -20,10 +20,10 @@ chrome.runtime.onMessage.addListener(
                 })
                     .then(res => {
                         if (res.status === 200) {
-                            console.log("background successfully sent product data to database")
+                            console.log("background successfully sent product data to database, ", res.data );
                         }
                         else {
-                            console.error("background failed to sent product data to database");
+                            console.error("background failed to sent product data to database, ", res.data);
                         }
                     })
                     .catch(err => {

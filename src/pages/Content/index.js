@@ -15,15 +15,16 @@ if (url.includes('amazon.com/gp/cart')) {
 
     for (let i = 0; i < content.length - 1; i++) { //content.length - 1 because last block is alexa ads
         let product = content[i];
-        // console.log('product ', i, " ", product);
-        // console.log(product.innerText.split("\n"));
+        console.log('product ', i);
+        console.log(product.innerText.split("\n"));
         let cleanedUpValues = product.innerText.split("\n");
         let item = {};
         item.product_title = cleanedUpValues[0];
         console.log("product_title: ", item.product_title)
-
-        item.product_cost = cleanedUpValues[cleanedUpValues.length - 1];
-        console.log("product_cost: ", item.product_cost)
+        let cost_str = cleanedUpValues[cleanedUpValues.length - 1];
+        cost_str = cost_str.substring(1);
+        item.product_cost = parseFloat(cost_str);
+        console.log("product_cost: ", item.product_cost);
 
         let img = document.querySelector("#" + product.id + img_query_string);
         item.product_link = domain + img.getAttribute("href");
@@ -48,22 +49,24 @@ function fetchMoreProductInfo(item) {
                     let product_summary = "";
                     for (let i = 0; i < summary_list.length; i++) {
                         if (!summary_list[i].innerHTML.includes("</")) {
-                            product_summary += summary_list[i].innerHTML;
+                            product_summary.concat(summary_list[i].innerHTML);
                         }
                     }
                     item.product_summary = product_summary;
                     // console.log("product_summary: ", product_summary);
                     let variation_imgs = page.querySelectorAll("button > div > div > img");
-                    let product_variations = [];
+                    let product_variation_names = [];
+                    let product_variation_imgurls = [];
                     for (let i = 0; i < variation_imgs.length; i++) {
                         let imgurl = variation_imgs[i].getAttribute('src');
                         let name = variation_imgs[i].getAttribute('alt');
-                        product_variations.push({ "name": name, "imgurl": imgurl });
+                        product_variation_names.push(name);
+                        product_variation_imgurls.push(imgurl);
                     }
                     // console.log('product_variations: ',product_variations);
-                    item.product_variations = product_variations;
+                    item.product_variation_names = product_variation_names;
+                    item.product_variation_imgurls = product_variation_imgurls;
                     productsToBeAdded.push(item);
-
 
                 })
             .catch(
