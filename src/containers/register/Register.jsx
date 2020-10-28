@@ -3,7 +3,6 @@ import {
     Typography,
 } from '@material-ui/core';
 import './Register.css';
-import axios from 'axios';
 
 import {
     Link
@@ -55,18 +54,14 @@ class Register extends React.Component {
             new_password_repeat: "",
 
         });
-
-        axios.post('http://localhost:8080/admin/register', request, {
-            headers: {
-                'content-type': 'application/json',
-            }
-        })
-            .then(res => {
-                console.log('Register receives reply from server: ', res.data);
+        let history = this.props.history;
+        chrome.runtime.sendMessage({ type: "onRegister", data: request },
+            function (res) {
+                console.log('Register receives reply from background: ', res.data);
                 if (res.status === 200) {
-                    alert("Registered succeeded. You can log in now.");
+                    console.log("Registered succeeded. Proceed.");
                     let redirect_path = "/admin/login";
-                    this.props.history.push(redirect_path);
+                    history.push(redirect_path);
                 } else if (res.status === 250) {
                     console.error(res);
                     alert(res.data + ", please try again.");
@@ -75,15 +70,7 @@ class Register extends React.Component {
                     alert(res.data + ", register failed for other reasons. Please try again.");
                     throw new Error(res.data);
                 }
-            })
-            .catch(err => {
-                console.error(err)
-                if (err.response.status === 400) {
-                    console.error("Register failed. Please try again.");
-                } else {
-                    console.error("Register failed for other reasons. Please try again.");
-                }
-            })
+            });
     }
 
 

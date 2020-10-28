@@ -45,7 +45,6 @@ class Popup extends React.Component {
                     });
                 }
             });
-        
     }
 
     onLoggedIn = (data) => {

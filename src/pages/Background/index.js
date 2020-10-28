@@ -15,7 +15,7 @@ chrome.runtime.onMessage.addListener(
                         if (res.status === 200 && res.data.user_id !== "") {
                             console.log("Already logged in. server response data: ", res.data, res.data.user_name, res.data.user_id);
                             sendResponse(res);
-                        } else{
+                        } else {
                             console.log(res);
                             sendResponse(res);
                         }
@@ -24,13 +24,51 @@ chrome.runtime.onMessage.addListener(
                             console.log(error);
                         });
                 return true;
-                break;
+            case "onRegister":
+                console.log("About to register: ", message.data);
+                axios.post('http://localhost:8080/admin/register', message.data, {
+                    headers: {
+                        'content-type': 'application/json',
+                    }
+                })
+                    .then(res => {
+                        console.log('Background onRegister receives reply from server: ', res.data);
+                        if (res.status === 200) {
+                            console.log("Registered succeeded. Proceed.");
+                            sendResponse(res);
+                        } else {
+                            console.error(res);
+                            sendResponse(res);
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err)
+                    })
+                return true;
+            case "onLogin":
+                console.log("About to register: ", message.data);
+                axios.post('http://localhost:8080/admin/login', message.data, {
+                    headers: {
+                        'content-type': 'application/json',
+                    }
+                })
+                    .then(res => {
+                        console.log('Background onLogin receives reply from server: ', res.data);
+                        if (res.status === 200) {
+                            console.log("Login succeeded. Proceed.");
+                            sendResponse(res);
+                        } else {
+                            console.error(res);
+                            sendResponse(res);
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                    })
+                return true;
             case 'productsToBeAdded':
                 console.log("Background about to send product data to background: ", message.data);
-                let request = {
-                    data: message.data,
-                };
-                axios.post('http://localhost:8080/user/add_products', request, {
+                axios.post('http://localhost:8080/user/add_products', message.data, {
                     headers: {
                         'content-type': 'application/json',
                     }
@@ -48,7 +86,6 @@ chrome.runtime.onMessage.addListener(
                         console.error(err)
                     });
                 return true;
-            break;
             default:
                 console.log('couldnt find matching case');
         }

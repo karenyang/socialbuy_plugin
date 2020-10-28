@@ -146,13 +146,13 @@ app.post('/admin/login', function (request, response) {
             return;
         }
         if (!user) {
-            console.error('User with user_name:' + user_name + ' not found.');
+            console.error('User with user_name:' + user_name + ' not found');
             response.status(250).send('User of this user_name not registered: ' + user_name);
             return;
         }
         if (!passwordsalt.doesPasswordMatch(user.password_digest, user.salt, request.body.password)) {
             console.error('Wrong password');
-            response.status(250).send('Wrong password.');
+            response.status(250).send('Wrong password');
             return;
         }
         request.session.user_id = user._id;
@@ -217,7 +217,7 @@ app.post('/admin/register', function (request, response) {
     },
         function (err, user) {
             if (user !== null) {
-                console.log("User already existed before register.");
+                console.log("User already existed before register");
                 response.status(250).send('user_name already exists');
             } else {
                 User.create(newUser,
