@@ -38,6 +38,7 @@ chrome.runtime.onMessage.addListener(
                     }
                 })
                     .then(res => {
+                        window.localStorage.clear();
                         printResponse('onLogin', res);
                         setStorageItem('user', res.data);
                         sendResponse(res);

@@ -49,7 +49,7 @@ function fetchMoreProductInfo(item) {
                     let product_summary = "";
                     for (let i = 0; i < summary_list.length; i++) {
                         if (!summary_list[i].innerHTML.includes("</")) {
-                            product_summary.concat(summary_list[i].innerHTML);
+                            product_summary = product_summary.concat(summary_list[i].innerHTML);
                         }
                     }
                     item.product_summary = product_summary;

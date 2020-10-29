@@ -55,7 +55,7 @@ app.post('/user/add_products', function (request, response) {
     if (request.session.user_id) {
         console.log('request.session.user_id: ', request.session.user_id);
 
-        let products = request.body.data;
+        let products = request.body;
 
         User.findOne({
             _id: request.session.user_id,
@@ -84,16 +84,18 @@ app.post('/user/add_products', function (request, response) {
                     if (err) {
                         console.error(err);
                     }
-                    if (product) {
+                    if (product !== null) {
                         console.log("product existed: ", product);
                         if (!product.buyer_list.includes(user._id)){
                             product.buyer_list.push(user._id);
                             product.save();
+                            console.log("Add buyer to an existing product,  user:", user.user_name,  " product: " ,product.product_title);
+
                         }
                         if (!user.product_list.includes(product.product_link)) {
                             user.product_list.push(product.product_link);
+                            console.log("Add product to an user's  product list,  user:", user.user_name,  " product: " ,product.product_title);
                         }
-                        console.log("Add buyer to an existing product, " + product.product_title);
                     }
                     else {
                         Object.assign(item, { "buyer_list": [request.session.user_id] });
