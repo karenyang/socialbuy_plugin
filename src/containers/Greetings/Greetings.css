@@ -4,10 +4,15 @@
     left: 16px;
 }
 
+.button:hover {
+    background-color: #5469d4;
+}
 
-.bottom {
-    position: absolute;
-    top: 350px;
+
+.button {
+    position: relative;
+    top: 20px;
+    right: 20px;
   }
   
 .container{
@@ -17,6 +22,5 @@
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    margin: 12px 12px;
 }
 
