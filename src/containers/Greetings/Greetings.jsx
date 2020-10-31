@@ -29,11 +29,12 @@ const useStyles = makeStyles((theme) => ({
     paper: {
         color: theme.palette.text.secondary,
         width: 400,
-        maxHeight: 450,
-        overflow: 'auto',
     },
     expandOpen: {
         transform: 'rotate(180deg)',
+    },
+    button: {
+        right: "20",
     },
     expand: {
         transform: 'rotate(0deg)',
@@ -149,20 +150,20 @@ class Greetings extends Component {
                         <img class="topleft" src={icon} alt="extension icon" />
                     </Grid>
                     <Grid item xs={6}>
-                        <Typography variant="h5" color="inherit">
+                        <Typography variant="h5" color="inherit" style={{"fontSize": 20}}>
                             Welcome! {this.state.user_name}
                         </Typography>
                     </Grid>
                     <Grid item xs={3}>
-                        <Button className="button" onClick={this.props.onLogOut}>
+                        <Button className="button" onClick={this.props.onLogOut} style={{"fontSize": 10}}>
                             Log Out
 				        </Button>
                     </Grid>
                     <Grid item xs={12}>
-                        <Paper style={classes.paper}>
+                        <Paper style={{maxHeight: 450, overflow: 'auto'}}>
                             {
                                 this.state.self_product_list.map((product) => (
-                                    <Card key={product._id} m={50}>
+                                    <Card key={product._id}>
                                         <Grid container spacing={3} >
                                             <Grid item xs={4}>
                                                 <CardActionArea>
