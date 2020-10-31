@@ -133,10 +133,11 @@ class Greetings extends Component {
     handleExpandClick = (product_id) => {
         console.log('Expand Clicked');
         let new_product_expanded = this.state.product_expanded;
-        Object.assign(new_product_expanded, {product_id: !new_product_expanded[product_id]}); //toggle
+        new_product_expanded[product_id] = !new_product_expanded[product_id]; //toggle
         this.setState({
             product_expanded: new_product_expanded
         });
+        console.log("state update to", this.state);
     }
 
 
@@ -192,7 +193,7 @@ class Greetings extends Component {
                                                         className={clsx(classes.expand, {
                                                             [classes.expandOpen]: this.state.product_expanded[product._id],
                                                         })}
-                                                        onClick={this.handleExpandClick}
+                                                        onClick={() => this.handleExpandClick(product._id)}
                                                         aria-expanded={this.state.product_expanded[product._id]}
                                                         aria-label="show more"
                                                     >
