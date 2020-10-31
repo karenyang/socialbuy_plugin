@@ -98,31 +98,6 @@ app.get('/user_productlist/:user_id', function (request, response) {
                     response.status(200).send(JSON.stringify(output));
                 }
             });
-            // for (let i = 0; i < product_links.length; i++){
-            //     console.log("Finding prouct with link: ", product_links[i]);
-            //     Product.findOne({
-            //         product_link: product_links[i],
-            //     }, function (err, product){
-            //         if (err) {
-            //             console.error(err);
-            //         }
-            //         if (product === null) {
-            //             console.error('product with product_link:' + product_links[i] + ' not found.');
-            //         }
-            //         else{
-            //             console.log("Found product: ", product);
-            //             product_list.push(product);
-            //         }
-            //     });
-            // }
-            // let output = {
-            //     "user_name": user.user_name,
-            //     "product_list": product_list,
-            // }
-
-            // response.status(200).send(JSON.stringify(output));
-            // return;
-
         });
     }
     else {
@@ -154,7 +129,6 @@ app.post('/add_products/:user_id', function (request, response) {
 
             async.each(products, function (item ,callback) {
                 user.product_list.push(item.product_link);
-                user.save();
                 Product.findOne({
                     'product_link': item.product_link
                 }, function (err, product) {
@@ -191,49 +165,12 @@ app.post('/add_products/:user_id', function (request, response) {
                     console.error(err);
                     response.status(400).send(err);
                 } else {
+                    user.save();
                     console.log("Done adding all products from page");
                     response.status(200).send("Success in adding products");
                 }
+                return;
             });
-
-            // for (let i = 0; i < products.length; i++) {
-            //     let item = products[i];
-            //     user.product_list.push(item.product_link);
-            //     user.save();
-            //     // add product if it is not product list, add user to products' buyer list if it is already there
-            //     Product.findOne({
-            //         'product_link': item.product_link
-            //     }, function (err, product) {
-            //         if (err) {
-            //             console.error(err);
-            //         }
-            //         if (product !== null) {
-            //             console.log("product existed: ", product);
-            //             if (!product.buyer_list.includes(user._id)) {
-            //                 product.buyer_list.push(user._id);
-            //                 product.save();
-            //                 console.log("Add buyer to an existing product,  user:", user.user_name, " product: ", product.product_title);
-
-            //             }
-            //             if (!user.product_list.includes(product.product_link)) {
-            //                 user.product_list.push(product.product_link);
-            //                 console.log("Add product to an user's  product list,  user:", user.user_name, " product: ", product.product_title);
-            //             }
-            //         }
-            //         else {
-            //             Object.assign(item, { "buyer_list": [user_id] });
-            //             Product.create(item,
-            //                 function (err, newProduct) {
-            //                     if (err) {
-            //                         console.error(err);
-            //                     }
-            //                     console.log("new newProduct created, ", newProduct);
-            //                 })
-            //         }
-            //     })
-            // }
-            // response.status(200).send("Success in adding products");
-            // return;
         })
     }
     else {

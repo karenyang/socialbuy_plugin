@@ -63,7 +63,7 @@ chrome.runtime.onMessage.addListener(
 
             case 'productsToBeAdded':
                 if (userInfo === undefined || userInfo.user_id === undefined) {
-                    console.error("User have not logged in");
+                    console.log("User have not logged in");
                     sendResponse("User have not logged in");
                 } else {
                     console.log("Background about to send product data to background: ", message.data);
@@ -85,7 +85,7 @@ chrome.runtime.onMessage.addListener(
             case "onLoadSelfProductList":
                 console.log("Background about to get LoadSelfProductList data from background: ");
                 if (userInfo === undefined || userInfo.user_id === undefined) {
-                    console.error("User have not logged in");
+                    console.log("User have not logged in");
                     sendResponse("User have not logged in");
                 } else {
                     console.log("current user id", userInfo.user_id);
@@ -99,6 +99,10 @@ chrome.runtime.onMessage.addListener(
                             console.error(err)
                         });
                 }
+                return true;
+            case "onClickProduct":
+                console.log("Background about to open a new tab: ", message.data);
+                chrome.tabs.create({ url: "http://" + message.data });
                 return true;
 
             default:
