@@ -4,13 +4,4 @@
     left: 16px;
 }
 
-.button:hover {
-    background-color: #5469d4;
-}
 
-
-.button {
-    position: relative;
-    top: 20px;
-    right: 20px;
-  }

@@ -104,19 +104,19 @@ class Greetings extends Component {
             this.setState({
                 user_id: this.props.user_id
             });
-            const updateSelfProductList = this.updateSelfProductList;
-            chrome.runtime.sendMessage({ type: "onLoadSelfProductList" },
-                function (res) {
-                    console.log('Greetings receives reply from background for onLoadSelfProductList ', res.data);
-                    if (res.status === 200) {
-                        console.log("onLoadSelfProductList succeeded.");
-                        updateSelfProductList(res.data.product_list);
-                    }
-                    else {
-                        console.error(res.data + ", onLoadSelfProductList failed.");
-                    }
-                }
-            );
+            // const updateSelfProductList = this.updateSelfProductList;
+            // chrome.runtime.sendMessage({ type: "onLoadSelfProductList" },
+            //     function (res) {
+            //         console.log('Greetings receives reply from background for onLoadSelfProductList ', res.data);
+            //         if (res.status === 200) {
+            //             console.log("onLoadSelfProductList succeeded.");
+            //             updateSelfProductList(res.data.product_list);
+            //         }
+            //         else {
+            //             console.error(res.data + ", onLoadSelfProductList failed.");
+            //         }
+            //     }
+            // );
         }
 
     }
@@ -134,16 +134,20 @@ class Greetings extends Component {
         console.log('Expand Clicked');
         let new_product_expanded = this.state.product_expanded;
         new_product_expanded[product_id] = !new_product_expanded[product_id]; //toggle
-        this.setState({
-            product_expanded: new_product_expanded
-        });
+        // this.setState({
+        //     product_expanded: new_product_expanded
+        // });
         console.log("state update to", this.state);
     }
 
-
+    cropTitle = (product_title) => {
+        let title = product_title.split(" ");
+        return  title.slice(0,10).join(" ");
+    }
 
     render() {
         const classes = this.props;
+        
         return (
             <div className="container">
                 <Grid container spacing={3} >
@@ -174,7 +178,7 @@ class Greetings extends Component {
                                             <Grid item xs={8}>
                                                 <CardContent >
                                                     <Typography gutterBottom variant="body2" component="h5">
-                                                        {(product.product_title)}
+                                                        {this.cropTitle(product.product_title)}
                                                     </Typography>
 
                                                     <Typography variant="body2" color="textSecondary" component="p">
@@ -189,14 +193,20 @@ class Greetings extends Component {
                                                     <IconButton aria-label="share">
                                                         <ShareIcon />
                                                     </IconButton>
-                                                    <IconButton
-                                                        className={clsx(classes.expand, {
-                                                            [classes.expandOpen]: this.state.product_expanded[product._id],
-                                                        })}
-                                                        onClick={() => this.handleExpandClick(product._id)}
-                                                        aria-expanded={this.state.product_expanded[product._id]}
-                                                        aria-label="show more"
-                                                    >
+                                                    {this.is_expanded(photo)?
+                                                        <IconButton
+                                                            className={classes.expandOpen}
+                                                            onClick={this.onCollapes(product._id)}
+                                                            aria-expanded={ture}
+                                                            aria-label="show less"
+                                                        >
+                                                        :
+                                                        <IconButton
+                                                            className={classes.expand}
+                                                            onClick={this.onExpand(product._id)}
+                                                            aria-expanded={false}
+                                                            aria-label="show more"
+                                                        ></IconButton>
                                                         <ExpandMoreIcon />
                                                     </IconButton>
                                                 </CardActions>
