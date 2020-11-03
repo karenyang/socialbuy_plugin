@@ -17,9 +17,10 @@ import { makeStyles, withStyles } from '@material-ui/core/styles';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import ShareIcon from '@material-ui/icons/Share';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import IconButton from '@material-ui/core/IconButton';
-import clsx from 'clsx';
-
+import Collapse from '@material-ui/core/Collapse';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -29,19 +30,6 @@ const useStyles = makeStyles((theme) => ({
     paper: {
         color: theme.palette.text.secondary,
         width: 400,
-    },
-    expandOpen: {
-        transform: 'rotate(180deg)',
-    },
-    button: {
-        right: "20",
-    },
-    expand: {
-        transform: 'rotate(0deg)',
-        marginLeft: 'auto',
-        transition: theme.transitions.create('transform', {
-            duration: theme.transitions.duration.shortest,
-        }),
     },
 }));
 
@@ -61,7 +49,7 @@ class Greetings extends Component {
 
     updateSelfProductList = (product_list) => {
         let product_expanded = []
-        for (let i = 0; i < product_list.length; i++){
+        for (let i = 0; i < product_list.length; i++) {
             const product = product_list[i];
             product_expanded[product._id] = false;
         }
@@ -104,19 +92,19 @@ class Greetings extends Component {
             this.setState({
                 user_id: this.props.user_id
             });
-            // const updateSelfProductList = this.updateSelfProductList;
-            // chrome.runtime.sendMessage({ type: "onLoadSelfProductList" },
-            //     function (res) {
-            //         console.log('Greetings receives reply from background for onLoadSelfProductList ', res.data);
-            //         if (res.status === 200) {
-            //             console.log("onLoadSelfProductList succeeded.");
-            //             updateSelfProductList(res.data.product_list);
-            //         }
-            //         else {
-            //             console.error(res.data + ", onLoadSelfProductList failed.");
-            //         }
-            //     }
-            // );
+            const updateSelfProductList = this.updateSelfProductList;
+            chrome.runtime.sendMessage({ type: "onLoadSelfProductList" },
+                function (res) {
+                    console.log('Greetings receives reply from background for onLoadSelfProductList ', res.data);
+                    if (res.status === 200) {
+                        console.log("onLoadSelfProductList succeeded.");
+                        updateSelfProductList(res.data.product_list);
+                    }
+                    else {
+                        console.error(res.data + ", onLoadSelfProductList failed.");
+                    }
+                }
+            );
         }
 
     }
@@ -130,24 +118,55 @@ class Greetings extends Component {
         );
     }
 
-    handleExpandClick = (product_id) => {
-        console.log('Expand Clicked');
-        let new_product_expanded = this.state.product_expanded;
-        new_product_expanded[product_id] = !new_product_expanded[product_id]; //toggle
-        // this.setState({
-        //     product_expanded: new_product_expanded
-        // });
-        console.log("state update to", this.state);
-    }
 
     cropTitle = (product_title) => {
         let title = product_title.split(" ");
-        return  title.slice(0,10).join(" ");
+        return title.slice(0, 10).join(" ");
+    }
+
+    is_expanded = (product_id) => {
+        return this.state.product_expanded[product_id];
+    }
+
+    onExpandClick(product_id) {
+        console.log('Expand Clicked');
+        let new_product_expanded = this.state.product_expanded;
+        if (new_product_expanded[product_id] == true) {
+            console.error("Should not be able to click expand is already expanded.");
+        }
+        new_product_expanded[product_id] = true; //toggle
+        this.setState({
+            product_expanded: new_product_expanded
+        });
+        console.log("state update to", this.state);
+    }
+
+    onCollapesClick(product_id) {
+        console.log('Collapse Clicked');
+        let new_product_expanded = this.state.product_expanded;
+        if (new_product_expanded[product_id] == false) {
+            console.error("Should not be able to click expand is already expanded.");
+        }
+        new_product_expanded[product_id] = false; //toggle
+        this.setState({
+            product_expanded: new_product_expanded
+        });
+        console.log("state update to", this.state);
+    }
+
+    onDeleteProduct(product_id) {
+        console.log("product to be delete has id", product_id);
+        let new_self_product_list = this.state.self_product_list.filter(item => item['_id'] !== product_id);
+        let new_product_expanded = this.state.product_expanded;
+        delete new_product_expanded[product_id];
+        this.setState({
+            self_product_list: new_self_product_list,
+            product_expanded: new_product_expanded,
+        });
     }
 
     render() {
         const classes = this.props;
-        
         return (
             <div className="container">
                 <Grid container spacing={3} >
@@ -155,27 +174,27 @@ class Greetings extends Component {
                         <img class="topleft" src={icon} alt="extension icon" />
                     </Grid>
                     <Grid item xs={6}>
-                        <Typography variant="h5" color="inherit" style={{"fontSize": 20}}>
+                        <Typography variant="h5" color="inherit" style={{ "fontSize": 20 }}>
                             Welcome! {this.state.user_name}
                         </Typography>
                     </Grid>
                     <Grid item xs={3}>
-                        <Button className="button" onClick={this.props.onLogOut} style={{"fontSize": 10}}>
+                        <Button onClick={this.props.onLogOut} style={{ "fontSize": 10 }}>
                             Log Out
 				        </Button>
                     </Grid>
                     <Grid item xs={12}>
-                        <Paper style={{maxHeight: 450, overflow: 'auto'}}>
+                        <Paper style={{ maxHeight: 540, width: 400, overflow: 'auto' }}>
                             {
                                 this.state.self_product_list.map((product) => (
                                     <Card key={product._id}>
-                                        <Grid container spacing={3} >
+                                        <Grid container spacing={0}  >
                                             <Grid item xs={4}>
                                                 <CardActionArea>
                                                     <img alt={product.product_title} src={product.product_imgurl} width="100" onClick={() => { this.onClickProduct(product) }} />
                                                 </CardActionArea>
                                             </Grid>
-                                            <Grid item xs={8}>
+                                            <Grid item xs={7}>
                                                 <CardContent >
                                                     <Typography gutterBottom variant="body2" component="h5">
                                                         {this.cropTitle(product.product_title)}
@@ -186,32 +205,59 @@ class Greetings extends Component {
                                                     </Typography>
                                                 </CardContent>
 
-                                                <CardActions disableSpacing>
+                                                <CardActions>
                                                     <IconButton aria-label="add to favorites">
-                                                        <FavoriteIcon />
+                                                        <FavoriteIcon style={{ fontSize: 20 }}/>
                                                     </IconButton>
                                                     <IconButton aria-label="share">
-                                                        <ShareIcon />
+                                                        <ShareIcon style={{ fontSize: 20 }} />
                                                     </IconButton>
-                                                    {this.is_expanded(photo)?
-                                                        <IconButton
-                                                            className={classes.expandOpen}
-                                                            onClick={this.onCollapes(product._id)}
-                                                            aria-expanded={ture}
-                                                            aria-label="show less"
-                                                        >
-                                                        :
-                                                        <IconButton
-                                                            className={classes.expand}
-                                                            onClick={this.onExpand(product._id)}
-                                                            aria-expanded={false}
-                                                            aria-label="show more"
-                                                        ></IconButton>
-                                                        <ExpandMoreIcon />
+                                                    {
+                                                        this.is_expanded(product._id) ?
+                                                            <IconButton
+                                                                className={classes.expand}
+                                                                onClick={() => this.onCollapesClick(product._id)}
+                                                                aria-expanded={true}
+                                                                aria-label="show less"
+                                                            >
+                                                                <ExpandLessIcon style={{ fontSize: 20 }}/>
+                                                            </IconButton>
+                                                            :
+                                                            <IconButton
+                                                                className={classes.expandOpen}
+                                                                onClick={() => this.onExpandClick(product._id)}
+                                                                aria-expanded={false}
+                                                                aria-label="show more"
+                                                            >
+                                                                <ExpandMoreIcon style={{ fontSize: 20 }}/>
+                                                            </IconButton>
+                                                    }
+                                                </CardActions>
+                                                <Collapse in={this.is_expanded(product._id)} timeout="auto" unmountOnExit>
+                                                    <CardContent>
+                                                        <Typography paragraph>Product Summary:</Typography>
+                                                        <Typography paragraph>
+                                                            {product.product_summary}
+                                                        </Typography>
+                                                        <Typography paragraph>Product Reviews:</Typography>
+                                                        <Typography paragraph>
+                                                            To be added.
+                                                        </Typography>
+
+                                                    </CardContent>
+                                                </Collapse>
+                                            </Grid>
+                                            <Grid item xs={1}>
+                                                <CardActions>
+                                                    <IconButton
+                                                        style={{padding: 0, height: 18,  width: 18}} 
+                                                        iconStyle={{width: 18, height: 18}}
+                                                        onClick={() => this.onDeleteProduct(product._id)}
+                                                    >
+                                                        <DeleteIcon style={{ fontSize: 15 }} />
                                                     </IconButton>
                                                 </CardActions>
                                             </Grid>
-
                                         </Grid>
                                     </Card>
                                 ))
@@ -221,7 +267,7 @@ class Greetings extends Component {
                 </Grid>
 
 
-            </div>
+            </div >
         );
     }
 }
