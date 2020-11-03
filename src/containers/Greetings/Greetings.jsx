@@ -21,7 +21,9 @@ import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import IconButton from '@material-ui/core/IconButton';
 import Collapse from '@material-ui/core/Collapse';
 import DeleteIcon from '@material-ui/icons/Delete';
-
+import SearchIcon from '@material-ui/icons/Search';
+import TextField from '@material-ui/core/TextField';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 
 class Greetings extends Component {
     constructor(props) {
@@ -29,6 +31,7 @@ class Greetings extends Component {
         this.state = {
             user_name: this.props.user_name,
             user_id: this.props.user_id,
+            search_value: "",
             self_product_list: [],
             product_expanded: {},
         }
@@ -152,7 +155,7 @@ class Greetings extends Component {
             self_product_list: new_self_product_list,
             product_expanded: new_product_expanded,
         });
-        chrome.runtime.sendMessage({type: "onDeleteSelfProduct", data: product_id },
+        chrome.runtime.sendMessage({ type: "onDeleteSelfProduct", data: product_id },
             function (res) {
                 console.log('Greetings receives reply from background for onDeleteSelfProduct ', res.data);
                 if (res.status === 200) {
@@ -166,24 +169,65 @@ class Greetings extends Component {
 
     }
 
+
+    handleInputChange = (event) => {
+        const {
+            value,
+            name
+        } = event.target;
+        this.setState({
+            [name]: value
+        });
+    }
+
+    handleSearch = (event) => {
+        if (event.key === 'Enter') {
+            console.log('Searching for: ', event.target.value);
+            chrome.runtime.sendMessage({ type: "onHandleSearch", data: { "search_category": "friends", "search_key": event.target.value } },
+                function (res) {
+                    console.log('Greetings receives reply from background for onHandleSearch ', res.data);
+                    if (res.status === 200) {
+                        console.log("onHandleSearch succeeded.", res.data);
+                    }
+                    else {
+                        console.error(res.data + ", onHandleSearch failed.");
+                    }
+                }
+            );
+        }
+    }
+
     render() {
         return (
             <div className="container">
-                <Grid container spacing={3} >
-                    <Grid item xs={3}>
+                <Grid container spacing={0} alignItems="center" >
+                    <Grid item xs={2}>
                         <img class="topleft" src={icon} alt="extension icon" />
                     </Grid>
-                    <Grid item xs={6}>
-                        <Typography variant="h5" color="inherit" style={{ "fontSize": 15 }}>
-                            Recent Purchase
-                        </Typography>
+                    <Grid item xs={1}>
+                        <div className="searchicon">
+                            <SearchIcon style={{ "fontSize": 20, "alignItems": "center", "display": 'flex' }} />
+                        </div>
                     </Grid>
-                    <Grid item xs={3}>
-                        <Button onClick={this.props.onLogOut} style={{ "fontSize": 10 }}>
-                            Log Out
-				        </Button>
+                    <Grid item xs={7}>
+                        <div className="searchbox">
+                            <TextField placeholder="Search…" style={{ "padding": 1, "paddingLeft": 4, "width": '100%' }}
+                                name="search_value"
+                                value={this.state.search_value}
+                                onChange={this.handleInputChange}
+                                onKeyPress={this.handleSearch}
+                            />
+                        </div>
+                    </Grid>
+                    <Grid item xs={1}>
+                        <IconButton aria-label="Log out" onClick={this.props.onLogOut} >
+                            <ExitToAppIcon style={{ "fontSize": 18 }} />
+                        </IconButton>
                     </Grid>
                     <Grid item xs={12}>
+                        <Typography variant="h4" color="inherit" style={{ "fontSize": 16, "paddingTop": 5, "paddingBottom": 5 }}>
+                            Recent Purchase
+                        </Typography>
                         <Paper style={{ maxHeight: 540, width: 400, overflow: 'auto' }}>
                             {
                                 this.state.self_product_list.map((product) => (
@@ -207,7 +251,7 @@ class Greetings extends Component {
 
                                                 <CardActions>
                                                     <IconButton aria-label="add to favorites">
-                                                        <FavoriteIcon style={{ fontSize: 20 }}/>
+                                                        <FavoriteIcon style={{ fontSize: 20 }} />
                                                     </IconButton>
                                                     <IconButton aria-label="share">
                                                         <ShareIcon style={{ fontSize: 20 }} />
@@ -219,7 +263,7 @@ class Greetings extends Component {
                                                                 aria-expanded={true}
                                                                 aria-label="show less"
                                                             >
-                                                                <ExpandLessIcon style={{ fontSize: 20 }}/>
+                                                                <ExpandLessIcon style={{ fontSize: 20 }} />
                                                             </IconButton>
                                                             :
                                                             <IconButton
@@ -227,7 +271,7 @@ class Greetings extends Component {
                                                                 aria-expanded={false}
                                                                 aria-label="show more"
                                                             >
-                                                                <ExpandMoreIcon style={{ fontSize: 20 }}/>
+                                                                <ExpandMoreIcon style={{ fontSize: 20 }} />
                                                             </IconButton>
                                                     }
                                                 </CardActions>
@@ -248,7 +292,7 @@ class Greetings extends Component {
                                             <Grid item xs={1}>
                                                 <CardActions>
                                                     <IconButton
-                                                        style={{padding: 0, height: 18,  width: 18}} 
+                                                        style={{ padding: 0, height: 18, width: 18 }}
                                                         onClick={() => this.onDeleteProduct(product._id)}
                                                     >
                                                         <DeleteIcon style={{ fontSize: 15 }} />

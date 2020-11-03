@@ -49,6 +49,46 @@ app.use(session({
 // *************************************************************
 // Server API
 // *************************************************************
+app.post('/search/:user_id', function (request, response) {
+    console.log('server receives Get request /search ');
+    const search_category = request.body.search_category;
+    const search_key = request.body.search_key;
+    console.log('search_category: ', search_category, "search_key: ", search_key);
+    let user_id = request.params.user_id;
+    if (user_id) {
+        console.log('request.session.user_id: ', user_id);
+        User.findOne({
+            _id: user_id,
+        }, function (err, user) {
+            if (err) {
+                console.error(err);
+            }
+            if (user === null) {
+                console.error('User with id:' + user_id + ' not found.');
+                response.status(421).send('User not found.');
+                return;
+            }
+            if (search_category == 'friends') {
+                User.findOne({
+                    user_name: search_key,
+                }, function (err, friend) {
+                    if (user === null) {
+                        response.status(201).send('User not found.');
+                        return;
+                    }
+                    else {
+                        console.log("Found a friend: ", friend.user_name, friend.product_list);
+                        
+                        response.status(200).send(friend.user_name);
+                        return;
+                    }
+
+                });
+            }
+        });
+    }
+});
+
 
 app.get('/user_productlist/:user_id', function (request, response) {
     console.log('server receives Get request /user_productlist/ ');

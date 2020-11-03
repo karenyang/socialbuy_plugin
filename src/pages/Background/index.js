@@ -104,15 +104,15 @@ chrome.runtime.onMessage.addListener(
                 console.log("Background about to open a new tab: ", message.data);
                 chrome.tabs.create({ url: "http://" + message.data });
                 return true;
-            
+
             case "onDeleteSelfProduct":
-                console.log("Background about to Delete Self Product: ", message.data, message.data);
+                console.log("Background about to Delete Self Product: ", message.data);
                 if (userInfo === undefined || userInfo.user_id === undefined) {
                     console.log("User have not logged in");
                     sendResponse("User have not logged in");
                 } else {
                     console.log("current user id", userInfo.user_id);
-                    axios.post('http://localhost:8080/delete_product/' + userInfo.user_id, {"product_id": message.data})
+                    axios.post('http://localhost:8080/delete_product/' + userInfo.user_id, { "product_id": message.data })
                         .then(res => {
                             printResponse('onDeleteSelfProduct', res);
                             sendResponse(res);
@@ -122,6 +122,25 @@ chrome.runtime.onMessage.addListener(
                         });
                 }
                 return true;
+
+            case "onHandleSearch":
+                console.log("Background about to Handle Search: ", message.data);
+                if (userInfo === undefined || userInfo.user_id === undefined) {
+                    console.log("User have not logged in");
+                    sendResponse("User have not logged in");
+                } else {
+                    console.log("current user id", userInfo.user_id);
+                    axios.post('http://localhost:8080/search/' + userInfo.user_id, message.data)
+                        .then(res => {
+                            printResponse('onHandleSearch', res);
+                            sendResponse(res);
+                        })
+                        .catch(err => {
+                            console.error(err)
+                        });
+                }
+                return true;
+
             default:
                 console.log('couldnt find matching case');
         }
