@@ -104,7 +104,24 @@ chrome.runtime.onMessage.addListener(
                 console.log("Background about to open a new tab: ", message.data);
                 chrome.tabs.create({ url: "http://" + message.data });
                 return true;
-
+            
+            case "onDeleteSelfProduct":
+                console.log("Background about to Delete Self Product: ", message.data, message.data);
+                if (userInfo === undefined || userInfo.user_id === undefined) {
+                    console.log("User have not logged in");
+                    sendResponse("User have not logged in");
+                } else {
+                    console.log("current user id", userInfo.user_id);
+                    axios.post('http://localhost:8080/delete_product/' + userInfo.user_id, {"product_id": message.data})
+                        .then(res => {
+                            printResponse('onDeleteSelfProduct', res);
+                            sendResponse(res);
+                        })
+                        .catch(err => {
+                            console.error(err)
+                        });
+                }
+                return true;
             default:
                 console.log('couldnt find matching case');
         }

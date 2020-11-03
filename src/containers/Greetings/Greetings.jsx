@@ -22,17 +22,6 @@ import IconButton from '@material-ui/core/IconButton';
 import Collapse from '@material-ui/core/Collapse';
 import DeleteIcon from '@material-ui/icons/Delete';
 
-const useStyles = makeStyles((theme) => ({
-    root: {
-        display: 'flex',
-        marginTop: 20,
-    },
-    paper: {
-        color: theme.palette.text.secondary,
-        width: 400,
-    },
-}));
-
 
 class Greetings extends Component {
     constructor(props) {
@@ -163,10 +152,21 @@ class Greetings extends Component {
             self_product_list: new_self_product_list,
             product_expanded: new_product_expanded,
         });
+        chrome.runtime.sendMessage({type: "onDeleteSelfProduct", data: product_id },
+            function (res) {
+                console.log('Greetings receives reply from background for onDeleteSelfProduct ', res.data);
+                if (res.status === 200) {
+                    console.log("onDeleteSelfProduct succeeded.");
+                }
+                else {
+                    console.error(res.data + ", onDeleteSelfProduct failed.");
+                }
+            }
+        );
+
     }
 
     render() {
-        const classes = this.props;
         return (
             <div className="container">
                 <Grid container spacing={3} >
@@ -174,8 +174,8 @@ class Greetings extends Component {
                         <img class="topleft" src={icon} alt="extension icon" />
                     </Grid>
                     <Grid item xs={6}>
-                        <Typography variant="h5" color="inherit" style={{ "fontSize": 20 }}>
-                            Welcome! {this.state.user_name}
+                        <Typography variant="h5" color="inherit" style={{ "fontSize": 15 }}>
+                            Recent Purchase
                         </Typography>
                     </Grid>
                     <Grid item xs={3}>
@@ -215,7 +215,6 @@ class Greetings extends Component {
                                                     {
                                                         this.is_expanded(product._id) ?
                                                             <IconButton
-                                                                className={classes.expand}
                                                                 onClick={() => this.onCollapesClick(product._id)}
                                                                 aria-expanded={true}
                                                                 aria-label="show less"
@@ -224,7 +223,6 @@ class Greetings extends Component {
                                                             </IconButton>
                                                             :
                                                             <IconButton
-                                                                className={classes.expandOpen}
                                                                 onClick={() => this.onExpandClick(product._id)}
                                                                 aria-expanded={false}
                                                                 aria-label="show more"
@@ -251,7 +249,6 @@ class Greetings extends Component {
                                                 <CardActions>
                                                     <IconButton
                                                         style={{padding: 0, height: 18,  width: 18}} 
-                                                        iconStyle={{width: 18, height: 18}}
                                                         onClick={() => this.onDeleteProduct(product._id)}
                                                     >
                                                         <DeleteIcon style={{ fontSize: 15 }} />
@@ -272,4 +269,4 @@ class Greetings extends Component {
     }
 }
 
-export default withStyles(useStyles, { withTheme: true })(Greetings);
+export default Greetings;

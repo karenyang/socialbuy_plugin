@@ -64,13 +64,13 @@ app.get('/user_productlist/:user_id', function (request, response) {
             }
             if (user === null) {
                 console.error('User with id:' + user_id + ' not found.');
-                response.status(401).send('User not found.');
+                response.status(421).send('User not found.');
                 return;
             }
             let product_list = [];
             const product_links = user.product_list;
             console.log("Number of  products links: ", product_links.length, product_links);
-            async.each(product_links, function(link, callback) {
+            async.each(product_links, function (link, callback) {
                 Product.findOne({
                     product_link: link,
                 }, function (err, product) {
@@ -107,6 +107,67 @@ app.get('/user_productlist/:user_id', function (request, response) {
 
 });
 
+
+app.post('/delete_product/:user_id', function (request, response) {
+    console.log('server receives POST request /delete_product ');
+    let user_id = request.params.user_id;
+    if (user_id) {
+        console.log('user_id: ', user_id);
+        let product_id = request.body["product_id"];
+        console.log('product_id: ', request.body);
+
+        User.findOne({
+            _id: user_id,
+        }, function (err, user) {
+            if (err) {
+                console.error(err);
+                response.status(422).send(err);
+            }
+            if (user === null) {
+                console.error('User with id:' + user_id + ' not found.');
+                response.status(421).send('User not found.');
+                return;
+            }
+            Product.findOne({
+                _id: product_id,
+            }, function (err, product) {
+                if (err) {
+                    console.error(err);
+                    response.status(422).send(err);
+                    return;
+                }
+                if (product === null) {
+                    console.error('Product with id:' + product_id + ' not found.');
+                    response.status(421).send('Product not found.');
+                    return;
+                }
+                const idx1 = user.product_list.indexOf(product.product_link);
+                if (idx1 === -1) {
+                    console.error('Product with id:' + product_id + ' not found in user product list');
+                    response.status(421).send('Product not found in user product list');
+                    return;
+                }
+                user.product_list.splice(idx1, 1);
+                user.save()
+                const idx2 = product.buyer_list.indexOf(user._id);
+                if (idx2 === -1) {
+                    console.error('user with id:' + user._id + ' not found in  product buyer list');
+                    response.status(421).send('User not found in product buyer list');
+                    return;
+                }
+                product.buyer_list.splice(idx2, 1);
+                product.save();
+                response.status(200).send('Success in deleting the product');
+            });
+        });
+    } else {
+        response.status(400).send('Not logged in yet.');
+        return;
+    }
+});
+
+
+
 app.post('/add_products/:user_id', function (request, response) {
     console.log('server receives POST request /add_product ');
     let user_id = request.params.user_id;
@@ -118,16 +179,18 @@ app.post('/add_products/:user_id', function (request, response) {
         }, function (err, user) {
             if (err) {
                 console.error(err);
+                response.status(422).send(err);
+
             }
             if (user === null) {
                 console.error('User with id:' + user_id + ' not found.');
-                response.status(401).send('User not found.');
+                response.status(421).send('User not found.');
                 return;
             }
             // fetch comments for each photo
             console.log("products: ", products);
 
-            async.each(products, function (item ,callback) {
+            async.each(products, function (item, callback) {
                 user.product_list.push(item.product_link);
                 Product.findOne({
                     'product_link': item.product_link
@@ -160,7 +223,7 @@ app.post('/add_products/:user_id', function (request, response) {
                     }
                     callback(null);
                 })
-            }, function (err){
+            }, function (err) {
                 if (err) {
                     console.error(err);
                     response.status(400).send(err);
@@ -274,7 +337,7 @@ app.post('/admin/register', function (request, response) {
                         response.status(200).send('New user registered');
                     })
             }
-        })
+        });
 
 });
 
