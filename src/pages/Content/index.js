@@ -28,6 +28,9 @@ if (url.includes('amazon.com/gp/cart')) {
 
         let img = document.querySelector("#" + product.id + img_query_string);
         item.product_link = domain + img.getAttribute("href");
+        if (item.product_link.includes("ref=")) {
+            item.product_link = item.product_link.split('ref=')[0];
+        }
         console.log("product_link:  ", item.product_link);
         item.product_imgurl = img.firstElementChild.getAttribute("src");
         console.log("product_imgurl:  ", item.product_imgurl);

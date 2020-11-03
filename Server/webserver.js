@@ -90,6 +90,7 @@ app.get('/user_productlist/:user_id', function (request, response) {
                     console.error("Failed to fetch user's product list");
                     response.status(400).send("Failed to fetch user's product list ");
                 } else {
+                    product_list.sort((a, b) => b.createdAt > a.createdAt ? 1 : -1);
                     console.log("Done fetching all product lists.");
                     let output = {
                         "user_name": user.user_name,
@@ -191,14 +192,13 @@ app.post('/add_products/:user_id', function (request, response) {
             console.log("products: ", products);
 
             async.each(products, function (item, callback) {
-                user.product_list.push(item.product_link);
                 Product.findOne({
                     'product_link': item.product_link
                 }, function (err, product) {
                     if (err) {
                         callback(err);
                     }
-                    if (product !== null) {
+                    if (product) {
                         console.log("product existed: ", product.product_title);
                         if (!product.buyer_list.includes(user_id)) {
                             product.buyer_list.push(user_id);
@@ -220,6 +220,7 @@ app.post('/add_products/:user_id', function (request, response) {
                                 }
                                 console.log("new newProduct created, ", newProduct.product_title);
                             })
+
                     }
                     callback(null);
                 })
