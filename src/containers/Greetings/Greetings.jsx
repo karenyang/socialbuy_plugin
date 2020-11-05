@@ -187,10 +187,10 @@ class Greetings extends Component {
                 function (res) {
                     console.log('Greetings receives reply from background for onHandleSearch ', res.data);
                     if (res.status === 200) {
-                        console.log("onHandleSearch succeeded.", res.data);
+                        this.setState({ search_result: res.data });
                     }
                     else {
-                        console.error(res.data + ", onHandleSearch failed.");
+                        this.setState({ search_result: "" });
                     }
                 }
             );

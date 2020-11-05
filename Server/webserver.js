@@ -68,7 +68,7 @@ app.post('/search/:user_id', function (request, response) {
                 response.status(421).send('User not found.');
                 return;
             }
-            if (search_category == 'friends') {
+            if (search_category === 'friends') {
                 User.findOne({
                     user_name: search_key,
                 }, function (err, friend) {
