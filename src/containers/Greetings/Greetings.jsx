@@ -24,6 +24,8 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import SearchIcon from '@material-ui/icons/Search';
 import TextField from '@material-ui/core/TextField';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import IconTabs from '../main/main';
+
 
 class Greetings extends Component {
     constructor(props) {
@@ -34,6 +36,7 @@ class Greetings extends Component {
             search_value: "",
             self_product_list: [],
             product_expanded: {},
+            search_result: "",
         }
         console.log(this.state);
     }
@@ -306,7 +309,7 @@ class Greetings extends Component {
                         </Paper>
                     </Grid>
                 </Grid>
-
+                <IconTabs/>
 
             </div >
         );

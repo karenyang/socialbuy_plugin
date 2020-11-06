@@ -78,7 +78,6 @@ app.post('/search/:user_id', function (request, response) {
                     }
                     else {
                         console.log("Found a friend: ", friend.user_name, friend.product_list);
-                        
                         response.status(200).send(friend.user_name);
                         return;
                     }

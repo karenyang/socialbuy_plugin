@@ -93,9 +93,6 @@ class Popup extends React.Component {
                             <Route path="/greetings"
                                 render={(props) => <Greetings {...props} user_name={this.state.user_name} user_id={this.state.user_id} onLogOut={this.onLogOut} />}
                             />
-                            <Route path="/main"
-                                render={(props) => <Main {...props} />}
-                            />
                             <Route path="/admin/register"
                                 render={(props) => <Register {...props} />}
                             />
@@ -103,7 +100,7 @@ class Popup extends React.Component {
                                 render={(props) => <Login {...props} onLoggedIn={this.onLoggedIn} />}
                             />
                             {this.state.user_id ?
-                                <Redirect to="/main" />
+                                <Redirect to="/greetings" />
                                 :
                                 <Redirect to="/admin/register" />
                             }

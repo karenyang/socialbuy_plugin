@@ -64,9 +64,9 @@ import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import PhoneIcon from '@material-ui/icons/Phone';
-import FavoriteIcon from '@material-ui/icons/Favorite';
-import PersonPinIcon from '@material-ui/icons/PersonPin';
+import SearchIcon from '@material-ui/icons/Search';
+import WhatshotIcon from '@material-ui/icons/Whatshot';
+import GroupIcon from '@material-ui/icons/Group';
 
 const useStyles = makeStyles({
     root: {
@@ -95,9 +95,9 @@ export default function IconTabs() {
                 textColor="primary"
                 aria-label="icon tabs example"
             >
-                <Tab icon={<PhoneIcon />} aria-label="phone" />
-                <Tab icon={<FavoriteIcon />} aria-label="favorite" />
-                <Tab icon={<PersonPinIcon />} aria-label="person" />
+                <Tab icon={<WhatshotIcon />} aria-label="popular" />
+                <Tab icon={<SearchIcon />} aria-label="search" />
+                <Tab icon={<GroupIcon />} aria-label="admin" />
             </Tabs>
         </AppBar>
     
