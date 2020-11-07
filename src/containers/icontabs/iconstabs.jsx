@@ -77,14 +77,17 @@ const useStyles = makeStyles({
     },
 });
 
-export default function IconTabs() {
+
+const IconTabs = ({handleTabChange}) => {
     const classes = useStyles();
     const [value, setValue] = React.useState(0);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
+        handleTabChange(newValue);
     };
-
+    
+    
     return (
         <AppBar square position="fixed" color="transparent" className={classes.root}>
             <Tabs
@@ -95,7 +98,7 @@ export default function IconTabs() {
                 textColor="primary"
                 aria-label="icon tabs example"
             >
-                <Tab icon={<WhatshotIcon />} aria-label="popular" />
+                <Tab icon={<WhatshotIcon />} aria-label="popular"  />
                 <Tab icon={<SearchIcon />} aria-label="search" />
                 <Tab icon={<GroupIcon />} aria-label="admin" />
             </Tabs>
@@ -103,3 +106,5 @@ export default function IconTabs() {
     
   );
 }
+
+export default IconTabs;

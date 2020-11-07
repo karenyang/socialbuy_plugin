@@ -10,7 +10,6 @@ import {
 import Greetings from '../../containers/greetings/Greetings';
 import Register from '../../containers/register/Register';
 import Login from '../../containers/login/Login';
-import Main from '../../containers/main/Main';
 
 import './Popup.css';
 
