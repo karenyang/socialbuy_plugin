@@ -49,6 +49,97 @@ app.use(session({
 // *************************************************************
 // Server API
 // *************************************************************
+app.get('/friendslist/:user_id', function(request, response) {
+    console.log('server receives Get request /friendslist ' );
+    let user_id = request.params.user_id;
+    if (user_id) {
+        console.log('request.session.user_id: ', user_id);
+        User.findOne({
+            _id: user_id,
+        }, function (err, user) {
+            if (err) {
+                console.error(err);
+            }
+            if (user === null) {
+                console.error('User with id:' + user_id + ' not found.');
+                response.status(421).send('User not found.');
+                return;
+            }
+            let friends_list = [];
+            console.log("Number of  products links: ", user.friends_list.length);
+            async.each(user.friends_list, function (friend_id, callback) {
+                User.findOne({
+                    _id: friend_id,
+                }, function (err, friend) {
+                    if (err) {
+                        callback(err);
+                    }
+                    if (friend === null) {
+                        callback('friend with id:' + friend_id + ' not found.');
+                    }
+                    else {
+                        friends_list.push(friend);
+                        callback(null);
+                    }
+                });
+            }, function (err) {
+                if (err) {
+                    console.error("Failed to fetch user's friend list");
+                    response.status(400).send("Failed to fetch user's friend list ");
+                } else {
+                    friends_list.sort((a, b) => b.createdAt > a.createdAt ? 1 : -1);
+                    console.log("Done fetching friends list.");
+                    let output = {
+                        "user_name": user.user_name,
+                        "friends_list": friends_list,
+                    }
+                    response.status(200).send(JSON.stringify(output));
+                }
+            });
+        });
+    }
+});
+
+
+app.post('/addfriend/:user_id', function (request, response) {
+    console.log('server receives Get request /addfriend ');
+    const friend_username = request.body.friend_username;
+    console.log('friend_username: ', friend_username);
+    let user_id = request.params.user_id;
+    if (user_id) {
+        console.log('request.session.user_id: ', user_id);
+        User.findOne({
+            _id: user_id,
+        }, function (err, user) {
+            if (err) {
+                console.error(err);
+            }
+            if (user === null) {
+                console.error('User with id:' + user_id + ' not found.');
+                response.status(421).send('User not found.');
+                return;
+            }
+            User.findOne({
+                user_name: friend_username,
+            }, function (err, friend) {
+                if (user === null) {
+                    response.status(201).send('User not found.');
+                    return;
+                }
+                else {
+                    console.log("Will add a friend: ", friend.user_name);
+                    user.friends_list.push(friend._id);
+                    user.save();
+                    response.status(200).send(user.friends_list);
+                    return;
+                }
+
+            });
+
+        });
+    }
+});
+
 app.post('/search/:user_id', function (request, response) {
     console.log('server receives Get request /search ');
     const search_category = request.body.search_category;
@@ -77,7 +168,7 @@ app.post('/search/:user_id', function (request, response) {
                         return;
                     }
                     else {
-                        console.log("Found a friend: ", friend.user_name, friend.product_list);
+                        console.log("Found a friend: ", friend.user_name, friend.bought_product_list);
                         response.status(200).send(friend.user_name);
                         return;
                     }
@@ -89,8 +180,8 @@ app.post('/search/:user_id', function (request, response) {
 });
 
 
-app.get('/user_productlist/:user_id', function (request, response) {
-    console.log('server receives Get request /user_productlist/ ');
+app.get('/user_bought_productlist/:user_id', function (request, response) {
+    console.log('server receives Get request /user_bought_productlist/ ');
 
     let user_id = request.params.user_id;
     if (user_id) {
@@ -106,8 +197,8 @@ app.get('/user_productlist/:user_id', function (request, response) {
                 response.status(421).send('User not found.');
                 return;
             }
-            let product_list = [];
-            const product_links = user.product_list;
+            let bought_product_list = [];
+            const product_links = user.bought_product_list;
             console.log("Number of  products links: ", product_links.length, product_links);
             async.each(product_links, function (link, callback) {
                 Product.findOne({
@@ -120,7 +211,7 @@ app.get('/user_productlist/:user_id', function (request, response) {
                         callback('product with product_link:' + link + ' not found.');
                     }
                     else {
-                        product_list.push(product);
+                        bought_product_list.push(product);
                         callback(null);
                     }
                 });
@@ -129,11 +220,11 @@ app.get('/user_productlist/:user_id', function (request, response) {
                     console.error("Failed to fetch user's product list");
                     response.status(400).send("Failed to fetch user's product list ");
                 } else {
-                    product_list.sort((a, b) => b.createdAt > a.createdAt ? 1 : -1);
+                    bought_product_list.sort((a, b) => b.createdAt > a.createdAt ? 1 : -1);
                     console.log("Done fetching all product lists.");
                     let output = {
                         "user_name": user.user_name,
-                        "product_list": product_list,
+                        "bought_product_list": bought_product_list,
                     }
                     response.status(200).send(JSON.stringify(output));
                 }
@@ -148,7 +239,7 @@ app.get('/user_productlist/:user_id', function (request, response) {
 });
 
 
-app.post('/delete_product/:user_id', function (request, response) {
+app.post('/delete_bought_product/:user_id', function (request, response) {
     console.log('server receives POST request /delete_product ');
     let user_id = request.params.user_id;
     if (user_id) {
@@ -181,13 +272,13 @@ app.post('/delete_product/:user_id', function (request, response) {
                     response.status(421).send('Product not found.');
                     return;
                 }
-                const idx1 = user.product_list.indexOf(product.product_link);
+                const idx1 = user.bought_product_list.indexOf(product.product_link);
                 if (idx1 === -1) {
                     console.error('Product with id:' + product_id + ' not found in user product list');
                     response.status(421).send('Product not found in user product list');
                     return;
                 }
-                user.product_list.splice(idx1, 1);
+                user.bought_product_list.splice(idx1, 1);
                 user.save()
                 const idx2 = product.buyer_list.indexOf(user._id);
                 if (idx2 === -1) {
@@ -208,7 +299,7 @@ app.post('/delete_product/:user_id', function (request, response) {
 
 
 
-app.post('/add_products/:user_id', function (request, response) {
+app.post('/add_bought_products/:user_id', function (request, response) {
     console.log('server receives POST request /add_product ');
     let user_id = request.params.user_id;
     if (user_id) {
@@ -245,8 +336,8 @@ app.post('/add_products/:user_id', function (request, response) {
                             console.log("Add buyer to an existing product,  user:", user.user_name, " product: ", product.product_title);
 
                         }
-                        if (!user.product_list.includes(product.product_link)) {
-                            user.product_list.push(product.product_link);
+                        if (!user.bought_product_list.includes(product.product_link)) {
+                            user.bought_product_list.push(product.product_link);
                             console.log("Add product to an user's  product list,  user:", user.user_name, " product: ", product.product_title);
                         }
                     }
@@ -358,7 +449,7 @@ app.post('/admin/register', function (request, response) {
         password_digest: passwordEntry.hash,
     });
     delete newUser.password; //delete the password
-
+   
     User.findOne({
         'user_name': newUser.user_name
     },
@@ -372,8 +463,10 @@ app.post('/admin/register', function (request, response) {
                         if (err) {
                             response.status(500).send(JSON.stringify(err));
                         }
-                        console.log("new userObj created, ", userObj);
+                        userObj.profile_img =  "https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png";  // default profile img
                         userObj.save();
+                        console.log("new userObj created, ", userObj);
+
                         response.status(200).send('New user registered');
                     })
             }

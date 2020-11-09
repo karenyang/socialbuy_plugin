@@ -61,20 +61,20 @@ chrome.runtime.onMessage.addListener(
                 window.localStorage.clear();
                 return true;
 
-            case 'productsToBeAdded':
+            case 'onBoughtProductsToBeAdded':
                 if (userInfo === undefined || userInfo.user_id === undefined) {
                     console.log("User have not logged in");
                     sendResponse("User have not logged in");
                 } else {
                     console.log("Background about to send product data to background: ", message.data);
                     console.log("current user id", userInfo.user_id);
-                    axios.post('http://localhost:8080/add_products/' + userInfo.user_id, message.data, {
+                    axios.post('http://localhost:8080/add_bought_products/' + userInfo.user_id, message.data, {
                         headers: {
                             'content-type': 'application/json',
                         }
                     })
                         .then(res => {
-                            printResponse('productsToBeAdded', res);
+                            printResponse('onBoughtProductsToBeAdded', res);
                             sendResponse(res);
                         })
                         .catch(err => {
@@ -82,7 +82,7 @@ chrome.runtime.onMessage.addListener(
                         });
                 }
                 return true;
-            case "onLoadSelfProductList":
+            case "onLoadSelfBoughtProductList":
                 console.log("Background about to get LoadSelfProductList data from background: ");
                 if (userInfo === undefined || userInfo.user_id === undefined) {
                     console.log("User have not logged in");
@@ -90,9 +90,9 @@ chrome.runtime.onMessage.addListener(
                 } else {
                     console.log("current user id", userInfo.user_id);
 
-                    axios.get('http://localhost:8080/user_productlist/' + userInfo.user_id)
+                    axios.get('http://localhost:8080/user_bought_productlist/' + userInfo.user_id)
                         .then(res => {
-                            printResponse('onLoadSelfProductList', res);
+                            printResponse('onLoadSelfBoughtProductList', res);
                             sendResponse(res);
                         })
                         .catch(err => {
@@ -105,16 +105,16 @@ chrome.runtime.onMessage.addListener(
                 chrome.tabs.create({ url: "http://" + message.data });
                 return true;
 
-            case "onDeleteSelfProduct":
-                console.log("Background about to Delete Self Product: ", message.data);
+            case "onDeleteSelfBoughtProduct":
+                console.log("Background about to Delete Self Bought Product: ", message.data);
                 if (userInfo === undefined || userInfo.user_id === undefined) {
                     console.log("User have not logged in");
                     sendResponse("User have not logged in");
                 } else {
                     console.log("current user id", userInfo.user_id);
-                    axios.post('http://localhost:8080/delete_product/' + userInfo.user_id, { "product_id": message.data })
+                    axios.post('http://localhost:8080/delete_bought_product/' + userInfo.user_id, { "product_id": message.data })
                         .then(res => {
-                            printResponse('onDeleteSelfProduct', res);
+                            printResponse('onDeleteSelfBoughtProduct', res);
                             sendResponse(res);
                         })
                         .catch(err => {
@@ -133,6 +133,42 @@ chrome.runtime.onMessage.addListener(
                     axios.post('http://localhost:8080/search/' + userInfo.user_id, message.data)
                         .then(res => {
                             printResponse('onHandleSearch', res);
+                            sendResponse(res);
+                        })
+                        .catch(err => {
+                            console.error(err)
+                        });
+                }
+                return true;
+
+            case "onAddFriend":
+                console.log("Background about to Handle onAddFriend: ", message.data);
+                if (userInfo === undefined || userInfo.user_id === undefined) {
+                    console.log("User have not logged in");
+                    sendResponse("User have not logged in");
+                } else {
+                    console.log("current user id", userInfo.user_id);
+                    axios.post('http://localhost:8080/addfriend/' + userInfo.user_id, message.data)
+                        .then(res => {
+                            printResponse('onAddFriend', res);
+                            sendResponse(res);
+                        })
+                        .catch(err => {
+                            console.error(err)
+                        });
+                }
+                return true;
+
+            case "onLoadFriendsList":
+                console.log("Background about to Handle onLoadFriendsList. ");
+                if (userInfo === undefined || userInfo.user_id === undefined) {
+                    console.log("User have not lpogged in");
+                    sendResponse("User have not logged in");
+                } else {
+                    console.log("current user id", userInfo.user_id);
+                    axios.get('http://localhost:8080/friendslist/' + userInfo.user_id)
+                        .then(res => {
+                            printResponse('onLoadFriendsList', res);
                             sendResponse(res);
                         })
                         .catch(err => {

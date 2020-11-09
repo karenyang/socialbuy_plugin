@@ -31,7 +31,7 @@ class SearchPage extends Component {
         super(props);
         this.state = {
             search_value: "",
-            search_result: "",
+            search_results: "",
         }
         console.log(this.state);
     }
@@ -48,10 +48,15 @@ class SearchPage extends Component {
 
     updateSearchResult = (res) => {
         if (res.status === 200) {
-            this.setState({ search_result: res.data });
+            if (!Array.isArray(res.data)) {
+                this.setState({ search_results: [res.data] });
+            }
+            else {
+                this.setState({ search_results: res.data });
+            }
         }
         else {
-            this.setState({ search_result: "" });
+            this.setState({ search_results: "" });
         }
     }
 
@@ -68,13 +73,22 @@ class SearchPage extends Component {
         }
     }
 
+    onAddFriend = (name) => {
+        console.log("onAddFriend: ", name);
+        chrome.runtime.sendMessage({ type: "onAddFriend", data: { "friend_username": name } },
+            function (res) {
+                console.log('SearchPage receives reply from background for onAddFriend ', res.data);
+            }
+        );
+    }
+
     render() {
         return (
             <Grid container spacing={0} alignItems="center" >
                 <Grid item xs={2}>
                     <img src={icon} alt="extension icon" />
                 </Grid>
-                <Grid item xs={1}>
+                <Grid item xs={2}>
                     <div className="searchicon">
                         <SearchIcon style={{ "fontSize": 20, "alignItems": "center", "display": 'flex' }} />
                     </div>
@@ -89,8 +103,34 @@ class SearchPage extends Component {
                         />
                     </div>
                 </Grid>
-                <Grid item xs={1}>
-                </Grid>
+                {this.state.search_results !== "" &&
+                    <Paper style={{ maxHeight: 540, width: 400, marginTop: 5, overflow: 'auto' }}>
+                        {
+                            this.state.search_results.map((result) => (
+                                <Card key={result}>
+                                    <Grid container spacing={0}  >
+                                        
+                                        <Grid item xs={7}>
+                                            <CardContent >
+                                                <Typography gutterBottom variant="body2" component="h5">
+                                                    {result}
+                                                </Typography>
+                                            </CardContent>
+                                        </Grid>
+                                        <Grid item xs={5}>
+                                            <CardActions>
+                                                <Button style={{ textTransform: "none" }} 
+                                                    onClick={() => this.onAddFriend(result)}
+                                                >
+                                                    Add Friend
+                                                </Button>
+                                            </CardActions>
+                                        </Grid>
+                                    </Grid>
+                                </Card>
+                            ))
+                        }
+                    </Paper>}
             </Grid>
         );
     }

@@ -5,7 +5,7 @@ var url = window.location.href;
 console.log('In Content script started.');
 console.log('Current URL: ', url);
 
-let productsToBeAdded = [];
+let onBoughtProductsToBeAdded = [];
 
 if (url.includes('amazon.com/gp/cart')) {
     let domain = "www.amazon.com";
@@ -69,7 +69,7 @@ function fetchMoreProductInfo(item) {
                     // console.log('product_variations: ',product_variations);
                     item.product_variation_names = product_variation_names;
                     item.product_variation_imgurls = product_variation_imgurls;
-                    productsToBeAdded.push(item);
+                    onBoughtProductsToBeAdded.push(item);
 
                 })
             .catch(
@@ -80,11 +80,11 @@ function fetchMoreProductInfo(item) {
 }
 
 setTimeout(function () {
-    if (productsToBeAdded.length > 0) {
-        sendToBackground("productsToBeAdded", productsToBeAdded);
+    if (onBoughtProductsToBeAdded.length > 0) {
+        sendToBackground("onBoughtProductsToBeAdded", onBoughtProductsToBeAdded);
     }
 },
-    5000); //update every 5 sec
+    7000); //update every 7 sec
 
 function sendToBackground(eventName, eventData, callback) {
     console.log("sending to background.");
@@ -93,7 +93,7 @@ function sendToBackground(eventName, eventData, callback) {
             console.log('this is the response from the background page for the ' + eventName + ' Event: ', response);
             if (response.status === 200) {
                 console.log("add_product succeeded.", response.data);
-                productsToBeAdded = []; //clear
+                onBoughtProductsToBeAdded = []; //clear
             } else {
                 console.log("add_product failed.", response.data);
             }

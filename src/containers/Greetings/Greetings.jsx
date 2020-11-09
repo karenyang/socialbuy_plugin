@@ -15,28 +15,11 @@ class Greetings extends Component {
             user_name: this.props.user_name,
             user_id: this.props.user_id,
             search_value: "",
-            self_product_list: [],
             product_expanded: {},
             search_result: "",
             tab: 0,
         }
         console.log(this.state);
-    }
-
-    componentDidMount = () => {
-        const updateSelfProductList = this.updateSelfProductList;
-        chrome.runtime.sendMessage({ type: "onLoadSelfProductList" },
-            function (res) {
-                console.log('Greetings receives reply from background for onLoadSelfProductList ', res.data);
-                if (res.status === 200) {
-                    console.log("onLoadSelfProductList succeeded.");
-                    updateSelfProductList(res.data.product_list);
-                }
-                else {
-                    console.error(res.data + ", onLoadSelfProductList failed.");
-                }
-            }
-        );
     }
 
     componentDidUpdate = (prevProps) => {
@@ -55,19 +38,6 @@ class Greetings extends Component {
             this.setState({
                 user_id: this.props.user_id
             });
-            const updateSelfProductList = this.updateSelfProductList;
-            chrome.runtime.sendMessage({ type: "onLoadSelfProductList" },
-                function (res) {
-                    console.log('Greetings receives reply from background for onLoadSelfProductList ', res.data);
-                    if (res.status === 200) {
-                        console.log("onLoadSelfProductList succeeded.");
-                        updateSelfProductList(res.data.product_list);
-                    }
-                    else {
-                        console.error(res.data + ", onLoadSelfProductList failed.");
-                    }
-                }
-            );
         }
 
     }

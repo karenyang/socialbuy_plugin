@@ -22,7 +22,8 @@ class UserInfoPage extends Component {
         super(props);
         this.state = {
             search_value: "",
-            self_product_list: [],
+            self_bought_product_list: [],
+            friends_list: [],
             search_result: "",
             tab: 0,
             show_collection: false,
@@ -32,24 +33,44 @@ class UserInfoPage extends Component {
     }
 
 
-    updateSelfProductList = (product_list) => {
+    updateSelfProductList = (bought_product_list) => {
         this.setState({
-            self_product_list: product_list,
+            self_bought_product_list: bought_product_list,
         });
         console.log("State product list updated: ", this.state);
     }
 
+    updateFriendsList = (friends_list) => {
+        this.setState({
+            friends_list: friends_list,
+        });
+        console.log("State friend list updated: ", this.state);
+    }
+
     componentDidMount = () => {
         const updateSelfProductList = this.updateSelfProductList;
-        chrome.runtime.sendMessage({ type: "onLoadSelfProductList" },
+        chrome.runtime.sendMessage({ type: "onLoadSelfBoughtProductList" },
             function (res) {
-                console.log('Greetings receives reply from background for onLoadSelfProductList ', res.data);
+                console.log('Greetings receives reply from background for onLoadSelfBoughtProductList ', res.data);
                 if (res.status === 200) {
-                    console.log("onLoadSelfProductList succeeded.");
-                    updateSelfProductList(res.data.product_list);
+                    console.log("onLoadSelfBoughtProductList succeeded.");
+                    updateSelfProductList(res.data.bought_product_list);
                 }
                 else {
-                    console.error(res.data + ", onLoadSelfProductList failed.");
+                    console.error(res.data + ", onLoadSelfBoughtProductList failed.");
+                }
+            }
+        );
+        const updateFriendsList = this.updateFriendsList;
+        chrome.runtime.sendMessage({ type: "onLoadFriendsList" },
+            function (res) {
+                console.log('Greetings receives reply from background for onLoadFriendsList ', res.data);
+                if (res.status === 200) {
+                    console.log("onLoadFriendsList succeeded.");
+                    updateFriendsList(res.data.friends_list);
+                }
+                else {
+                    console.error(res.data + ", onLoadSelfBoughtProductList failed.");
                 }
             }
         );
@@ -70,36 +91,40 @@ class UserInfoPage extends Component {
         return title.slice(0, 10).join(" ");
     }
 
-    onDeleteProduct(product_id) {
+    onDeleteBoughtProduct(product_id) {
         console.log("product to be delete has id", product_id);
-        let new_self_product_list = this.state.self_product_list.filter(item => item['_id'] !== product_id);
+        let new_self_bought_product_list = this.state.self_bought_product_list.filter(item => item['_id'] !== product_id);
 
         this.setState({
-            self_product_list: new_self_product_list,
+            self_bought_product_list: new_self_bought_product_list,
         });
-        chrome.runtime.sendMessage({ type: "onDeleteSelfProduct", data: product_id },
+        chrome.runtime.sendMessage({ type: "onDeleteSelfBoughtProduct", data: product_id },
             function (res) {
-                console.log('Greetings receives reply from background for onDeleteSelfProduct ', res.data);
+                console.log('Greetings receives reply from background for onDeleteSelfBoughtProduct ', res.data);
                 if (res.status === 200) {
-                    console.log("onDeleteSelfProduct succeeded.");
+                    console.log("onDeleteSelfBoughtProduct succeeded.");
                 }
                 else {
-                    console.error(res.data + ", onDeleteSelfProduct failed.");
+                    console.error(res.data + ", onDeleteSelfBoughtProduct failed.");
                 }
             }
         );
     }
 
-    onClickCollection = () => {
+    onClickCollectionButton = () => {
         this.setState({
             show_collection: !this.state.show_collection
         })
     }
 
-    onClickFriends = () => {
+    onClickFriendsButton = () => {
         this.setState({
             show_friends: !this.state.show_friends
         })
+    }
+
+    onClickFriend = (friend) =>{
+        console.log("friend clicked: ", friend.user_name);
     }
 
     render() {
@@ -109,17 +134,11 @@ class UserInfoPage extends Component {
                     <img src={icon} alt="extension icon" />
                 </Grid>
                 <Grid item xs={10}>
-
                 </Grid>
-
                 <Grid item xs={12}>
-                    {/* <Typography variant="h4" color="inherit" style={{ "fontSize": 16, "paddingTop": 5, "paddingBottom": 5 }}>
-                        Your Collection - purchased
-                    </Typography> */}
-
                     <Card style={{ width: 400, marginTop: 5, display: 'flex', justifyContent: 'center' }}>
                         <CardActions>
-                            <Button onClick={this.onClickCollection} style={{ textTransform: "none" }} >
+                            <Button onClick={this.onClickCollectionButton} style={{ textTransform: "none" }} >
                                 Your Collection - purchased
                             </Button>
                         </CardActions>
@@ -128,7 +147,7 @@ class UserInfoPage extends Component {
                     <Collapse in={this.state.show_collection}>
                         <Paper style={{ maxHeight: 540, width: 400, marginTop: 5, overflow: 'auto' }}>
                             {
-                                this.state.self_product_list.map((product) => (
+                                this.state.self_bought_product_list.map((product) => (
                                     <Card key={product._id}>
                                         <Grid container spacing={0}  >
                                             <Grid item xs={4}>
@@ -149,7 +168,7 @@ class UserInfoPage extends Component {
                                                         style={{ padding: 0, height: 18, width: 18 }}
                                                         onClick={() => this.onDeleteProduct(product._id)}
                                                     >
-                                                        <DeleteIcon style={{ fontSize: 15 }} />
+                                                        <DeleteIcon style={{ fontSize: 15 }}/>
                                                     </IconButton>
                                                 </CardActions>
                                             </Grid>
@@ -163,11 +182,35 @@ class UserInfoPage extends Component {
 
                     <Card style={{ width: 400, marginTop: 5, display: 'flex', justifyContent: 'center' }}>
                         <CardActions>
-                            <Button onClick={this.onClickFriends} style={{ textTransform: "none" }} >
+                            <Button onClick={this.onClickFriendsButton} style={{ textTransform: "none" }} >
                                 Friends
                             </Button>
                         </CardActions>
                     </Card>
+                    <Collapse in={this.state.show_friends}>
+                        <Paper style={{ maxHeight: 540, width: 400, marginTop: 5, overflow: 'auto' }}>
+                            {
+                                this.state.friends_list.map((friend) => (
+                                    <Card key={friend._id}>
+                                        <Grid container spacing={0}  >
+                                            <Grid item xs={4}>
+                                                <CardActionArea>
+                                                    <img alt={friend.user_name} src={friend.profile_img} width="75" onClick={() => { this.onClickFriend(friend) }} />
+                                                </CardActionArea>
+                                            </Grid>
+                                            <Grid item xs={7}>
+                                                <CardContent >
+                                                    <Typography gutterBottom variant="body2" component="h5">
+                                                        {this.cropTitle(friend.user_name)}
+                                                    </Typography>
+                                                </CardContent>
+                                            </Grid>
+                                        </Grid>
+                                    </Card>
+                                ))
+                            }
+                        </Paper>
+                    </Collapse>
 
 
                     <Card style={{ width: 400, marginTop: 5, display: 'flex', justifyContent: 'center' }}>

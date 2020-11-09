@@ -27,7 +27,7 @@ class RecommmendationPage extends Component {
             // user_name: this.props.user_name,
             // user_id: this.props.user_id,
             search_value: "",
-            self_product_list: [],
+            self_bought_product_list: [],
             product_expanded: {},
             search_result: "",
             tab: 0,
@@ -36,14 +36,14 @@ class RecommmendationPage extends Component {
     }
 
 
-    updateSelfProductList = (product_list) => {
+    updateSelfProductList = (bought_product_list) => {
         let product_expanded = []
-        for (let i = 0; i < product_list.length; i++) {
-            const product = product_list[i];
+        for (let i = 0; i < bought_product_list.length; i++) {
+            const product = bought_product_list[i];
             product_expanded[product._id] = false;
         }
         this.setState({
-            self_product_list: product_list,
+            self_bought_product_list: bought_product_list,
             product_expanded: product_expanded,
         });
         console.log("State product list updated: ", this.state);
@@ -51,15 +51,15 @@ class RecommmendationPage extends Component {
 
     componentDidMount = () => {
         const updateSelfProductList = this.updateSelfProductList;
-        chrome.runtime.sendMessage({ type: "onLoadSelfProductList" },
+        chrome.runtime.sendMessage({ type: "onLoadSelfBoughtProductList" },
             function (res) {
-                console.log('Greetings receives reply from background for onLoadSelfProductList ', res.data);
+                console.log('Greetings receives reply from background for onLoadSelfBoughtProductList ', res.data);
                 if (res.status === 200) {
-                    console.log("onLoadSelfProductList succeeded.");
-                    updateSelfProductList(res.data.product_list);
+                    console.log("onLoadSelfBoughtProductList succeeded.");
+                    updateSelfProductList(res.data.bought_product_list);
                 }
                 else {
-                    console.error(res.data + ", onLoadSelfProductList failed.");
+                    console.error(res.data + ", onLoadSelfBoughtProductList failed.");
                 }
             }
         );
@@ -152,7 +152,7 @@ class RecommmendationPage extends Component {
                         </Typography>
                     <Paper style={{ maxHeight: 540, width: 400, overflow: 'auto' }}>
                         {
-                            this.state.self_product_list.map((product) => (
+                            this.state.self_bought_product_list.map((product) => (
                                 <Card key={product._id}>
                                     <Grid container spacing={0}  >
                                         <Grid item xs={4}>

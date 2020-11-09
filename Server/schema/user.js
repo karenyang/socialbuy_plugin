@@ -11,7 +11,10 @@ var userSchema = new mongoose.Schema({
     user_name: String,  //unique login name
     password_digest: String,  //the digest of user set password
     salt: String,  //8byte hex string salt to concat to the user set password
-    product_list: [String]
+    bought_product_list: [String], //product urls 
+    liked_product_list: [String], //product urls 
+    friends_list: [String], // friends ids 
+    profile_img: String //url to the photo
 },
     { timestamps: true }
 );
