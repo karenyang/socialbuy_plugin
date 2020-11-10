@@ -28,6 +28,7 @@ class RecommmendationPage extends Component {
             // user_id: this.props.user_id,
             search_value: "",
             self_bought_product_list: [],
+            friends_product_list: [],
             product_expanded: {},
             search_result: "",
             tab: 0,
@@ -35,31 +36,31 @@ class RecommmendationPage extends Component {
         console.log(this.state);
     }
 
-
-    updateSelfProductList = (bought_product_list) => {
+    updateFriendsProductList = (friends_product_list) => {
         let product_expanded = []
-        for (let i = 0; i < bought_product_list.length; i++) {
-            const product = bought_product_list[i];
+        for (let i = 0; i < friends_product_list.length; i++) {
+            const product = friends_product_list[i];
             product_expanded[product._id] = false;
         }
         this.setState({
-            self_bought_product_list: bought_product_list,
+            self_bought_product_list: friends_product_list,
             product_expanded: product_expanded,
         });
         console.log("State product list updated: ", this.state);
+
     }
 
     componentDidMount = () => {
-        const updateSelfProductList = this.updateSelfProductList;
-        chrome.runtime.sendMessage({ type: "onLoadSelfBoughtProductList" },
+        const updateFriendsProductList = this.updateFriendsProductList;
+        chrome.runtime.sendMessage({ type: "onLoadFriendsProductList" },
             function (res) {
-                console.log('Greetings receives reply from background for onLoadSelfBoughtProductList ', res.data);
+                console.log('Greetings receives reply from background for onLoadFriendsProductList ', res.data);
                 if (res.status === 200) {
-                    console.log("onLoadSelfBoughtProductList succeeded.");
-                    updateSelfProductList(res.data.bought_product_list);
+                    console.log("onLoadFriendsProductList succeeded.");
+                    updateFriendsProductList(res.data.bought_product_list);
                 }
                 else {
-                    console.error(res.data + ", onLoadSelfBoughtProductList failed.");
+                    console.error(res.data + ", onLoadFriendsProductList failed.");
                 }
             }
         );
@@ -152,7 +153,7 @@ class RecommmendationPage extends Component {
                         </Typography>
                     <Paper style={{ maxHeight: 540, width: 400, overflow: 'auto' }}>
                         {
-                            this.state.self_bought_product_list.map((product) => (
+                            this.state.friends_product_list.map((product) => (
                                 <Card key={product._id}>
                                     <Grid container spacing={0}  >
                                         <Grid item xs={4}>
@@ -166,6 +167,10 @@ class RecommmendationPage extends Component {
                                                     {this.cropTitle(product.product_title)}
                                                 </Typography>
 
+                                                <Typography variant="body2" color="textSecondary" component="p">
+                                                    ${product.product_cost}
+                                                </Typography>
+                                                
                                                 <Typography variant="body2" color="textSecondary" component="p">
                                                     ${product.product_cost}
                                                 </Typography>

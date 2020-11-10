@@ -64,24 +64,6 @@ class Popup extends React.Component {
         console.log("State reset to, ", this.state);
     }
 
-    onLogOut = () => {
-        console.log("about to log out");
-        let reset_state = this.reset_state;
-        chrome.runtime.sendMessage({ type: "onLogout" },
-            function (res) {
-                console.log('this is the response from the background page for onLogout', res);
-                if (res.status === 200) {
-                    console.log("Logging out.", res.data);
-                    reset_state();
-                }
-                else {
-                    alert(res.data);
-                    throw (new Error(res.data));
-                }
-            });
-    }
-
-
     render() {
         console.log("done fetch? ", this.state.done_fetch);
         return (
@@ -90,7 +72,7 @@ class Popup extends React.Component {
                     <div className="App">
                         <Switch>
                             <Route path="/greetings"
-                                render={(props) => <Greetings {...props} user_name={this.state.user_name} user_id={this.state.user_id} onLogOut={this.onLogOut} />}
+                                render={(props) => <Greetings {...props} user_name={this.state.user_name} user_id={this.state.user_id} />}
                             />
                             <Route path="/admin/register"
                                 render={(props) => <Register {...props} />}

@@ -48,12 +48,7 @@ class SearchPage extends Component {
 
     updateSearchResult = (res) => {
         if (res.status === 200) {
-            if (!Array.isArray(res.data)) {
-                this.setState({ search_results: [res.data] });
-            }
-            else {
-                this.setState({ search_results: res.data });
-            }
+            this.setState({ search_results: res.data });
         }
         else {
             this.setState({ search_results: "" });
@@ -84,11 +79,11 @@ class SearchPage extends Component {
 
     render() {
         return (
-            <Grid container spacing={0} alignItems="center" >
+            <Grid container spacing={0} alignItems="center" justify="center"  >
                 <Grid item xs={2}>
                     <img src={icon} alt="extension icon" />
                 </Grid>
-                <Grid item xs={2}>
+                <Grid item xs={1}>
                     <div className="searchicon">
                         <SearchIcon style={{ "fontSize": 20, "alignItems": "center", "display": 'flex' }} />
                     </div>
@@ -103,28 +98,48 @@ class SearchPage extends Component {
                         />
                     </div>
                 </Grid>
+                <Grid item xs={2}>
+                    
+                </Grid>
                 {this.state.search_results !== "" &&
                     <Paper style={{ maxHeight: 540, width: 400, marginTop: 5, overflow: 'auto' }}>
                         {
-                            this.state.search_results.map((result) => (
-                                <Card key={result}>
+                            this.state.search_results.results.map((result) => (
+                                <Card key={result.user_name} style={{ width: 400, marginTop: 5, display: 'flex', justifyContent: 'center' }}>
                                     <Grid container spacing={0}  >
-                                        
+
                                         <Grid item xs={7}>
                                             <CardContent >
                                                 <Typography gutterBottom variant="body2" component="h5">
-                                                    {result}
+                                                    {result.user_name}
                                                 </Typography>
                                             </CardContent>
                                         </Grid>
+
                                         <Grid item xs={5}>
-                                            <CardActions>
-                                                <Button style={{ textTransform: "none" }} 
-                                                    onClick={() => this.onAddFriend(result)}
-                                                >
-                                                    Add Friend
-                                                </Button>
-                                            </CardActions>
+                                            {!result.is_friend && !result.is_self &&
+                                                <CardActions>
+                                                    <Button style={{ textTransform: "none" }}
+                                                        onClick={() => this.onAddFriend(result.user_name)}
+                                                    >
+                                                        Add Friend
+                                                    </Button>
+                                                </CardActions>
+                                            }
+                                            {result.is_friend && !result.is_self &&
+                                                <CardContent >
+                                                    <Typography variant="body2" component="h5" style={{'color': 'grey'}}>
+                                                        Your friend
+                                                    </Typography>
+                                                </CardContent>
+                                            }
+                                            {result.is_self && !result.is_friend &&
+                                                <CardContent >
+                                                    <Typography variant="body2" component="h5" style={{'color': 'grey'}}>
+                                                        Me
+                                                    </Typography>
+                                                </CardContent>
+                                            }
                                         </Grid>
                                     </Grid>
                                 </Card>

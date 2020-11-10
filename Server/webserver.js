@@ -49,8 +49,80 @@ app.use(session({
 // *************************************************************
 // Server API
 // *************************************************************
-app.get('/friendslist/:user_id', function(request, response) {
-    console.log('server receives Get request /friendslist ' );
+
+
+app.get('/friends_productlist/:user_id', function (request, response) {
+    console.log('server receives Get request /friends_productlist/ ');
+    let user_id = request.params.user_id;
+    if (user_id) {
+        console.log('request.session.user_id: ', user_id);
+        User.findOne({
+            _id: user_id,
+        }, function (err, user) {
+            if (err) {
+                console.error(err);
+            }
+            if (user === null) {
+                console.error('User with id:' + user_id + ' not found.');
+                response.status(421).send('User not found.');
+                return;
+            }
+            let products = []
+            async.each(user.friends_list, function (friend_id, callback) {
+                User.findOne({
+                    _id: friend_id,
+                }, function (err, friend) {
+                    if (err) {
+                        callback(err);
+                    }
+                    if (friend === null) {
+                        callback('friend with id:' + friend_id + ' not found.');
+                    }
+                    else {
+                        for (let i = 0; i < friend.bought_product_list.length; i++) {
+                            if (friend.bought_product_list[i] in products) {
+                                products[friend.bought_product_list[i]].bought++;
+                                products[friend.bought_product_list[i]].liked++;
+                            }
+                            else {
+                                Product.findOne({ _id: friend.bought_product_list[i] 
+                                    }, function (err, product) {
+                                        if (err) {
+                                            callback(err);
+                                        }
+                                        products[friend.bought_product_list[i]] = {
+                                            product: product,
+                                            bought: 1,
+                                            liked: 1
+                                        }
+                                        console.log("just added a product to product list: ", products[friend.bought_product_list[i]].product.product_title);
+                                    });
+
+                            }
+                        }
+                        callback(null);
+                    }
+                });
+            }, function (err) {
+                if (err) {
+                    console.error("Failed to fetch user's products list");
+                    response.status(400).send("Failed to fetch user's products list ");
+                } else {
+                    products.sort((a, b) => b.liked > a.liked ? 1 : -1);
+                    console.log("Done fetching friends list.", products);
+                    let output = {
+                        "user_name": user.user_name,
+                        "products": products,
+                    }
+                    response.status(200).send(JSON.stringify(output));
+                }
+            });
+        });
+    }
+});
+
+app.get('/friendslist/:user_id', function (request, response) {
+    console.log('server receives Get request /friendslist ');
     let user_id = request.params.user_id;
     if (user_id) {
         console.log('request.session.user_id: ', user_id);
@@ -66,7 +138,6 @@ app.get('/friendslist/:user_id', function(request, response) {
                 return;
             }
             let friends_list = [];
-            console.log("Number of  products links: ", user.friends_list.length);
             async.each(user.friends_list, function (friend_id, callback) {
                 User.findOne({
                     _id: friend_id,
@@ -127,7 +198,7 @@ app.post('/addfriend/:user_id', function (request, response) {
                     return;
                 }
                 else {
-                    console.log("Will add a friend: ", friend.user_name);
+                    console.log("Will add a friend: ", friend_username);
                     user.friends_list.push(friend._id);
                     user.save();
                     response.status(200).send(user.friends_list);
@@ -168,8 +239,18 @@ app.post('/search/:user_id', function (request, response) {
                         return;
                     }
                     else {
-                        console.log("Found a friend: ", friend.user_name, friend.bought_product_list);
-                        response.status(200).send(friend.user_name);
+                        let result = {};
+                        result["user_name"] = friend.user_name;
+                        result["is_friend"] = user.friends_list.includes(friend._id); //whether is already friend or is users themselves;
+                        result["is_self"] = user.user_name === friend.user_name; //whether is already friend or is users themselves;
+
+                        let output = {
+                            user_name: user.user_name,
+                            results: [result]
+                        }
+
+                        console.log("Found a friend: ", result);
+                        response.status(200).send(JSON.stringify(output));
                         return;
                     }
 
@@ -178,6 +259,7 @@ app.post('/search/:user_id', function (request, response) {
         });
     }
 });
+
 
 
 app.get('/user_bought_productlist/:user_id', function (request, response) {
@@ -318,8 +400,7 @@ app.post('/add_bought_products/:user_id', function (request, response) {
                 response.status(421).send('User not found.');
                 return;
             }
-            // fetch comments for each photo
-            console.log("products: ", products);
+            // console.log("products: ", products);
 
             async.each(products, function (item, callback) {
                 Product.findOne({
@@ -449,7 +530,7 @@ app.post('/admin/register', function (request, response) {
         password_digest: passwordEntry.hash,
     });
     delete newUser.password; //delete the password
-   
+
     User.findOne({
         'user_name': newUser.user_name
     },
@@ -463,7 +544,7 @@ app.post('/admin/register', function (request, response) {
                         if (err) {
                             response.status(500).send(JSON.stringify(err));
                         }
-                        userObj.profile_img =  "https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png";  // default profile img
+                        userObj.profile_img = "https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png";  // default profile img
                         userObj.save();
                         console.log("new userObj created, ", userObj);
 

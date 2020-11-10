@@ -188,7 +188,7 @@ class UserInfoPage extends Component {
                         </CardActions>
                     </Card>
                     <Collapse in={this.state.show_friends}>
-                        <Paper style={{ maxHeight: 540, width: 400, marginTop: 5, overflow: 'auto' }}>
+                        <Paper style={{ maxHeight: 320, width: 400, marginTop: 5, overflow: 'auto' }}>
                             {
                                 this.state.friends_list.map((friend) => (
                                     <Card key={friend._id}>
