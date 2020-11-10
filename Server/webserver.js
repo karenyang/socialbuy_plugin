@@ -67,11 +67,12 @@ app.get('/friends_productlist/:user_id', function (request, response) {
                 response.status(421).send('User not found.');
                 return;
             }
-            let products = []
+            let products = [];
+            let product_links = [];
             async.each(user.friends_list, function (friend_id, callback) {
                 User.findOne({
                     _id: friend_id,
-                }, function (err, friend) {
+                },  async function (err, friend) {
                     if (err) {
                         callback(err);
                     }
@@ -80,24 +81,27 @@ app.get('/friends_productlist/:user_id', function (request, response) {
                     }
                     else {
                         for (let i = 0; i < friend.bought_product_list.length; i++) {
-                            if (friend.bought_product_list[i] in products) {
-                                products[friend.bought_product_list[i]].bought++;
-                                products[friend.bought_product_list[i]].liked++;
+                            if (friend.bought_product_list[i] in product_links) {
+                                products[product_links.indexOf(friend.bought_product_list[i])].bought.push(friend.user_name);
+                                products[product_links.indexOf(friend.bought_product_list[i])].liked.push(friend.user_name);
                             }
                             else {
-                                Product.findOne({ _id: friend.bought_product_list[i] 
-                                    }, function (err, product) {
-                                        if (err) {
-                                            callback(err);
-                                        }
-                                        products[friend.bought_product_list[i]] = {
-                                            product: product,
-                                            bought: 1,
-                                            liked: 1
-                                        }
-                                        console.log("just added a product to product list: ", products[friend.bought_product_list[i]].product.product_title);
+                                product_links.push(friend.bought_product_list[i]);
+                                await Product.findOne({
+                                    product_link: friend.bought_product_list[i]
+                                },  function (err, product) {
+                                    if (err) {
+                                        callback(err);
+                                    }
+                                    products.push({
+                                        product: product,
+                                        bought: [friend.user_name],
+                                        liked: [friend.user_name]
                                     });
 
+                                });
+                               
+                                console.log("added a product link to product lists: ", products.length)
                             }
                         }
                         callback(null);
@@ -108,11 +112,11 @@ app.get('/friends_productlist/:user_id', function (request, response) {
                     console.error("Failed to fetch user's products list");
                     response.status(400).send("Failed to fetch user's products list ");
                 } else {
-                    products.sort((a, b) => b.liked > a.liked ? 1 : -1);
-                    console.log("Done fetching friends list.", products);
+                    products.sort((a, b) => b.liked.length > a.liked.length ? 1 : -1);
+                    console.log("Done fetching product lists: length=", products.length);
                     let output = {
                         "user_name": user.user_name,
-                        "products": products,
+                        "friends_productlist": products,
                     }
                     response.status(200).send(JSON.stringify(output));
                 }

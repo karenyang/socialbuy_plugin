@@ -37,13 +37,19 @@ class RecommmendationPage extends Component {
     }
 
     updateFriendsProductList = (friends_product_list) => {
-        let product_expanded = []
-        for (let i = 0; i < friends_product_list.length; i++) {
-            const product = friends_product_list[i];
+        let product_expanded = [];
+        let product_objs = [];
+        let friends_bought = [];
+        let friends_liked = [];
+        for (let i= 0; i < friends_product_list.length; i++) {
+            let product = friends_product_list[i].product;
+            product.friends_bought = friends_product_list[i].bought;
+            product.friends_liked = friends_product_list[i].liked;
+            product_objs.push(product);
             product_expanded[product._id] = false;
         }
         this.setState({
-            self_bought_product_list: friends_product_list,
+            friends_product_list: product_objs,
             product_expanded: product_expanded,
         });
         console.log("State product list updated: ", this.state);
@@ -57,7 +63,7 @@ class RecommmendationPage extends Component {
                 console.log('Greetings receives reply from background for onLoadFriendsProductList ', res.data);
                 if (res.status === 200) {
                     console.log("onLoadFriendsProductList succeeded.");
-                    updateFriendsProductList(res.data.bought_product_list);
+                    updateFriendsProductList(res.data.friends_productlist);
                 }
                 else {
                     console.error(res.data + ", onLoadFriendsProductList failed.");
@@ -172,7 +178,7 @@ class RecommmendationPage extends Component {
                                                 </Typography>
                                                 
                                                 <Typography variant="body2" color="textSecondary" component="p">
-                                                    ${product.product_cost}
+                                                    purchased by {product.friends_bought.join(', ')} 
                                                 </Typography>
                                             </CardContent>
 
