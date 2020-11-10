@@ -41,7 +41,7 @@ class RecommmendationPage extends Component {
         let product_objs = [];
         let friends_bought = [];
         let friends_liked = [];
-        for (let i= 0; i < friends_product_list.length; i++) {
+        for (let i = 0; i < friends_product_list.length; i++) {
             let product = friends_product_list[i].product;
             product.friends_bought = friends_product_list[i].bought;
             product.friends_liked = friends_product_list[i].liked;
@@ -176,9 +176,9 @@ class RecommmendationPage extends Component {
                                                 <Typography variant="body2" color="textSecondary" component="p">
                                                     ${product.product_cost}
                                                 </Typography>
-                                                
+
                                                 <Typography variant="body2" color="textSecondary" component="p">
-                                                    purchased by {product.friends_bought.join(', ')} 
+                                                    purchased by {product.friends_bought.join(', ')}
                                                 </Typography>
                                             </CardContent>
 
@@ -222,7 +222,7 @@ class RecommmendationPage extends Component {
                                                 </CardContent>
                                             </Collapse>
                                         </Grid>
-                                        
+
                                     </Grid>
                                 </Card>
                             ))
