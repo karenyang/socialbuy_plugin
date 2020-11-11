@@ -166,6 +166,7 @@ chrome.runtime.onMessage.addListener(
                         });
                 }
                 return true;
+                
             case "onDeleteSelfLikedProduct":
                 console.log("Background about to Delete Self Liked Product: ", message.data);
                 if (userInfo === undefined || userInfo.user_id === undefined) {

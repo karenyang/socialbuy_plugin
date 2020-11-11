@@ -176,7 +176,7 @@ class UserInfoPage extends Component {
         })
     }
 
-    onClickFriend = (friend) =>{
+    onClickFriend = (friend) => {
         console.log("friend clicked: ", friend.user_name);
     }
 
@@ -191,136 +191,133 @@ class UserInfoPage extends Component {
                 <Grid item xs={10}>
                 </Grid>
                 <Grid item xs={12}>
-                    <Card style={{ width: 400, marginTop: 5, display: 'flex', justifyContent: 'center' }}>
-                        <CardActions>
-                            <Button onClick={this.onClickCollectionBoughtButton} style={{ textTransform: "none" }} >
-                                Your Collection - purchased
+                    <Paper style={{ maxHeight: 490, width: 400, marginTop: 5, overflow: 'auto' }}>
+                        <Card style={{ width: 400, marginTop: 5, display: 'flex', justifyContent: 'center' }}>
+                            <CardActions>
+                                <Button onClick={this.onClickCollectionBoughtButton} style={{ textTransform: "none" }} >
+                                    Your Collection - purchased
                             </Button>
-                        </CardActions>
-                    </Card>
+                            </CardActions>
+                        </Card>
 
-                    <Collapse in={this.state.show_collection_bought}>
-                        <Paper style={{ maxHeight: 500, width: 400, marginTop: 5, overflow: 'auto' }}>
-                            {
-                                this.state.self_bought_product_list.map((product) => (
-                                    <Card key={product._id}>
-                                        <Grid container spacing={0}  >
-                                            <Grid item xs={4}>
-                                                <CardActionArea>
-                                                    <img alt={product.product_title} src={product.product_imgurl} width="100" onClick={() => { this.onClickProduct(product) }} />
-                                                </CardActionArea>
+                        <Collapse in={this.state.show_collection_bought}>
+                            <Paper style={{ maxHeight: 450, width: 400, marginTop: 5, overflow: 'auto' }}>
+                                {
+                                    this.state.self_bought_product_list.map((product) => (
+                                        <Card key={product._id}>
+                                            <Grid container spacing={0}  >
+                                                <Grid item xs={4}>
+                                                    <CardActionArea>
+                                                        <img alt={product.product_title} src={product.product_imgurl} width="100" onClick={() => { this.onClickProduct(product) }} />
+                                                    </CardActionArea>
+                                                </Grid>
+                                                <Grid item xs={7}>
+                                                    <CardContent >
+                                                        <Typography gutterBottom variant="body2" component="h5">
+                                                            {this.cropTitle(product.product_title)}
+                                                        </Typography>
+                                                    </CardContent>
+                                                </Grid>
+                                                <Grid item xs={1}>
+                                                    <CardActions>
+                                                        <IconButton
+                                                            style={{ padding: 0, height: 18, width: 18 }}
+                                                            onClick={() => this.onDeleteBoughtProduct(product._id)}
+                                                        >
+                                                            <DeleteIcon style={{ fontSize: 15 }} />
+                                                        </IconButton>
+                                                    </CardActions>
+                                                </Grid>
                                             </Grid>
-                                            <Grid item xs={7}>
-                                                <CardContent >
-                                                    <Typography gutterBottom variant="body2" component="h5">
-                                                        {this.cropTitle(product.product_title)}
-                                                    </Typography>
-                                                </CardContent>
-                                            </Grid>
-                                            <Grid item xs={1}>
-                                                <CardActions>
-                                                    <IconButton
-                                                        style={{ padding: 0, height: 18, width: 18 }}
-                                                        onClick={() => this.onDeleteBoughtProduct(product._id)}
-                                                    >
-                                                        <DeleteIcon style={{ fontSize: 15 }}/>
-                                                    </IconButton>
-                                                </CardActions>
-                                            </Grid>
-                                        </Grid>
-                                    </Card>
-                                ))
-                            }
-                        </Paper>
-                    </Collapse>
-                    
+                                        </Card>
+                                    ))
+                                }
+                            </Paper>
+                        </Collapse>
 
-                    <Card style={{ width: 400, marginTop: 5, display: 'flex', justifyContent: 'center' }}>
-                        <CardActions>
-                            <Button onClick={this.onClickCollectionLikedButton} style={{ textTransform: "none" }} >
-                                Your Collection - liked
+                        <Card style={{ width: 400, marginTop: 5, display: 'flex', justifyContent: 'center' }}>
+                            <CardActions>
+                                <Button onClick={this.onClickCollectionLikedButton} style={{ textTransform: "none" }} >
+                                    Your Collection - liked
                             </Button>
-                        </CardActions>
-                    </Card>
+                            </CardActions>
+                        </Card>
 
-                    <Collapse in={this.state.show_collection_liked}>
-                        <Paper style={{ maxHeight: 450, width: 400, marginTop: 5, overflow: 'auto' }}>
-                            {
-                                this.state.self_liked_product_list.map((product) => (
-                                    <Card key={product._id}>
-                                        <Grid container spacing={0}  >
-                                            <Grid item xs={4}>
-                                                <CardActionArea>
-                                                    <img alt={product.product_title} src={product.product_imgurl} width="100" onClick={() => { this.onClickProduct(product) }} />
-                                                </CardActionArea>
+                        <Collapse in={this.state.show_collection_liked}>
+                            <Paper style={{ maxHeight: 450, width: 400, marginTop: 5, overflow: 'auto' }}>
+                                {
+                                    this.state.self_liked_product_list.map((product) => (
+                                        <Card key={product._id}>
+                                            <Grid container spacing={0}  >
+                                                <Grid item xs={4}>
+                                                    <CardActionArea>
+                                                        <img alt={product.product_title} src={product.product_imgurl} width="100" onClick={() => { this.onClickProduct(product) }} />
+                                                    </CardActionArea>
+                                                </Grid>
+                                                <Grid item xs={7}>
+                                                    <CardContent >
+                                                        <Typography gutterBottom variant="body2" component="h5">
+                                                            {this.cropTitle(product.product_title)}
+                                                        </Typography>
+                                                    </CardContent>
+                                                </Grid>
+                                                <Grid item xs={1}>
+                                                    <CardActions>
+                                                        <IconButton
+                                                            style={{ padding: 0, height: 18, width: 18 }}
+                                                            onClick={() => this.onDeleteLikedProduct(product._id)}
+                                                        >
+                                                            <DeleteIcon style={{ fontSize: 15 }} />
+                                                        </IconButton>
+                                                    </CardActions>
+                                                </Grid>
                                             </Grid>
-                                            <Grid item xs={7}>
-                                                <CardContent >
-                                                    <Typography gutterBottom variant="body2" component="h5">
-                                                        {this.cropTitle(product.product_title)}
-                                                    </Typography>
-                                                </CardContent>
-                                            </Grid>
-                                            <Grid item xs={1}>
-                                                <CardActions>
-                                                    <IconButton
-                                                        style={{ padding: 0, height: 18, width: 18 }}
-                                                        onClick={() => this.onDeleteLikedProduct(product._id)}
-                                                    >
-                                                        <DeleteIcon style={{ fontSize: 15 }}/>
-                                                    </IconButton>
-                                                </CardActions>
-                                            </Grid>
-                                        </Grid>
-                                    </Card>
-                                ))
-                            }
-                        </Paper>
-                    </Collapse>
-                    
+                                        </Card>
+                                    ))
+                                }
+                            </Paper>
+                        </Collapse>
 
-
-
-                    <Card style={{ width: 400, marginTop: 5, display: 'flex', justifyContent: 'center' }}>
-                        <CardActions>
-                            <Button onClick={this.onClickFriendsButton} style={{ textTransform: "none" }} >
-                                Friends
+                        <Card style={{ width: 400, marginTop: 5, display: 'flex', justifyContent: 'center' }}>
+                            <CardActions>
+                                <Button onClick={this.onClickFriendsButton} style={{ textTransform: "none" }} >
+                                    Friends
                             </Button>
-                        </CardActions>
-                    </Card>
-                    <Collapse in={this.state.show_friends}>
-                        <Paper style={{ maxHeight: 320, width: 400, marginTop: 5, overflow: 'auto' }}>
-                            {
-                                this.state.friends_list.map((friend) => (
-                                    <Card key={friend._id}>
-                                        <Grid container spacing={0}  >
-                                            <Grid item xs={4}>
-                                                <CardActionArea>
-                                                    <img alt={friend.user_name} src={friend.profile_img} width="75" onClick={() => { this.onClickFriend(friend) }} />
-                                                </CardActionArea>
+                            </CardActions>
+                        </Card>
+                        <Collapse in={this.state.show_friends}>
+                            <Paper style={{ maxHeight: 450, width: 400, marginTop: 5, overflow: 'auto' }}>
+                                {
+                                    this.state.friends_list.map((friend) => (
+                                        <Card key={friend._id}>
+                                            <Grid container spacing={0}  >
+                                                <Grid item xs={4}>
+                                                    <CardActionArea>
+                                                        <img alt={friend.user_name} src={friend.profile_img} width="75" onClick={() => { this.onClickFriend(friend) }} />
+                                                    </CardActionArea>
+                                                </Grid>
+                                                <Grid item xs={7}>
+                                                    <CardContent >
+                                                        <Typography gutterBottom variant="body2" component="h5">
+                                                            {this.cropTitle(friend.user_name)}
+                                                        </Typography>
+                                                    </CardContent>
+                                                </Grid>
                                             </Grid>
-                                            <Grid item xs={7}>
-                                                <CardContent >
-                                                    <Typography gutterBottom variant="body2" component="h5">
-                                                        {this.cropTitle(friend.user_name)}
-                                                    </Typography>
-                                                </CardContent>
-                                            </Grid>
-                                        </Grid>
-                                    </Card>
-                                ))
-                            }
-                        </Paper>
-                    </Collapse>
+                                        </Card>
+                                    ))
+                                }
+                            </Paper>
+                        </Collapse>
 
-
-                    <Card style={{ width: 400, marginTop: 5, display: 'flex', justifyContent: 'center' }}>
-                        <CardActions>
-                            <Button onClick={this.props.onLogOut} style={{ textTransform: "none" }} >
-                                Log Out
+                        <Card style={{ width: 400, marginTop: 5, display: 'flex', justifyContent: 'center' }}>
+                            <CardActions>
+                                <Button onClick={this.props.onLogOut} style={{ textTransform: "none" }} >
+                                    Log Out
                             </Button>
-                        </CardActions>
-                    </Card>
+                            </CardActions>
+                        </Card>
+                    </Paper>
 
                 </Grid>
             </Grid>
