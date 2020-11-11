@@ -13,6 +13,8 @@ const productSchema = new mongoose.Schema(
         product_cost: Number,
         product_imgurl: String,
         buyer_list: { type: [String], default: [] }, //user ids
+        liker_list: { type: [String], default: [] }, //user ids
+
         product_variation_names: [String], 
         product_variation_imgurls: [String]
     },

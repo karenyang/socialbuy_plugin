@@ -72,7 +72,7 @@ app.get('/friends_productlist/:user_id', function (request, response) {
             async.each(user.friends_list, function (friend_id, callback) {
                 User.findOne({
                     _id: friend_id,
-                },  async function (err, friend) {
+                }, async function (err, friend) {
                     if (err) {
                         callback(err);
                     }
@@ -89,7 +89,7 @@ app.get('/friends_productlist/:user_id', function (request, response) {
                                 product_links.push(friend.bought_product_list[i]);
                                 await Product.findOne({
                                     product_link: friend.bought_product_list[i]
-                                },  function (err, product) {
+                                }, function (err, product) {
                                     if (err) {
                                         callback(err);
                                     }
@@ -100,8 +100,7 @@ app.get('/friends_productlist/:user_id', function (request, response) {
                                     });
 
                                 });
-                               
-                                console.log("added a product link to product lists: ", products.length)
+                                // console.log("added a product link to product lists: ", products.length)
                             }
                         }
                         callback(null);
@@ -265,6 +264,63 @@ app.post('/search/:user_id', function (request, response) {
 });
 
 
+app.get('/user_liked_productlist/:user_id', function (request, response) {
+    console.log('server receives Get request /user_liked_productlist/ ');
+
+    let user_id = request.params.user_id;
+    if (user_id) {
+        console.log('request.session.user_id: ', user_id);
+        User.findOne({
+            _id: user_id,
+        }, function (err, user) {
+            if (err) {
+                console.error(err);
+            }
+            if (user === null) {
+                console.error('User with id:' + user_id + ' not found.');
+                response.status(421).send('User not found.');
+                return;
+            }
+            let liked_productlist = [];
+            const product_links = user.liked_productlist;
+            console.log("Number of  products links: ", product_links.length, product_links);
+            async.each(product_links, function (link, callback) {
+                Product.findOne({
+                    product_link: link,
+                }, function (err, product) {
+                    if (err) {
+                        callback(err);
+                    }
+                    if (product === null) {
+                        callback('product with product_link:' + link + ' not found.');
+                    }
+                    else {
+                        liked_productlist.push(product);
+                        callback(null);
+                    }
+                });
+            }, function (err) {
+                if (err) {
+                    console.error("Failed to fetch user's product list");
+                    response.status(400).send("Failed to fetch user's product list ");
+                } else {
+                    liked_productlist.sort((a, b) => b.createdAt > a.createdAt ? 1 : -1);
+                    console.log("Done fetching all product lists.");
+                    let output = {
+                        "user_name": user.user_name,
+                        "liked_productlist": liked_productlist,
+                    }
+                    response.status(200).send(JSON.stringify(output));
+                }
+            });
+        });
+    }
+    else {
+        response.status(400).send('Not logged in yet.');
+        return;
+    }
+
+});
 
 app.get('/user_bought_productlist/:user_id', function (request, response) {
     console.log('server receives Get request /user_bought_productlist/ ');
@@ -383,10 +439,71 @@ app.post('/delete_bought_product/:user_id', function (request, response) {
     }
 });
 
+app.post('/add_liked_products/:user_id', function (request, response) {
+    console.log('server receives POST request /add_liked_products ');
+    let user_id = request.params.user_id;
+    if (user_id) {
+        console.log('user_id: ', user_id);
+        let item = request.body;
+        User.findOne({
+            _id: user_id,
+        }, function (err, user) {
+            if (err) {
+                console.error(err);
+                response.status(422).send(err);
+            }
+            if (user === null) {
+                console.error('User with id:' + user_id + ' not found.');
+                response.status(421).send('User not found.');
+                return;
+            }
+            Product.findOne({
+                'product_link': item.product_link
+            }, function (err, product) {
+                if (err) {
+                }
+                if (product) {
+                    console.log("product existed: ", product.product_title);
+                    if (!product.liker_list.includes(user_id)) {
+                        product.liker_list.push(user_id);
+                        product.save();
+                        console.log("Add liker to an existing product,  user:", user.user_name, " product: ", product.product_title);
 
+                    }
+                    if (!user.liked_product_list.includes(product.product_link)) {
+                        user.liked_product_list.push(product.product_link);
+                        console.log("Add product to an user's liked product list,  user:", user.user_name, " product: ", product.product_title);
+                    }
+                }
+                else {
+                    Object.assign(item, { "liker_list": [user_id] });
+                    Product.create(item,
+                        function (err, newProduct) {
+                            if (err) {
+                            }
+                            console.log("new newProduct created, ", newProduct.product_title);
+                        });
+
+                    user.liked_product_list.push(item.product_link);
+                    console.log("Add product to an user's liked product list,  user:", user.user_name, " product: ", item.product_title);
+
+                }
+                let output = {
+                    "user_name": user.user_name,
+                    "liked_product": item.product_title,
+                }
+                response.status(200).send(JSON.stringify(output));
+            })
+        })
+    }
+    else {
+        response.status(400).send('Not logged in yet.');
+        return;
+    }
+});
 
 app.post('/add_bought_products/:user_id', function (request, response) {
-    console.log('server receives POST request /add_product ');
+    console.log('server receives POST request /add_bought_products ');
     let user_id = request.params.user_id;
     if (user_id) {
         console.log('user_id: ', user_id);

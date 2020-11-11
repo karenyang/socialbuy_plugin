@@ -82,6 +82,30 @@ chrome.runtime.onMessage.addListener(
                         });
                 }
                 return true;
+
+            case "onLikedProductsToBeAdded":
+                console.log("Background about to Handle onLikedProductsToBeAdded. ");
+                if (userInfo === undefined || userInfo.user_id === undefined) {
+                    console.log("User have not logged in");
+                    sendResponse("User have not logged in");
+                } else {
+                    console.log("Background about to send product data to background: ", message.data);
+                    console.log("current user id", userInfo.user_id);
+                    axios.post('http://localhost:8080/add_liked_products/' + userInfo.user_id, message.data, {
+                        headers: {
+                            'content-type': 'application/json',
+                        }
+                    })
+                        .then(res => {
+                            printResponse('onLikedProductsToBeAdded', res);
+                            sendResponse(res);
+                        })
+                        .catch(err => {
+                            console.error(err)
+                        });
+                }
+                return true;
+            
             case "onLoadSelfBoughtProductList":
                 console.log("Background about to get LoadSelfProductList data from background: ");
                 if (userInfo === undefined || userInfo.user_id === undefined) {
@@ -100,6 +124,26 @@ chrome.runtime.onMessage.addListener(
                         });
                 }
                 return true;
+            
+            case "onLoadSelfLikedProductList":
+                console.log("Background about to get onLoadSelfLikedProductList data from background: ");
+                if (userInfo === undefined || userInfo.user_id === undefined) {
+                    console.log("User have not logged in");
+                    sendResponse("User have not logged in");
+                } else {
+                    console.log("current user id", userInfo.user_id);
+
+                    axios.get('http://localhost:8080/user_liked_productlist/' + userInfo.user_id)
+                        .then(res => {
+                            printResponse('onLoadSelfLikedProductList', res);
+                            sendResponse(res);
+                        })
+                        .catch(err => {
+                            console.error(err)
+                        });
+                }
+                return true;
+
             case "onClickProduct":
                 console.log("Background about to open a new tab: ", message.data);
                 chrome.tabs.create({ url: "http://" + message.data });
@@ -176,7 +220,7 @@ chrome.runtime.onMessage.addListener(
                         });
                 }
                 return true;
-            
+
             case "onLoadFriendsProductList":
                 console.log("Background about to Handle onLoadFriendsProductList. ");
                 if (userInfo === undefined || userInfo.user_id === undefined) {
@@ -194,6 +238,7 @@ chrome.runtime.onMessage.addListener(
                         });
                 }
                 return true;
+
 
             default:
                 console.log('couldnt find matching case');
