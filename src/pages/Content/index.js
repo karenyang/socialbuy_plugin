@@ -30,7 +30,7 @@ if (url.includes('amazon.com/gp/cart')) {
         console.log("product_cost: ", item.product_cost);
 
         let img = document.querySelector("#" + product.id + img_query_string);
-        item.product_link = domain + img.getAttribute("href");
+        item.product_link = "https://" + domain + img.getAttribute("href");
         if (item.product_link.includes("ref=")) {
             item.product_link = item.product_link.split('ref=')[0];
         }
@@ -141,7 +141,12 @@ function fetchLikedProductInfo(item) {
         let item = {};
         item.product_title = document.querySelector("#productTitle").innerText;
         console.log("product_title: ", item.product_title)
-        let cost_str = document.querySelector("#priceblock_ourprice").innerText;
+        let cost_str = "";
+        if (document.querySelector("#priceblock_ourprice") == null){
+            cost_str = document.querySelector("#priceblock_saleprice").innerText;
+        } else {
+            cost_str =  document.querySelector("#priceblock_ourprice").innerText;
+        }
         cost_str = cost_str.substring(1);
         item.product_cost = parseFloat(cost_str);
         console.log("product_cost: ", item.product_cost);
@@ -150,7 +155,8 @@ function fetchLikedProductInfo(item) {
             item.product_link = item.product_link.split('ref=')[0];
         }
         console.log("product_link:  ", item.product_link);
-        item.product_imgurl = document.querySelector("#landingImage").src;
+        item.product_imgurl = document.querySelector("#main-image-container > ul > li.image.item.itemNo0.maintain-height.selected > span > span > div > img").src;
+        
         console.log("product_imgurl:  ", item.product_imgurl);
         item.product_by = "Amazon";
 

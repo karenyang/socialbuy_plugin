@@ -264,8 +264,8 @@ app.post('/search/:user_id', function (request, response) {
 });
 
 
-app.get('/user_liked_productlist/:user_id', function (request, response) {
-    console.log('server receives Get request /user_liked_productlist/ ');
+app.get('/user_liked_product_list/:user_id', function (request, response) {
+    console.log('server receives Get request /user_liked_product_list/ ');
 
     let user_id = request.params.user_id;
     if (user_id) {
@@ -281,8 +281,8 @@ app.get('/user_liked_productlist/:user_id', function (request, response) {
                 response.status(421).send('User not found.');
                 return;
             }
-            let liked_productlist = [];
-            const product_links = user.liked_productlist;
+            let liked_product_list = [];
+            const product_links = user.liked_product_list;
             console.log("Number of  products links: ", product_links.length, product_links);
             async.each(product_links, function (link, callback) {
                 Product.findOne({
@@ -295,7 +295,7 @@ app.get('/user_liked_productlist/:user_id', function (request, response) {
                         callback('product with product_link:' + link + ' not found.');
                     }
                     else {
-                        liked_productlist.push(product);
+                        liked_product_list.push(product);
                         callback(null);
                     }
                 });
@@ -304,11 +304,11 @@ app.get('/user_liked_productlist/:user_id', function (request, response) {
                     console.error("Failed to fetch user's product list");
                     response.status(400).send("Failed to fetch user's product list ");
                 } else {
-                    liked_productlist.sort((a, b) => b.createdAt > a.createdAt ? 1 : -1);
+                    liked_product_list.sort((a, b) => b.createdAt > a.createdAt ? 1 : -1);
                     console.log("Done fetching all product lists.");
                     let output = {
                         "user_name": user.user_name,
-                        "liked_productlist": liked_productlist,
+                        "liked_product_list": liked_product_list,
                     }
                     response.status(200).send(JSON.stringify(output));
                 }
@@ -322,8 +322,8 @@ app.get('/user_liked_productlist/:user_id', function (request, response) {
 
 });
 
-app.get('/user_bought_productlist/:user_id', function (request, response) {
-    console.log('server receives Get request /user_bought_productlist/ ');
+app.get('/user_bought_product_list/:user_id', function (request, response) {
+    console.log('server receives Get request /user_bought_product_list/ ');
 
     let user_id = request.params.user_id;
     if (user_id) {
@@ -439,6 +439,64 @@ app.post('/delete_bought_product/:user_id', function (request, response) {
     }
 });
 
+app.post('/delete_liked_product/:user_id', function (request, response) {
+    console.log('server receives POST request /delete_liked_product ');
+    let user_id = request.params.user_id;
+    if (user_id) {
+        console.log('user_id: ', user_id);
+        let product_id = request.body["product_id"];
+        console.log('product_id: ', request.body);
+
+        User.findOne({
+            _id: user_id,
+        }, function (err, user) {
+            if (err) {
+                console.error(err);
+                response.status(422).send(err);
+            }
+            if (user === null) {
+                console.error('User with id:' + user_id + ' not found.');
+                response.status(421).send('User not found.');
+                return;
+            }
+            Product.findOne({
+                _id: product_id,
+            }, function (err, product) {
+                if (err) {
+                    console.error(err);
+                    response.status(422).send(err);
+                    return;
+                }
+                if (product === null) {
+                    console.error('Product with id:' + product_id + ' not found.');
+                    response.status(421).send('Product not found.');
+                    return;
+                }
+                const idx1 = user.liked_product_list.indexOf(product.product_link);
+                if (idx1 === -1) {
+                    console.error('Product with id:' + product_id + ' not found in user liked product list');
+                    response.status(421).send('Product not found in user liked product list');
+                    return;
+                }
+                user.liked_product_list.splice(idx1, 1);
+                user.save()
+                const idx2 = product.liker_list.indexOf(user._id);
+                if (idx2 === -1) {
+                    console.error('user with id:' + user._id + ' not found in  product liker list');
+                    response.status(421).send('User not found in product liker list');
+                    return;
+                }
+                product.liker_list.splice(idx2, 1);
+                product.save();
+                response.status(200).send('Success in deleting the liked product');
+            });
+        });
+    } else {
+        response.status(400).send('Not logged in yet.');
+        return;
+    }
+});
+
 app.post('/add_liked_products/:user_id', function (request, response) {
     console.log('server receives POST request /add_liked_products ');
     let user_id = request.params.user_id;
@@ -472,10 +530,14 @@ app.post('/add_liked_products/:user_id', function (request, response) {
                     }
                     if (!user.liked_product_list.includes(product.product_link)) {
                         user.liked_product_list.push(product.product_link);
+                        user.save()
                         console.log("Add product to an user's liked product list,  user:", user.user_name, " product: ", product.product_title);
                     }
                 }
                 else {
+                    user.liked_product_list.push(item.product_link);
+                    console.log("Add product to an user's  product list,  user:", user.user_name, " product: ", item.product_title);
+                    user.save();
                     Object.assign(item, { "liker_list": [user_id] });
                     Product.create(item,
                         function (err, newProduct) {
@@ -483,8 +545,6 @@ app.post('/add_liked_products/:user_id', function (request, response) {
                             }
                             console.log("new newProduct created, ", newProduct.product_title);
                         });
-
-                    user.liked_product_list.push(item.product_link);
                     console.log("Add product to an user's liked product list,  user:", user.user_name, " product: ", item.product_title);
 
                 }
@@ -545,12 +605,15 @@ app.post('/add_bought_products/:user_id', function (request, response) {
                     }
                     else {
                         Object.assign(item, { "buyer_list": [user_id] });
+                        user.bought_product_list.push(item.product_link);
+                        console.log("Add product to an user's  product list,  user:", user.user_name, " product: ", item.product_title);
+
                         Product.create(item,
                             function (err, newProduct) {
                                 if (err) {
                                     callback(err);
                                 }
-                                console.log("new newProduct created, ", newProduct.product_title);
+                                console.log("new newProduct created, ", newProduct.product_title);  
                             })
 
                     }
@@ -563,7 +626,7 @@ app.post('/add_bought_products/:user_id', function (request, response) {
                 } else {
                     user.save();
                     console.log("Done adding all products from page");
-                    response.status(200).send("Success in adding products");
+                    response.status(200).send("Success in adding bought products");
                 }
                 return;
             });

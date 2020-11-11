@@ -23,22 +23,33 @@ class UserInfoPage extends Component {
         this.state = {
             search_value: "",
             self_bought_product_list: [],
+            self_liked_product_list: [],
             friends_list: [],
             search_result: "",
             tab: 0,
-            show_collection: false,
+            show_collection_bought: false,
+            show_collection_liked: false,
+
             show_friends: false,
         }
         console.log(this.state);
     }
 
 
-    updateSelfProductList = (bought_product_list) => {
+    updateSelfBoughtProductList = (bought_product_list) => {
         this.setState({
             self_bought_product_list: bought_product_list,
         });
         console.log("State product list updated: ", this.state);
     }
+
+    updateSelfLikedProductList = (liked_product_list) => {
+        this.setState({
+            self_liked_product_list: liked_product_list,
+        });
+        console.log("State product list updated: ", this.state);
+    }
+
 
     updateFriendsList = (friends_list) => {
         this.setState({
@@ -48,19 +59,36 @@ class UserInfoPage extends Component {
     }
 
     componentDidMount = () => {
-        const updateSelfProductList = this.updateSelfProductList;
+        const updateSelfBoughtProductList = this.updateSelfBoughtProductList;
         chrome.runtime.sendMessage({ type: "onLoadSelfBoughtProductList" },
             function (res) {
                 console.log('Greetings receives reply from background for onLoadSelfBoughtProductList ', res.data);
                 if (res.status === 200) {
                     console.log("onLoadSelfBoughtProductList succeeded.");
-                    updateSelfProductList(res.data.bought_product_list);
+                    updateSelfBoughtProductList(res.data.bought_product_list);
                 }
                 else {
-                    console.error(res.data + ", onLoadSelfBoughtProductList failed.");
+                    console.error(res.data + ", onLoadSelfProductList failed.");
                 }
             }
         );
+
+        const updateSelfLikedProductList = this.updateSelfLikedProductList;
+
+        chrome.runtime.sendMessage({ type: "onLoadSelfLikedProductList" },
+            function (res) {
+                console.log('Greetings receives reply from background for onLoadSelfLikedProductList ', res.data);
+                if (res.status === 200) {
+                    console.log("onLoadSelfLikedProductList succeeded.");
+                    updateSelfLikedProductList(res.data.liked_product_list);
+                }
+                else {
+                    console.error(res.data + ", onLoadSelfLikedProductList failed.");
+                }
+            }
+        );
+
+
         const updateFriendsList = this.updateFriendsList;
         chrome.runtime.sendMessage({ type: "onLoadFriendsList" },
             function (res) {
@@ -111,9 +139,34 @@ class UserInfoPage extends Component {
         );
     }
 
-    onClickCollectionButton = () => {
+    onDeleteLikedProduct(product_id) {
+        console.log("product to be delete has id", product_id);
+        let new_self_liked_product_list = this.state.self_liked_product_list.filter(item => item['_id'] !== product_id);
         this.setState({
-            show_collection: !this.state.show_collection
+            self_liked_product_list: new_self_liked_product_list,
+        });
+        chrome.runtime.sendMessage({ type: "onDeleteSelfLikedProduct", data: product_id },
+            function (res) {
+                console.log('Greetings receives reply from background for onDeleteSelfLikedProduct', res.data);
+                if (res.status === 200) {
+                    console.log("onDeleteSelfLikedProduct succeeded.");
+                }
+                else {
+                    console.error(res.data + ", onDeleteSelfLikedProduct failed.");
+                }
+            }
+        );
+    }
+
+    onClickCollectionBoughtButton = () => {
+        this.setState({
+            show_collection_bought: !this.state.show_collection_bought
+        })
+    }
+
+    onClickCollectionLikedButton = () => {
+        this.setState({
+            show_collection_liked: !this.state.show_collection_liked
         })
     }
 
@@ -127,6 +180,8 @@ class UserInfoPage extends Component {
         console.log("friend clicked: ", friend.user_name);
     }
 
+
+
     render() {
         return (
             <Grid container spacing={0} alignItems="center" justify="center" >
@@ -138,14 +193,14 @@ class UserInfoPage extends Component {
                 <Grid item xs={12}>
                     <Card style={{ width: 400, marginTop: 5, display: 'flex', justifyContent: 'center' }}>
                         <CardActions>
-                            <Button onClick={this.onClickCollectionButton} style={{ textTransform: "none" }} >
+                            <Button onClick={this.onClickCollectionBoughtButton} style={{ textTransform: "none" }} >
                                 Your Collection - purchased
                             </Button>
                         </CardActions>
                     </Card>
 
-                    <Collapse in={this.state.show_collection}>
-                        <Paper style={{ maxHeight: 540, width: 400, marginTop: 5, overflow: 'auto' }}>
+                    <Collapse in={this.state.show_collection_bought}>
+                        <Paper style={{ maxHeight: 500, width: 400, marginTop: 5, overflow: 'auto' }}>
                             {
                                 this.state.self_bought_product_list.map((product) => (
                                     <Card key={product._id}>
@@ -166,7 +221,7 @@ class UserInfoPage extends Component {
                                                 <CardActions>
                                                     <IconButton
                                                         style={{ padding: 0, height: 18, width: 18 }}
-                                                        onClick={() => this.onDeleteProduct(product._id)}
+                                                        onClick={() => this.onDeleteBoughtProduct(product._id)}
                                                     >
                                                         <DeleteIcon style={{ fontSize: 15 }}/>
                                                     </IconButton>
@@ -179,6 +234,52 @@ class UserInfoPage extends Component {
                         </Paper>
                     </Collapse>
                     
+
+                    <Card style={{ width: 400, marginTop: 5, display: 'flex', justifyContent: 'center' }}>
+                        <CardActions>
+                            <Button onClick={this.onClickCollectionLikedButton} style={{ textTransform: "none" }} >
+                                Your Collection - liked
+                            </Button>
+                        </CardActions>
+                    </Card>
+
+                    <Collapse in={this.state.show_collection_liked}>
+                        <Paper style={{ maxHeight: 450, width: 400, marginTop: 5, overflow: 'auto' }}>
+                            {
+                                this.state.self_liked_product_list.map((product) => (
+                                    <Card key={product._id}>
+                                        <Grid container spacing={0}  >
+                                            <Grid item xs={4}>
+                                                <CardActionArea>
+                                                    <img alt={product.product_title} src={product.product_imgurl} width="100" onClick={() => { this.onClickProduct(product) }} />
+                                                </CardActionArea>
+                                            </Grid>
+                                            <Grid item xs={7}>
+                                                <CardContent >
+                                                    <Typography gutterBottom variant="body2" component="h5">
+                                                        {this.cropTitle(product.product_title)}
+                                                    </Typography>
+                                                </CardContent>
+                                            </Grid>
+                                            <Grid item xs={1}>
+                                                <CardActions>
+                                                    <IconButton
+                                                        style={{ padding: 0, height: 18, width: 18 }}
+                                                        onClick={() => this.onDeleteLikedProduct(product._id)}
+                                                    >
+                                                        <DeleteIcon style={{ fontSize: 15 }}/>
+                                                    </IconButton>
+                                                </CardActions>
+                                            </Grid>
+                                        </Grid>
+                                    </Card>
+                                ))
+                            }
+                        </Paper>
+                    </Collapse>
+                    
+
+
 
                     <Card style={{ width: 400, marginTop: 5, display: 'flex', justifyContent: 'center' }}>
                         <CardActions>

@@ -105,7 +105,7 @@ chrome.runtime.onMessage.addListener(
                         });
                 }
                 return true;
-            
+
             case "onLoadSelfBoughtProductList":
                 console.log("Background about to get LoadSelfProductList data from background: ");
                 if (userInfo === undefined || userInfo.user_id === undefined) {
@@ -114,7 +114,7 @@ chrome.runtime.onMessage.addListener(
                 } else {
                     console.log("current user id", userInfo.user_id);
 
-                    axios.get('http://localhost:8080/user_bought_productlist/' + userInfo.user_id)
+                    axios.get('http://localhost:8080/user_bought_product_list/' + userInfo.user_id)
                         .then(res => {
                             printResponse('onLoadSelfBoughtProductList', res);
                             sendResponse(res);
@@ -124,7 +124,7 @@ chrome.runtime.onMessage.addListener(
                         });
                 }
                 return true;
-            
+
             case "onLoadSelfLikedProductList":
                 console.log("Background about to get onLoadSelfLikedProductList data from background: ");
                 if (userInfo === undefined || userInfo.user_id === undefined) {
@@ -133,7 +133,7 @@ chrome.runtime.onMessage.addListener(
                 } else {
                     console.log("current user id", userInfo.user_id);
 
-                    axios.get('http://localhost:8080/user_liked_productlist/' + userInfo.user_id)
+                    axios.get('http://localhost:8080/user_liked_product_list/' + userInfo.user_id)
                         .then(res => {
                             printResponse('onLoadSelfLikedProductList', res);
                             sendResponse(res);
@@ -146,7 +146,7 @@ chrome.runtime.onMessage.addListener(
 
             case "onClickProduct":
                 console.log("Background about to open a new tab: ", message.data);
-                chrome.tabs.create({ url: "http://" + message.data });
+                chrome.tabs.create({ url: message.data });
                 return true;
 
             case "onDeleteSelfBoughtProduct":
@@ -159,6 +159,23 @@ chrome.runtime.onMessage.addListener(
                     axios.post('http://localhost:8080/delete_bought_product/' + userInfo.user_id, { "product_id": message.data })
                         .then(res => {
                             printResponse('onDeleteSelfBoughtProduct', res);
+                            sendResponse(res);
+                        })
+                        .catch(err => {
+                            console.error(err)
+                        });
+                }
+                return true;
+            case "onDeleteSelfLikedProduct":
+                console.log("Background about to Delete Self Liked Product: ", message.data);
+                if (userInfo === undefined || userInfo.user_id === undefined) {
+                    console.log("User have not logged in");
+                    sendResponse("User have not logged in");
+                } else {
+                    console.log("current user id", userInfo.user_id);
+                    axios.post('http://localhost:8080/delete_liked_product/' + userInfo.user_id, { "product_id": message.data })
+                        .then(res => {
+                            printResponse('onDeleteSelfLikedProduct', res);
                             sendResponse(res);
                         })
                         .catch(err => {
