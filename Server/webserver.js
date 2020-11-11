@@ -490,7 +490,7 @@ app.post('/add_liked_products/:user_id', function (request, response) {
                 }
                 let output = {
                     "user_name": user.user_name,
-                    "liked_product": item.product_title,
+                    "liked_product_list": item.product_title,
                 }
                 response.status(200).send(JSON.stringify(output));
             })
