@@ -28,8 +28,8 @@ productSchema.index({
     name: "text-index",
     weights: {
         product_title: 10,
-        product_variation_names: 5,
-        product_summary: 3
+        product_variation_names: 2,
+        product_summary: 3,
     }
 });
 

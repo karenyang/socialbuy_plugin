@@ -20,7 +20,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Collapse from '@material-ui/core/Collapse';
 import DeleteIcon from '@material-ui/icons/Delete';
 
-class RecommmendationPage extends Component {
+class RecentActivitiesPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -74,7 +74,7 @@ class RecommmendationPage extends Component {
         console.log("product clicked.", product.product_title);
         chrome.runtime.sendMessage({ type: "onClickProduct", data: product.product_link },
             function (res) {
-                console.log("Page opened for product: ", product.title);
+                console.log("Page opened for product: ", product.product_title);
             }
         );
     }
@@ -215,4 +215,4 @@ class RecommmendationPage extends Component {
     }
 }
 
-export default RecommmendationPage;
+export default RecentActivitiesPage;

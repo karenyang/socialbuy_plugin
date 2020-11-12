@@ -84,15 +84,15 @@ class SideBox extends Component {
 
     render() {
         return (
-            <Draggable axis="y">
-                <div style={{ display: "inline-block", top: "200px", right: "0px", margin: "0px", position: "fixed", zIndex: 285 }} onMouseLeave={this.onMouseLeaveBlock}>
+            <Draggable>
+                <div style={{ display: "inline-block", position: "fixed", top: "200px", right: "0px", margin: "0px", zIndex: 285 }} onMouseLeave={this.onMouseLeaveBlock}>
                     <CardActionArea style={{ padding: "0px" }}>
                         <img className="iconimage" alt="icon" draggable="false" src={icon_url} width="56" height="56" style={{ zIndex: 288, margin: "0px" }} onMouseOver={this.onMouseOverIcon} onMouseLeave={this.onMouseLeaveIcon} />
                     </CardActionArea>
                     {this.state.product !== null && this.state.show_product &&
-                        <Card style={{ width: 250, position: "absolute", right: "0px", display: "flex", flexDirection: 'column', justifyContent: "space-between", alignItems: "center" }}>
+                        <Card style={{ backgroundColor: "white", width: 250, position: "absolute", right: "0px", display: "flex", flexDirection: 'column', justifyContent: "space-between", alignItems: "center" }}>
                             <div style={{ display: "flex", flexDirection: 'row', justifyContent: "space-between" }}>
-                                <img alt={this.state.product.product_title} src={this.state.product.product_imgurl} width="80" height="80" style={{ backgroundColor: "grey", margin: "10px" }} />
+                                <img className="productimage" alt={this.state.product.product_title} src={this.state.product.product_imgurl} />
                                 <CardContent style={{ paddingTop: "10px", paddingRight: "5px", paddingLeft: "5px" }} >
                                     <Typography gutterBottom variant="body2" component="h5" style={{ fontSize: 12, padding: "5px" }}>
                                         {this.cropTitle(this.state.product.product_title)}

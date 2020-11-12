@@ -289,9 +289,18 @@ app.post('/search/:user_id', function (request, response) {
                 }
                 console.log("search string is: ", search_string);
                 Product.aggregate([
-                    { $match: { $text: { $search: search_string } } },
-                    { $project: { score: { $meta: "textScore" } } },
-                    { $match: { score: { $gt: 8.0 } } }
+                    {
+                        $match: { $text: { $search: search_string } }
+                    },
+                    {
+                        $project: {
+                            _id: 1, product_title: 1, product_cost: 1, product_link: 1, product_imgurl: 1,
+                            score: { $meta: "textScore" },
+                        }
+                    },
+                    {
+                        $match: { score: { $gt: 6.0 } }
+                    }
                 ]).exec(function (err, items) {
                     if (err) {
                         console.log("Error Finding Query " + err)
@@ -301,6 +310,8 @@ app.post('/search/:user_id', function (request, response) {
                         user_name: user.user_name,
                         results: items,
                     }
+                    console.log("search results are: ", items);
+
                     response.status(200).send(JSON.stringify(output));
                 });
             }

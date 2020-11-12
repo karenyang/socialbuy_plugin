@@ -4,7 +4,7 @@ import React, {
 import './Greetings.css';
 import IconTabs from '../icontabs/iconstabs';
 import SearchPage from '../search_page/search_page';
-import RecommmendationPage from "../recommendation_page/recommendation_page";
+import RecentActivitiesPage from "../recent_activities/recent_activities";
 import UserInfoPage from "../userinfo_page/userinfo_page";
 
 
@@ -70,7 +70,7 @@ class Greetings extends Component {
     render() {
         return (
             <div className="container">
-                { this.state.tab === 0 &&  <RecommmendationPage />}
+                { this.state.tab === 0 &&  <RecentActivitiesPage />}
                 { this.state.tab === 1 &&  <SearchPage /> }
                 { this.state.tab === 2 &&  <UserInfoPage onLogOut={this.onLogOut} />}
                 <IconTabs handleTabChange={this.handleTabChange}/>

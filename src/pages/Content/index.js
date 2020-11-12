@@ -1,6 +1,8 @@
 import axios from 'axios';
 import './content.styles.css';
 import SideBox from "../../containers/sidebox/sidebox";
+import RecommendationBox from "../../containers/recommendationbox/recommendationbox";
+
 import React from 'react';
 import ReactDOM from "react-dom";
 
@@ -46,6 +48,12 @@ function searchFromUrl(){
             console.log('this is the response from the background page for onHandleSearch: ', response);
             if (response.status === 200) {
                 console.log("onHandleSearch succeeded.", response.data);
+                if (response.data.results.length > 0 ){
+                    ReactDOM.render(
+                        <RecommendationBox recommendated_products={response.data.results}/>,
+                        document.body.appendChild(document.createElement("DIV"))
+                    )
+                }
             } else {
                 console.log("onHandleSearch failed.", response.data);
             }

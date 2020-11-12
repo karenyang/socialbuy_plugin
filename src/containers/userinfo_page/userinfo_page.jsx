@@ -282,7 +282,7 @@ class UserInfoPage extends Component {
                             <CardActions>
                                 <Button onClick={this.onClickFriendsButton} style={{ textTransform: "none" }} >
                                     Friends
-                            </Button>
+                                </Button>
                             </CardActions>
                         </Card>
                         <Collapse in={this.state.show_friends}>
