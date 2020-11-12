@@ -161,6 +161,7 @@ class RecommmendationPage extends Component {
                                                     </Typography>
                                                 }
                                             </CardContent>
+                                            
                                             {/* <CardActions>
                                                 <IconButton aria-label="add to favorites">
                                                     <FavoriteIcon style={{ fontSize: 20 }} />

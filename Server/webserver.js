@@ -260,8 +260,8 @@ app.post('/search/:user_id', function (request, response) {
                 User.findOne({
                     user_name: search_key,
                 }, function (err, friend) {
-                    if (user === null) {
-                        response.status(201).send('User not found.');
+                    if (friend === null) {
+                        response.status(201).send('friend not found.');
                         return;
                     }
                     else {
