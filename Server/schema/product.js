@@ -1,7 +1,6 @@
 "use strict";
 
 const mongoose = require('mongoose');
-const { ObjectId } = mongoose.Schema;
 
 
 const productSchema = new mongoose.Schema(
@@ -15,12 +14,24 @@ const productSchema = new mongoose.Schema(
         buyer_list: { type: [String], default: [] }, //user ids
         liker_list: { type: [String], default: [] }, //user ids
 
-        product_variation_names: [String], 
+        product_variation_names: [String],
         product_variation_imgurls: [String]
     },
     { timestamps: true }
 );
 
+productSchema.index({
+    "product_title": 'text',
+    "product_variation_names": 'text',
+    "product_summary": 'text',
+}, {
+    name: "text-index",
+    weights: {
+        product_title: 10,
+        product_variation_names: 5,
+        product_summary: 3
+    }
+});
 
 var Product = mongoose.model('Product', productSchema);
 

@@ -134,7 +134,7 @@ app.get('/friends_productlist/:user_id', function (request, response) {
                     console.error("Failed to fetch user's products list");
                     response.status(400).send("Failed to fetch user's products list ");
                 } else {
-                    products.sort((a, b) => b.liked.length + 2 * b.bought.length > a.liked.length  + 2 * a.bought.length? 1 : -1);
+                    products.sort((a, b) => b.liked.length + 2 * b.bought.length > a.liked.length + 2 * a.bought.length ? 1 : -1);
                     console.log("Done fetching product lists: length=", products.length);
                     let output = {
                         "user_name": user.user_name,
@@ -280,6 +280,28 @@ app.post('/search/:user_id', function (request, response) {
                         return;
                     }
 
+                });
+            }
+            else {
+                let search_string = search_key;
+                if (search_category !== null) {
+                    search_string = search_key.concat(" " + search_category);
+                }
+                console.log("search string is: ", search_string);
+                Product.aggregate([
+                    { $match: { $text: { $search: search_string } } },
+                    { $project: { score: { $meta: "textScore" } } },
+                    { $match: { score: { $gt: 8.0 } } }
+                ]).exec(function (err, items) {
+                    if (err) {
+                        console.log("Error Finding Query " + err)
+                    };
+
+                    let output = {
+                        user_name: user.user_name,
+                        results: items,
+                    }
+                    response.status(200).send(JSON.stringify(output));
                 });
             }
         });
@@ -636,7 +658,7 @@ app.post('/add_bought_products/:user_id', function (request, response) {
                                 if (err) {
                                     callback(err);
                                 }
-                                console.log("new newProduct created, ", newProduct.product_title);  
+                                console.log("new newProduct created, ", newProduct.product_title);
                             })
 
                     }

@@ -9,17 +9,12 @@ import {
 } from '@material-ui/core';
 import CardActionArea from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
-import CardActions from '@material-ui/core/CardActions';
-import SearchIcon from '@material-ui/icons/Search';
-import TextField from '@material-ui/core/TextField';
 import Draggable from 'react-draggable';
 import fetchLikedProductInfo from './modules/fetch_product';
 import "./sidebox.css";
 
-const pink_heart = "https://crissov.github.io/unicode-proposals/img/pink-heart_emojitwo.svg";
-const red_heart = "https://crissov.github.io/unicode-proposals/img/2764_emojitwo.svg";
+const icon_url = "https://lh3.googleusercontent.com/1IJ60N360-Z6JxbS77UnKYPug2JmjXd40vX0-PRkT1VbjB4GGxLF1gfXMCiPs09Hj-2Lfo8=s85";
 
-const icon = "https://lh3.googleusercontent.com/7RD2Vgs9Xpieti3nKf9IWQeq8nd7hIR_-zVdwHdzw87CsDT_TfstQSunauqnbWjgqA1WjhI=s85";
 class SideBox extends Component {
     constructor(props) {
         super(props);
@@ -92,7 +87,7 @@ class SideBox extends Component {
             <Draggable axis="y">
                 <div style={{ display: "inline-block", top: "200px", right: "0px", margin: "0px", position: "fixed", zIndex: 285 }} onMouseLeave={this.onMouseLeaveBlock}>
                     <CardActionArea style={{ padding: "0px" }}>
-                        <img className="iconimage" alt="icon" draggable="false" src={icon} width="56" height="56" style={{ zIndex: 288, margin: "0px" }} onMouseOver={this.onMouseOverIcon} onMouseLeave={this.onMouseLeaveIcon} />
+                        <img className="iconimage" alt="icon" draggable="false" src={icon_url} width="56" height="56" style={{ zIndex: 288, margin: "0px" }} onMouseOver={this.onMouseOverIcon} onMouseLeave={this.onMouseLeaveIcon} />
                     </CardActionArea>
                     {this.state.product !== null && this.state.show_product &&
                         <Card style={{ width: 250, position: "absolute", right: "0px", display: "flex", flexDirection: 'column', justifyContent: "space-between", alignItems: "center" }}>
@@ -115,12 +110,9 @@ class SideBox extends Component {
                                     </Button>
                                 }
                             </CardActionArea>
-
-
                         </Card>
                     }
                 </div>
-
             </Draggable>
 
         )

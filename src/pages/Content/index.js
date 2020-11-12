@@ -14,11 +14,49 @@ let onBoughtProductsToBeAdded = [];
 
 
 if (url.includes('amazon.com/gp/cart')) {
+    console.log("Grabbing all products in cart...");
+    grabAllProductsInCart();
+}
+else if (url.includes('amazon.com/s?k=')) {
+    console.log("Searching from URL  .....");
+    searchFromUrl();
+}
+else if (url.includes('amazon.com/')) {//Creating the side box
+    console.log("Adding button .....");
+    ReactDOM.render(
+        <SideBox />,
+        document.body.appendChild(document.createElement("DIV"))
+    )
+}
+
+
+console.log("================================================================================================");
+
+function searchFromUrl(){
+    const query_url = new URL(url);
+    const key = query_url.searchParams.get('k');
+    const category = query_url.searchParams.get('i');
+    console.log("Amazon search query: ", key, ", category: ", category);
+    let query = {
+        search_key: key,
+        search_category: category,
+    }
+    chrome.runtime.sendMessage({type: "onHandleSearch", data: query},
+        function (response) {
+            console.log('this is the response from the background page for onHandleSearch: ', response);
+            if (response.status === 200) {
+                console.log("onHandleSearch succeeded.", response.data);
+            } else {
+                console.log("onHandleSearch failed.", response.data);
+            }
+        }
+    );
+}
+
+function grabAllProductsInCart() {
     let domain = "www.amazon.com";
     let img_query_string = " > div.sc-list-item-content > div > div.a-column.a-span10 > div > div > div.a-fixed-left-grid-col.a-float-left.sc-product-image-desktop.a-col-left > a";
     let content = document.querySelectorAll("#activeCartViewForm > div.a-row.a-spacing-mini.sc-list-body.sc-java-remote-feature >  div.a-row.sc-list-item.sc-list-item-border.sc-java-remote-feature");
-    // console.log("content: " , content);
-
     for (let i = 0; i < content.length - 1; i++) { //content.length - 1 because last block is alexa ads
         let product = content[i];
         console.log('product ', i);
@@ -43,23 +81,6 @@ if (url.includes('amazon.com/gp/cart')) {
         item.product_by = "Amazon";
         fetchMoreBoughtProductInfo(item);
     }
-}
-else if (url.includes('amazon.com/s?k=')) {
-    const query_url = new URL(url);
-    const key = query_url.searchParams.get('k');
-    const category = query_url.searchParams.get('i');
-    console.log( "Amazon search query: ", key, ", category: ", category);
-
-}
-else if (url.includes('amazon.com/')) {//Creating Elements
-    console.log("Adding button .....");
-    //Appending to DOM 
-    ReactDOM.render(
-        <SideBox />,
-        document.body.appendChild(document.createElement("DIV"))
-      )
-      
-
 }
 
 function fetchMoreBoughtProductInfo(item) {
@@ -91,7 +112,6 @@ function fetchMoreBoughtProductInfo(item) {
                     item.product_variation_names = product_variation_names;
                     item.product_variation_imgurls = product_variation_imgurls;
                     onBoughtProductsToBeAdded.push(item);
-
                 })
             .catch(
                 error => {
@@ -101,7 +121,6 @@ function fetchMoreBoughtProductInfo(item) {
 }
 
 setInterval(function () {
-
     if (onBoughtProductsToBeAdded.length > 0) {
         sendToBackground("onBoughtProductsToBeAdded", onBoughtProductsToBeAdded);
     }
@@ -119,10 +138,7 @@ function sendToBackground(eventName, eventData, callback) {
                 console.log(eventName, " failed.", response.data);
             }
             onBoughtProductsToBeAdded = []; //clear
-
         }
     );
 }
 
-
-console.log("================================================================================================");
