@@ -1,0 +1,6 @@
+.iconimage:hover {
+    cursor: move;
+  }
+.iconimage {
+    vertical-align: true;
+}

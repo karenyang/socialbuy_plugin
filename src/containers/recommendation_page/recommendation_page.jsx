@@ -39,8 +39,6 @@ class RecommmendationPage extends Component {
     updateFriendsProductList = (friends_product_list) => {
         let product_expanded = [];
         let product_objs = [];
-        let friends_bought = [];
-        let friends_liked = [];
         for (let i = 0; i < friends_product_list.length; i++) {
             let product = friends_product_list[i].product;
             product.friends_bought = friends_product_list[i].bought;
@@ -81,7 +79,6 @@ class RecommmendationPage extends Component {
         );
     }
 
-
     cropTitle = (product_title) => {
         let title = product_title.split(" ");
         return title.slice(0, 10).join(" ");
@@ -117,32 +114,7 @@ class RecommmendationPage extends Component {
         console.log("state update to", this.state);
     }
 
-    handleInputChange = (event) => {
-        const {
-            value,
-            name
-        } = event.target;
-        this.setState({
-            [name]: value
-        });
-    }
 
-    handleSearch = (event) => {
-        if (event.key === 'Enter') {
-            console.log('Searching for: ', event.target.value);
-            chrome.runtime.sendMessage({ type: "onHandleSearch", data: { "search_category": "friends", "search_key": event.target.value } },
-                function (res) {
-                    console.log('Greetings receives reply from background for onHandleSearch ', res.data);
-                    if (res.status === 200) {
-                        this.setState({ search_result: res.data });
-                    }
-                    else {
-                        this.setState({ search_result: "" });
-                    }
-                }
-            );
-        }
-    }
     render() {
         return (
             <Grid container spacing={0} alignItems="center" >
@@ -157,7 +129,7 @@ class RecommmendationPage extends Component {
                     <Typography variant="h4" color="inherit" style={{ "fontSize": 16, "paddingTop": 5, "paddingBottom": 5 }}>
                         What's popular
                         </Typography>
-                    <Paper style={{ maxHeight: 540, width: 400, overflow: 'auto' }}>
+                    <Paper style={{ maxHeight: 470, width: 400, overflow: 'auto' }}>
                         {
                             this.state.friends_product_list.map((product) => (
                                 <Card key={product._id}>
@@ -177,12 +149,19 @@ class RecommmendationPage extends Component {
                                                     ${product.product_cost}
                                                 </Typography>
 
-                                                <Typography variant="body2" color="textSecondary" component="p">
-                                                    purchased by {product.friends_bought.join(', ')}
-                                                </Typography>
-                                            </CardContent>
+                                                {product.friends_bought.length > 0  && 
+                                                    <Typography variant="body2" color="textSecondary" component="p">
+                                                        purchased by {product.friends_bought.join(', ')}
+                                                    </Typography>
+                                                }
 
-                                            <CardActions>
+                                                { product.friends_liked.length > 0  && 
+                                                    <Typography variant="body2" color="textSecondary" component="p">
+                                                        liked by {product.friends_liked.join(', ')}
+                                                    </Typography>
+                                                }
+                                            </CardContent>
+                                            {/* <CardActions>
                                                 <IconButton aria-label="add to favorites">
                                                     <FavoriteIcon style={{ fontSize: 20 }} />
                                                 </IconButton>
@@ -220,7 +199,7 @@ class RecommmendationPage extends Component {
                                                         </Typography>
 
                                                 </CardContent>
-                                            </Collapse>
+                                            </Collapse> */}
                                         </Grid>
 
                                     </Grid>

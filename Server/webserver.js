@@ -83,7 +83,7 @@ app.get('/friends_productlist/:user_id', function (request, response) {
                         for (let i = 0; i < friend.bought_product_list.length; i++) {
                             if (friend.bought_product_list[i] in product_links) {
                                 products[product_links.indexOf(friend.bought_product_list[i])].bought.push(friend.user_name);
-                                products[product_links.indexOf(friend.bought_product_list[i])].liked.push(friend.user_name);
+                                // products[product_links.indexOf(friend.bought_product_list[i])].liked.push(friend.user_name);
                             }
                             else {
                                 product_links.push(friend.bought_product_list[i]);
@@ -96,6 +96,29 @@ app.get('/friends_productlist/:user_id', function (request, response) {
                                     products.push({
                                         product: product,
                                         bought: [friend.user_name],
+                                        liked: [],
+                                    });
+
+                                });
+                                // console.log("added a product link to product lists: ", products.length)
+                            }
+                        }
+                        for (let i = 0; i < friend.liked_product_list.length; i++) {
+                            if (friend.liked_product_list[i] in product_links) {
+                                products[product_links.indexOf(friend.liked_product_list[i])].liked.push(friend.user_name);
+                                // products[product_links.indexOf(friend.bought_product_list[i])].liked.push(friend.user_name);
+                            }
+                            else {
+                                product_links.push(friend.liked_product_list[i]);
+                                await Product.findOne({
+                                    product_link: friend.liked_product_list[i]
+                                }, function (err, product) {
+                                    if (err) {
+                                        callback(err);
+                                    }
+                                    products.push({
+                                        product: product,
+                                        bought: [],
                                         liked: [friend.user_name]
                                     });
 
@@ -111,7 +134,7 @@ app.get('/friends_productlist/:user_id', function (request, response) {
                     console.error("Failed to fetch user's products list");
                     response.status(400).send("Failed to fetch user's products list ");
                 } else {
-                    products.sort((a, b) => b.liked.length > a.liked.length ? 1 : -1);
+                    products.sort((a, b) => b.liked.length + 2 * b.bought.length > a.liked.length  + 2 * a.bought.length? 1 : -1);
                     console.log("Done fetching product lists: length=", products.length);
                     let output = {
                         "user_name": user.user_name,
