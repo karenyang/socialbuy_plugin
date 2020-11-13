@@ -57,11 +57,20 @@ class SearchPage extends Component {
         }
     }
 
-    onAddFriend = (name) => {
-        console.log("onAddFriend: ", name);
-        chrome.runtime.sendMessage({ type: "onAddFriend", data: { "friend_username": name } },
+    onRequestFriend = (name) => {
+        console.log("onRequestFriend: ", name);
+        chrome.runtime.sendMessage({ type: "onRequestFriend", data: { "friend_username": name } },
             function (res) {
-                console.log('SearchPage receives reply from background for onAddFriend ', res.data);
+                console.log('SearchPage receives reply from background for onRequestFriend ', res.data);
+            }
+        );
+    }
+
+    onHandleFriendRequest = (name, is_accept_friend) => {
+        console.log("onHandleFriendRequest: ", name);
+        chrome.runtime.sendMessage({ type: "onHandleFriendRequest", data: { "friend_username": name , "is_accept_friend": is_accept_friend} },
+            function (res) {
+                console.log('SearchPage receives reply from background for onHandleFriendRequest ', res.data);
             }
         );
     }
@@ -97,7 +106,7 @@ class SearchPage extends Component {
                                 <Card key={result.user_name} style={{ width: 400, marginTop: 5, display: 'flex', justifyContent: 'center' }}>
                                     <Grid container spacing={0}  >
 
-                                        <Grid item xs={7}>
+                                        <Grid item xs={5}>
                                             <CardContent >
                                                 <Typography gutterBottom variant="body2" component="h5">
                                                     {result.user_name}
@@ -105,11 +114,11 @@ class SearchPage extends Component {
                                             </CardContent>
                                         </Grid>
 
-                                        <Grid item xs={5}>
-                                            {!result.is_friend && !result.is_self &&
+                                        <Grid item xs={7}>
+                                            {!result.is_friend && !result.is_self && !result.is_received_friend_reqeust && !result.is_sent_friend_reqeust &&
                                                 <CardActions>
                                                     <Button style={{ textTransform: "none" }}
-                                                        onClick={() => this.onAddFriend(result.user_name)}
+                                                        onClick={() => this.onRequestFriend(result.user_name)}
                                                     >
                                                         Add Friend
                                                     </Button>
@@ -128,6 +137,32 @@ class SearchPage extends Component {
                                                         Me
                                                     </Typography>
                                                 </CardContent>
+                                            }
+                                            {result.is_sent_friend_reqeust && !result.is_friend &&
+                                                <CardContent >
+                                                    <Typography variant="body2" component="h5" style={{'color': 'grey'}}>
+                                                        Friend request sent
+                                                    </Typography>
+                                                </CardContent>
+                                            }
+                                             {result.is_received_friend_reqeust && !result.is_friend &&
+                                                <CardActions>
+                                                    <Typography variant="body2" component="h5" style={{'color': 'grey'}}>
+                                                        Friend request received
+                                                    </Typography>
+                                                    <div style={{display: 'flex'}}>
+                                                    <Button style={{ textTransform: "none" }}
+                                                        onClick={() => this.onHandleFriendRequest(result.user_name, true)}
+                                                    >
+                                                        Accept
+                                                    </Button>
+                                                    <Button style={{ textTransform: "none" }}
+                                                        onClick={() => this.onHandleFriendRequest(result.user_name, false)}
+                                                    >
+                                                        Deny
+                                                    </Button>
+                                                    </div>
+                                                </CardActions>
                                             }
                                         </Grid>
                                     </Grid>

@@ -191,8 +191,51 @@ app.get('/friendslist/:user_id', function (request, response) {
     }
 });
 
+app.get('/receivedfriendrequests/:user_id', function (request, response) {
+    console.log('server receives Get request /receivedfriendrequests ');
+    let user_id = request.params.user_id;
+    if (user_id) {
+        console.log('request.session.user_id: ', user_id);
+        User.findOne({
+            _id: user_id,
+        }, function (err, user) {
+            if (err) {
+                console.error(err);
+            }
+            if (user === null) {
+                console.error('User with id:' + user_id + ' not found.');
+                response.status(421).send('User not found.');
+                return;
+            }
+            User.aggregate([
+                {
+                    $match: {
+                        "_id" : {"$in": user.friend_requests_list}, // my id is in their friends request list
+                    }
+                },
+                {
+                    $project: {
+                        _id: 1, user_name: 1, profile_img: 1,
+                    }
+                }
+            ]).exec(function (err, received_friend_requests) {
+                if (err) {
+                    console.log("Error Finding Friends " + err)
+                };
+                let output = {
+                    user_name: user.user_name,
+                    received_friend_requests: received_friend_requests,
+                }
+                console.log("found friend requests: ", received_friend_requests);
+                response.status(200).send(JSON.stringify(output));
+            });
+        });
+    }
+});
+
+
 app.post('/respondfriendrequest/:user_id', function (request, response) {
-    console.log('server receives Get request /acceptfriendrequest ');
+    console.log('server receives Get request /respondfriendrequest ');
     const friend_username = request.body.friend_username;
     const is_accept_friend = request.body.is_accept_friend; //boolean
 
@@ -220,19 +263,25 @@ app.post('/respondfriendrequest/:user_id', function (request, response) {
                 }
                 else {
                     console.log("Will respondfriendrequest a friend: ", friend_username, is_accept_friend);
-                    if (is_accept_friend){
+                    if (is_accept_friend){ //both add
                         user.friends_list.push(ObjectID(friend._id));
+                        friend.friends_list.push(ObjectID(user._id));
                     }
-                    // remove from the freind_requests_list no matter whether accepts or not 
-                    const idx = user.freind_requests_list.indexOf(friend._id);
+                    // remove from friend's friend_requests_list no matter whether accepts or not 
+                    const idx = friend.friend_requests_list.indexOf(user._id);
                     if (idx === -1) {
-                        console.error('friend with id:' + friend._id + ' not found in user product list');
+                        console.error('user with id:' + user._id + "not found in the sender's friend request list");
                         response.status(421).send('User not found.');
                         return;
                     }
-                    user.freind_requests_list.splice(idx, 1);
+                    else{
+                        friend.friend_requests_list.splice(idx, 1);
+                    }
+                    friend.save();
                     user.save();
-                    console.log("Handled a friend reqeust: ", user.friends_list);
+                    console.log("responded a friend reqeust between ", user._id, " and ",friend._id);
+                    console.log("their current friendlist should have each other: ", user.friends_list, " and ",friend.friends_list);
+                    console.log("their current friend request list should not have each other: ", user.friend_requests_list, " and ",friend.friend_requests_list);
                     response.status(200).send(user.friends_list);
                     return;
                 }
@@ -271,7 +320,7 @@ app.post('/requestfriend/:user_id', function (request, response) {
                 else {
                     console.log("Will send a request for friend: ", friend_username);
                     // user.friends_list.push(ObjectID(friend._id));
-                    user.freind_requests_list.push(ObjectID(friend._id));
+                    user.friend_requests_list.push(ObjectID(friend._id));
                     user.save();
                     console.log("requested a friend: ", user.friends_list);
                     response.status(200).send(user.friends_list);
@@ -316,7 +365,8 @@ app.post('/search/:user_id', function (request, response) {
                         result["user_name"] = friend.user_name;
                         result["is_friend"] = user.friends_list.includes(friend._id); //whether is already friend or is users themselves;
                         result["is_self"] = user.user_name === friend.user_name; //whether is already friend or is users themselves;
-                        result["is_sent_friend_reqeust"] = user.freind_requests_list.include(friend.user_name); //whether is already friend or is users themselves;
+                        result["is_sent_friend_reqeust"] = user.friend_requests_list.includes(friend._id); //whether i have sent friend request to others
+                        result["is_received_friend_reqeust"] = friend.friend_requests_list.includes(user._id); //whether others have sent friend request to me
 
                         let output = {
                             user_name: user.user_name,
@@ -471,7 +521,7 @@ app.get('/user_bought_product_list/:user_id', function (request, response) {
                     console.log("Done fetching all product lists.");
                     let output = {
                         "user_name": user.user_name,
-                        "liked_product_list": bought_product_list,
+                        "bought_product_list": bought_product_list,
                     }
                     response.status(200).send(JSON.stringify(output));
                 }

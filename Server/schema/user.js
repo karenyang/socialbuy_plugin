@@ -14,6 +14,7 @@ var userSchema = new mongoose.Schema({
     bought_product_list: [String], //product urls 
     liked_product_list: [String], //product urls 
     friends_list: [ObjectID], // friends ids 
+    friend_requests_list: [ObjectID],  // requested friends ids 
     profile_img: String //url to the photo
 },
     { timestamps: true }

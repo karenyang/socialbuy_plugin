@@ -166,7 +166,7 @@ chrome.runtime.onMessage.addListener(
                         });
                 }
                 return true;
-                
+
             case "onDeleteSelfLikedProduct":
                 console.log("Background about to Delete Self Liked Product: ", message.data);
                 if (userInfo === undefined || userInfo.user_id === undefined) {
@@ -203,16 +203,16 @@ chrome.runtime.onMessage.addListener(
                 }
                 return true;
 
-            case "onAddFriend":
-                console.log("Background about to Handle onAddFriend: ", message.data);
+            case "onRequestFriend":
+                console.log("Background about to Handle onRequestFriend: ", message.data);
                 if (userInfo === undefined || userInfo.user_id === undefined) {
                     console.log("User have not logged in");
                     sendResponse("User have not logged in");
                 } else {
                     console.log("current user id", userInfo.user_id);
-                    axios.post('http://localhost:8080/addfriend/' + userInfo.user_id, message.data)
+                    axios.post('http://localhost:8080/requestfriend/' + userInfo.user_id, message.data)
                         .then(res => {
-                            printResponse('onAddFriend', res);
+                            printResponse('onRequestFriend', res);
                             sendResponse(res);
                         })
                         .catch(err => {
@@ -257,9 +257,27 @@ chrome.runtime.onMessage.addListener(
                 }
                 return true;
 
+            case "onHandleFriendRequest":
+                console.log("Background about to Handle onHandleFriendRequest. ");
+                if (userInfo === undefined || userInfo.user_id === undefined) {
+                    console.log("User have not lpogged in");
+                    sendResponse("User have not logged in");
+                } else {
+                    console.log("current user id", userInfo.user_id);
+                    axios.post('http://localhost:8080/respondfriendrequest/' + userInfo.user_id, message.data)
+                        .then(res => {
+                            printResponse('onHandleFriendRequest', res);
+                            sendResponse(res);
+                        })
+                        .catch(err => {
+                            console.error(err)
+                        });
+                }
+                return true;
+
 
             default:
-                console.log('couldnt find matching case');
+                console.log('couldnt find matching case for ', message.type);
         }
     },
 );
