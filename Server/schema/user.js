@@ -5,7 +5,7 @@
 /* jshint node: true */
 
 var mongoose = require('mongoose');
-
+var ObjectID = mongoose.Types.ObjectId;
 // create a schema for User
 var userSchema = new mongoose.Schema({
     user_name: String,  //unique login name
@@ -13,7 +13,7 @@ var userSchema = new mongoose.Schema({
     salt: String,  //8byte hex string salt to concat to the user set password
     bought_product_list: [String], //product urls 
     liked_product_list: [String], //product urls 
-    friends_list: [String], // friends ids 
+    friends_list: [ObjectID], // friends ids 
     profile_img: String //url to the photo
 },
     { timestamps: true }

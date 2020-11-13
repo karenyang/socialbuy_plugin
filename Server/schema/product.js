@@ -2,18 +2,18 @@
 
 const mongoose = require('mongoose');
 
+var ObjectID = mongoose.Types.ObjectId;
 
 const productSchema = new mongoose.Schema(
     {
-        product_title: String,
+        product_title: String,   
         product_summary: String,
-        product_by: String,
-        product_link: String,
-        product_cost: Number,
-        product_imgurl: String,
-        buyer_list: { type: [String], default: [] }, //user ids
-        liker_list: { type: [String], default: [] }, //user ids
-
+        product_by: String,     //Amazon
+        product_link: String,   //url
+        product_cost: Number,   //float
+        product_imgurl: String, //url for img
+        buyer_list: { type: [ObjectID], default: [] }, //user ids
+        liker_list: { type: [ObjectID], default: [] }, //user ids
         product_variation_names: [String],
         product_variation_imgurls: [String]
     },
