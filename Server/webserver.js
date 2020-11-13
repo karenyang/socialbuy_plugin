@@ -69,6 +69,7 @@ app.get('/friends_productlist/:user_id', function (request, response) {
             }
             let products = [];
             let product_links = [];
+
             async.each(user.friends_list, function (friend_id, callback) {
                 User.findOne({
                     _id: friend_id,
@@ -290,7 +291,20 @@ app.post('/search/:user_id', function (request, response) {
                 console.log("search string is: ", search_string);
                 Product.aggregate([
                     {
-                        $match: { $text: { $search: search_string } }
+                        $match: {
+                            $text: { $search: search_string },  //match with string query.
+                            $expr: {
+                                $gt: [
+                                    {
+                                        $sum: [
+                                            { $size: { $setIntersection: ['$liker_list', user.friends_list] } }, //liker or buyer has my friends in it
+                                            { $size: { $setIntersection: ['$buyer_list', user.friends_list] } }
+                                        ]
+                                    },
+                                    0
+                                ]
+                            }
+                        }
                     },
                     {
                         $project: {
@@ -311,7 +325,6 @@ app.post('/search/:user_id', function (request, response) {
                         results: items,
                     }
                     console.log("search results are: ", items);
-
                     response.status(200).send(JSON.stringify(output));
                 });
             }
