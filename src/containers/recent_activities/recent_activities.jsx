@@ -8,17 +8,10 @@ import {
     Paper
 } from '@material-ui/core';
 import CardActionArea from '@material-ui/core/CardActionArea';
-import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import icon from '../../assets/img/icon-34.png';
-import { makeStyles, withStyles } from '@material-ui/core/styles';
-import FavoriteIcon from '@material-ui/icons/Favorite';
-import ShareIcon from '@material-ui/icons/Share';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import IconButton from '@material-ui/core/IconButton';
-import Collapse from '@material-ui/core/Collapse';
-import DeleteIcon from '@material-ui/icons/Delete';
+import CloseIcon from '@material-ui/icons/Close';
 
 class RecentActivitiesPage extends Component {
     constructor(props) {
@@ -119,10 +112,14 @@ class RecentActivitiesPage extends Component {
         return (
             <Grid container spacing={0} alignItems="center" >
                 <Grid item xs={2}>
-                    <img src={icon} alt="extension icon" />
+                    <img src={icon} alt="extension icon" width="25px" />
                 </Grid>
-                <Grid item xs={10}>
-
+                <Grid item xs={8}>
+                </Grid>
+                <Grid item xs={2}>
+                    <IconButton onClick={() => { window.close(); }} >
+                        <CloseIcon style={{ fontSize: 15 }} />
+                    </IconButton>
                 </Grid>
 
                 <Grid item xs={12}>
@@ -149,19 +146,19 @@ class RecentActivitiesPage extends Component {
                                                     ${product.product_cost}
                                                 </Typography>
 
-                                                {product.friends_bought.length > 0  && 
+                                                {product.friends_bought.length > 0 &&
                                                     <Typography variant="body2" color="textSecondary" component="p">
                                                         purchased by {product.friends_bought.join(', ')}
                                                     </Typography>
                                                 }
 
-                                                { product.friends_liked.length > 0  && 
+                                                {product.friends_liked.length > 0 &&
                                                     <Typography variant="body2" color="textSecondary" component="p">
                                                         liked by {product.friends_liked.join(', ')}
                                                     </Typography>
                                                 }
                                             </CardContent>
-                                            
+
                                             {/* <CardActions>
                                                 <IconButton aria-label="add to favorites">
                                                     <FavoriteIcon style={{ fontSize: 20 }} />

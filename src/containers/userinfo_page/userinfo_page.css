@@ -1,0 +1,22 @@
+
+.productimage {
+    max-width: 100px;
+    max-height: 120px;
+    width: auto;
+    height: auto;
+    align-self: center;
+    padding: 10px;
+}
+.productimage:hover{
+    cursor: pointer;
+}
+
+
+.avatar{
+    margin-left: 15px;
+    
+}
+.avatar:hover{
+    cursor: pointer;
+
+}

@@ -60,6 +60,25 @@ chrome.runtime.onMessage.addListener(
                     })
                 window.localStorage.clear();
                 return true;
+            
+            case "onLoadSelfInfo":
+                console.log("Background about to get onLoadSelfInfo data from background: ");
+                if (userInfo === undefined || userInfo.user_id === undefined) {
+                    console.log("User have not logged in");
+                    sendResponse("User have not logged in");
+                } else {
+                    console.log("current user id", userInfo.user_id);
+
+                    axios.get('http://localhost:8080/userinfo/' + userInfo.user_id)
+                        .then(res => {
+                            printResponse('onLoadSelfInfo', res);
+                            sendResponse(res);
+                        })
+                        .catch(err => {
+                            console.error(err)
+                        });
+                }
+                return true;
 
             case 'onBoughtProductsToBeAdded':
                 if (userInfo === undefined || userInfo.user_id === undefined) {
@@ -274,7 +293,7 @@ chrome.runtime.onMessage.addListener(
                         });
                 }
                 return true;
-                
+
             case "onHandleFriendRequest":
                 console.log("Background about to Handle onHandleFriendRequest. ");
                 if (userInfo === undefined || userInfo.user_id === undefined) {

@@ -168,12 +168,13 @@ app.get('/friendslist/:user_id', function (request, response) {
             User.aggregate([
                 {
                     $match: {
-                        "_id" : {"$in": user.friends_list},
+                        "_id": { "$in": user.friends_list },
                     }
                 },
                 {
                     $project: {
                         _id: 1, user_name: 1, profile_img: 1,
+                        mutual_friends: { $setIntersection: ["$friends_list", user.friends_list] },
                     }
                 }
             ]).exec(function (err, friends_list) {
@@ -210,12 +211,13 @@ app.get('/receivedfriendrequests/:user_id', function (request, response) {
             User.aggregate([
                 {
                     $match: {
-                        friend_requests_list : ObjectID(user_id), // my id is in their friends request list
+                        friend_requests_list: ObjectID(user_id), // my id is in their friends request list
                     }
                 },
                 {
                     $project: {
                         _id: 1, user_name: 1, profile_img: 1,
+                        mutual_friends: { $setIntersection: ["$friends_list", user.friends_list] },
                     }
                 }
             ]).exec(function (err, received_friend_requests) {
@@ -263,7 +265,7 @@ app.post('/respondfriendrequest/:user_id', function (request, response) {
                 }
                 else {
                     console.log("Will respondfriendrequest a friend: ", friend_username, is_accept_friend);
-                    if (is_accept_friend){ //both add
+                    if (is_accept_friend) { //both add
                         user.friends_list.push(ObjectID(friend._id));
                         friend.friends_list.push(ObjectID(user._id));
                     }
@@ -274,14 +276,14 @@ app.post('/respondfriendrequest/:user_id', function (request, response) {
                         response.status(421).send('User not found.');
                         return;
                     }
-                    else{
+                    else {
                         friend.friend_requests_list.splice(idx, 1);
                     }
                     friend.save();
                     user.save();
-                    console.log("responded a friend reqeust between ", user._id, " and ",friend._id);
-                    console.log("their current friendlist should have each other: ", user.friends_list, " and ",friend.friends_list);
-                    console.log("their current friend request list should not have each other: ", user.friend_requests_list, " and ",friend.friend_requests_list);
+                    console.log("responded a friend reqeust between ", user._id, " and ", friend._id);
+                    console.log("their current friendlist should have each other: ", user.friends_list, " and ", friend.friends_list);
+                    console.log("their current friend request list should not have each other: ", user.friend_requests_list, " and ", friend.friend_requests_list);
                     response.status(200).send(user.friends_list);
                     return;
                 }
@@ -367,7 +369,6 @@ app.post('/search/:user_id', function (request, response) {
                         result["is_self"] = user.user_name === friend.user_name; //whether is already friend or is users themselves;
                         result["is_sent_friend_reqeust"] = user.friend_requests_list.includes(friend._id); //whether i have sent friend request to others
                         result["is_received_friend_reqeust"] = friend.friend_requests_list.includes(user._id); //whether others have sent friend request to me
-
                         let output = {
                             user_name: user.user_name,
                             results: [result]
@@ -451,7 +452,7 @@ app.get('/user_liked_product_list/:user_id', function (request, response) {
             Product.aggregate([
                 {
                     $match: {
-                        "product_link" : {"$in": user.liked_product_list},
+                        "product_link": { "$in": user.liked_product_list },
                     }
                 },
                 {
@@ -459,21 +460,21 @@ app.get('/user_liked_product_list/:user_id', function (request, response) {
                         _id: 1, product_title: 1, product_link: 1, product_cost: 1, product_imgurl: 1,
                     }
                 },
-                { $sort : { createdAt : 1 }},
+                { $sort: { createdAt: 1 } },
             ])
-            .exec(function (err, liked_product_list) {
-                if (err) {
-                    console.error("Failed to fetch user's product list");
-                    response.status(400).send("Failed to fetch user's product list ");
-                } else {
-                    console.log("Done fetching all product lists.");
-                    let output = {
-                        "user_name": user.user_name,
-                        "liked_product_list": liked_product_list,
+                .exec(function (err, liked_product_list) {
+                    if (err) {
+                        console.error("Failed to fetch user's product list");
+                        response.status(400).send("Failed to fetch user's product list ");
+                    } else {
+                        console.log("Done fetching all product lists.");
+                        let output = {
+                            "user_name": user.user_name,
+                            "liked_product_list": liked_product_list,
+                        }
+                        response.status(200).send(JSON.stringify(output));
                     }
-                    response.status(200).send(JSON.stringify(output));
-                }
-            });
+                });
         });
     }
     else {
@@ -503,7 +504,7 @@ app.get('/user_bought_product_list/:user_id', function (request, response) {
             Product.aggregate([
                 {
                     $match: {
-                        "product_link" : {"$in": user.bought_product_list},
+                        "product_link": { "$in": user.bought_product_list },
                     }
                 },
                 {
@@ -511,21 +512,21 @@ app.get('/user_bought_product_list/:user_id', function (request, response) {
                         _id: 1, product_title: 1, product_link: 1, product_cost: 1, product_imgurl: 1,
                     }
                 },
-                { $sort : { createdAt : 1 }},
+                { $sort: { createdAt: 1 } },
             ])
-            .exec(function (err, bought_product_list) {
-                if (err) {
-                    console.error("Failed to fetch user's product list");
-                    response.status(400).send("Failed to fetch user's product list ");
-                } else {
-                    console.log("Done fetching all product lists.");
-                    let output = {
-                        "user_name": user.user_name,
-                        "bought_product_list": bought_product_list,
+                .exec(function (err, bought_product_list) {
+                    if (err) {
+                        console.error("Failed to fetch user's product list");
+                        response.status(400).send("Failed to fetch user's product list ");
+                    } else {
+                        console.log("Done fetching all product lists.");
+                        let output = {
+                            "user_name": user.user_name,
+                            "bought_product_list": bought_product_list,
+                        }
+                        response.status(200).send(JSON.stringify(output));
                     }
-                    response.status(200).send(JSON.stringify(output));
-                }
-            });
+                });
         });
     }
     else {
@@ -791,6 +792,34 @@ app.post('/add_bought_products/:user_id', function (request, response) {
         response.status(400).send('Not logged in yet.');
         return;
     }
+});
+
+
+app.get('/userinfo/:user_id', function (request, response) {
+    console.log('server receives GET request /user_info ');
+    let user_id = request.params.user_id;
+    User.findOne({
+        _id: user_id,
+    }, function (err, user) {
+        if (err) {
+            console.error(err);
+            response.status(422).send(err);
+
+        }
+        if (user === null) {
+            console.error('User with id:' + user_id + ' not found.');
+            response.status(421).send('User not found.');
+            return;
+        }
+        // console.log("products: ", products);
+        let output = {
+            user_id: user_id,
+            user_name: user.user_name,
+            profile_img: user.profile_img,
+        };
+        console.log("get /user_info: ", output);
+        response.status(200).send(JSON.stringify(output));
+    });
 });
 
 app.post('/admin/login', function (request, response) {

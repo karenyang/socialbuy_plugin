@@ -13,7 +13,8 @@ import Button from '@material-ui/core/Button';
 import icon from '../../assets/img/icon-34.png';
 import SearchIcon from '@material-ui/icons/Search';
 import TextField from '@material-ui/core/TextField';
-
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
 
 class SearchPage extends Component {
     constructor(props) {
@@ -77,18 +78,14 @@ class SearchPage extends Component {
 
     render() {
         return (
-            <Grid container spacing={0} alignItems="center" justify="center"  >
+            <Grid container spacing={0} alignItems="center" justifyContent="center"  >
                 <Grid item xs={2}>
-                    <img src={icon} alt="extension icon" />
+                    <img src={icon} alt="extension icon" width="25px" />
                 </Grid>
-                <Grid item xs={1}>
-                    <div className="searchicon">
-                        <SearchIcon style={{ "fontSize": 20, "alignItems": "center", "display": 'flex' }} />
-                    </div>
-                </Grid>
-                <Grid item xs={7}>
+
+                <Grid item xs={8}>
                     <div className="searchbox">
-                        <TextField placeholder="Search…" style={{ "padding": 1, "paddingLeft": 4, "width": '100%' }}
+                        <TextField placeholder="Search…" style={{"paddingLeft": 4, "width": '100%' }}
                             name="search_value"
                             value={this.state.search_value}
                             onChange={this.handleInputChange}
@@ -97,6 +94,9 @@ class SearchPage extends Component {
                     </div>
                 </Grid>
                 <Grid item xs={2}>
+                    <IconButton onClick={()=>{window.close();}} >
+                        <CloseIcon style={{fontSize: 15}}/>
+                    </IconButton>
                     
                 </Grid>
                 {this.state.search_results !== "" &&

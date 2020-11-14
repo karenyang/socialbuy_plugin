@@ -7,7 +7,8 @@ import {
     Card,
     Paper,
     Button,
-    Badge
+    Badge,
+    Divider,
 } from '@material-ui/core';
 import CardActionArea from '@material-ui/core/CardActionArea';
 import CardActions from '@material-ui/core/CardActions';
@@ -16,8 +17,10 @@ import icon from '../../assets/img/icon-34.png';
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import Collapse from '@material-ui/core/Collapse';
 import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Avatar from '@material-ui/core/Avatar';
+import "./userinfo_page.css";
 
 
 class UserInfoPage extends Component {
@@ -34,32 +37,40 @@ class UserInfoPage extends Component {
             show_collection_bought: false,
             show_collection_liked: false,
             show_friends: false,
+            user_name: "", //login user's name 
+            profile_img: "",//login user's profile_img 
         }
         console.log(this.state);
     }
 
-    handleUpdate = (name, value) => { //[name of variable]: value of variable
-        this.setState({ [name]: value, });
-        console.log("Update state-> ", this.state);
+    handleUpdateSelf = (data) => {
+        this.setState({
+            user_name: data.user_name,
+            profile_img: data.profile_img,
+        })
+        console.log("updated self: ", this.state);
     }
 
     componentDidMount = () => {
+        // DESIGN choice: arbitrary: load liked products, and friend requests upfront, not friends and bought products
         const handleUpdate = this.handleUpdate;
-        chrome.runtime.sendMessage({ type: "onLoadSelfBoughtProductList" },
+        const handleUpdateSelf = this.handleUpdateSelf;
+        chrome.runtime.sendMessage({ type: "onLoadSelfInfo" },
             function (res) {
-                console.log('Userinfo Page receives reply from background for onLoadSelfBoughtProductList ', res.data);
+                console.log('Userinfo receives reply from background for onLoadSelfInfo ', res.data);
                 if (res.status === 200) {
-                    console.log("onLoadSelfBoughtProductList succeeded.");
-                    handleUpdate("bought_product_list", res.data.bought_product_list);
+                    console.log("onLoadSelfInfo succeeded.");
+                    handleUpdateSelf(res.data);
                 }
                 else {
-                    console.error(res.data + ", onLoadSelfProductList failed.");
+                    console.error(res.data + ", onLoadSelfInfo failed.");
                 }
             }
         );
+        //assuming people will see liked products more often on this page
         chrome.runtime.sendMessage({ type: "onLoadSelfLikedProductList" },
             function (res) {
-                console.log('Greetings receives reply from background for onLoadSelfLikedProductList ', res.data);
+                console.log('Userinfo receives reply from background for onLoadSelfLikedProductList ', res.data);
                 if (res.status === 200) {
                     console.log("onLoadSelfLikedProductList succeeded.");
                     handleUpdate("liked_product_list", res.data.liked_product_list);
@@ -69,22 +80,10 @@ class UserInfoPage extends Component {
                 }
             }
         );
-        chrome.runtime.sendMessage({ type: "onLoadFriendsList" },
-            function (res) {
-                console.log('Greetings receives reply from background for onLoadFriendsList ', res.data);
-                if (res.status === 200) {
-                    console.log("onLoadFriendsList succeeded.");
-                    handleUpdate("friends_list", res.data.friends_list);
-                }
-                else {
-                    console.error(res.data + ", onLoadSelfBoughtProductList failed.");
-                }
-            }
-        );
-
+        // to show the friends requests. 
         chrome.runtime.sendMessage({ type: "onLoadFriendRequestsList" },
             function (res) {
-                console.log('Greetings receives reply from background for onLoadFriendRequestsList ', res.data);
+                console.log('Userinfo receives reply from background for onLoadFriendRequestsList ', res.data);
                 if (res.status === 200) {
                     console.log("onLoadFriendsList succeeded.");
                     handleUpdate("received_friend_requests", res.data.received_friend_requests);
@@ -94,7 +93,14 @@ class UserInfoPage extends Component {
                 }
             }
         );
+
     }
+
+    handleUpdate = (name, value) => { //[name of variable]: value of variable
+        this.setState({ [name]: value, });
+        console.log("Update state-> ", this.state);
+    }
+
 
     onClickProduct(product) {
         console.log("product clicked.", product.product_title);
@@ -120,7 +126,7 @@ class UserInfoPage extends Component {
         });
         chrome.runtime.sendMessage({ type: "onDeleteSelfBoughtProduct", data: product_id },
             function (res) {
-                console.log('Greetings receives reply from background for onDeleteSelfBoughtProduct ', res.data);
+                console.log('Userinfo     receives reply from background for onDeleteSelfBoughtProduct ', res.data);
                 if (res.status === 200) {
                     console.log("onDeleteSelfBoughtProduct succeeded.");
                 }
@@ -139,7 +145,7 @@ class UserInfoPage extends Component {
         });
         chrome.runtime.sendMessage({ type: "onDeleteSelfLikedProduct", data: product_id },
             function (res) {
-                console.log('Greetings receives reply from background for onDeleteSelfLikedProduct', res.data);
+                console.log('Userinfo     receives reply from background for onDeleteSelfLikedProduct', res.data);
                 if (res.status === 200) {
                     console.log("onDeleteSelfLikedProduct succeeded.");
                 }
@@ -151,6 +157,19 @@ class UserInfoPage extends Component {
     }
 
     onClickCollectionBoughtButton = () => {
+        const handleUpdate = this.handleUpdate;
+        chrome.runtime.sendMessage({ type: "onLoadSelfBoughtProductList" },
+            function (res) {
+                console.log('Userinfo Page receives reply from background for onLoadSelfBoughtProductList ', res.data);
+                if (res.status === 200) {
+                    console.log("onLoadSelfBoughtProductList succeeded.");
+                    handleUpdate("bought_product_list", res.data.bought_product_list);
+                }
+                else {
+                    console.error(res.data + ", onLoadSelfProductList failed.");
+                }
+            }
+        );
         this.setState({
             show_collection_bought: !this.state.show_collection_bought
         })
@@ -163,6 +182,19 @@ class UserInfoPage extends Component {
     }
 
     onClickFriendsButton = () => {
+        const handleUpdate = this.handleUpdate;
+        chrome.runtime.sendMessage({ type: "onLoadFriendsList" },
+            function (res) {
+                console.log('Userinfo eceives reply from background for onLoadFriendsList ', res.data);
+                if (res.status === 200) {
+                    console.log("onLoadFriendsList succeeded.");
+                    handleUpdate("friends_list", res.data.friends_list);
+                }
+                else {
+                    console.error(res.data + ", onLoadSelfBoughtProductList failed.");
+                }
+            }
+        );
         this.setState({
             show_friends: !this.state.show_friends
         })
@@ -181,18 +213,36 @@ class UserInfoPage extends Component {
         );
     }
 
+    onUpdateProfileImg = () => {
+        console.log("onUpdateProfileImg --- TODO");
+    }
 
     render() {
         return (
-            <Grid container spacing={0} alignItems="center" justify="center" >
+            <Grid container spacing={0} alignItems="center" style={{margin:0, padding:0}}>
                 <Grid item xs={2}>
-                    <img src={icon} alt="extension icon" />
+                    <img src={icon} alt="extension icon" width="25px" />
                 </Grid>
-                <Grid item xs={10}>
+                <Grid item xs={8}>
+                </Grid>
+                <Grid item xs={2}>
+                    <IconButton onClick={() => { window.close(); }} >
+                        <CloseIcon style={{ fontSize: 15 }} />
+                    </IconButton>
                 </Grid>
                 <Grid item xs={12}>
-                    <Paper style={{ maxHeight: 490, width: 400, marginTop: 5, overflow: 'auto' }}>
-                        <Card style={{ width: 400, marginTop: 5, display: 'flex', justifyContent: 'center' }}>
+                    <Divider />
+                    <div style={{ width: 400, margin: 0, padding: 10, display: 'flex', flexDirection: "row", alignItems: "center" }}>
+                        <Avatar className="avatar" alt={this.state.user_name} src={this.state.profile_img} onClick={this.onUpdateProfileImg} />
+                        <Typography variant="body2" component="h5" style={{width: 200}}>
+                            {this.state.user_name}
+                        </Typography>
+                    </div>
+                </Grid>
+
+                <Grid item xs={12}>
+                    <Paper style={{ maxHeight: 490, width: 400, marginTop: 5, overflowY: 'auto' }}>
+                        <Card style={{ width: 400, marginTop: 6, display: 'flex', justifyContent: 'center' }}>
                             <CardActions>
                                 <Button onClick={this.onClickCollectionBoughtButton} style={{ textTransform: "none" }} >
                                     Your Collection - purchased
@@ -201,41 +251,56 @@ class UserInfoPage extends Component {
                         </Card>
 
                         <Collapse in={this.state.show_collection_bought}>
-                            <Paper style={{ maxHeight: 450, width: 400, marginTop: 5, overflow: 'auto' }}>
-                                {
-                                    this.state.bought_product_list.map((product) => (
-                                        <Card key={product._id}>
-                                            <Grid container spacing={0}  >
-                                                <Grid item xs={4}>
-                                                    <CardActionArea>
-                                                        <img alt={product.product_title} src={product.product_imgurl} width="100" onClick={() => { this.onClickProduct(product) }} />
-                                                    </CardActionArea>
-                                                </Grid>
-                                                <Grid item xs={7}>
-                                                    <CardContent >
-                                                        <Typography gutterBottom variant="body2" component="h5">
-                                                            {this.cropTitle(product.product_title)}
-                                                        </Typography>
-                                                    </CardContent>
-                                                </Grid>
-                                                <Grid item xs={1}>
-                                                    <CardActions>
-                                                        <IconButton
-                                                            style={{ padding: 0, height: 18, width: 18 }}
-                                                            onClick={() => this.onDeleteBoughtProduct(product._id)}
-                                                        >
-                                                            <DeleteIcon style={{ fontSize: 15 }} />
-                                                        </IconButton>
-                                                    </CardActions>
-                                                </Grid>
+                            {
+                                this.state.bought_product_list.map((product) => (
+                                    <div style={{ padding: "10px" }}>
+                                        <Grid container spacing={2}  >
+                                            <Grid item xs={4}>
+                                                <CardActionArea>
+                                                    <img className="productimage" alt={product.product_title} src={product.product_imgurl} width="100" onClick={() => { this.onClickProduct(product) }} />
+                                                </CardActionArea>
                                             </Grid>
-                                        </Card>
-                                    ))
-                                }
-                            </Paper>
+                                            <Grid item xs={7}>
+                                                <CardContent style={{ padding: "8px", display: "flex", flexDirection: "column", alignItems: "center" }}>
+                                                    <Typography gutterBottom variant="body2" component="h5" style={{ "fontSize": 12 }}>
+                                                        {this.cropTitle(product.product_title)}
+                                                    </Typography>
+
+                                                    {/* <Typography variant="body2" color="textSecondary" component="p" style={{ "fontSize": 10 }}>
+                                                        ${product.product_cost}
+                                                    </Typography> */}
+
+                                                    {/* {product.friends_bought.length > 0  && 
+                                                    <Typography variant="body2" color="textSecondary" component="p">
+                                                        purchased by {product.friends_bought.join(', ')}
+                                                    </Typography>
+                                                    }
+
+                                                    { product.friends_liked.length > 0  && 
+                                                        <Typography variant="body2" color="textSecondary" component="p">
+                                                            liked by {product.friends_liked.join(', ')}
+                                                        </Typography>
+                                                    } */}
+                                                </CardContent>
+                                            </Grid>
+                                            <Grid item xs={1}>
+                                                <CardActions>
+                                                    <IconButton
+                                                        style={{ padding: 0, height: 18, width: 18 }}
+                                                        onClick={() => this.onDeleteBoughtProduct(product._id)}
+                                                    >
+                                                        <DeleteIcon style={{ fontSize: 15 }} />
+                                                    </IconButton>
+                                                </CardActions>
+                                            </Grid>
+                                        </Grid>
+                                        <Divider />
+                                    </div>
+                                ))
+                            }
                         </Collapse>
 
-                        <Card style={{ width: 400, marginTop: 5, display: 'flex', justifyContent: 'center' }}>
+                        <Card style={{ width: 400, marginTop: 6, display: 'flex', justifyContent: 'center' }}>
                             <CardActions>
                                 <Button onClick={this.onClickCollectionLikedButton} style={{ textTransform: "none" }} >
                                     Your Collection - liked
@@ -244,41 +309,41 @@ class UserInfoPage extends Component {
                         </Card>
 
                         <Collapse in={this.state.show_collection_liked}>
-                            <Paper style={{ maxHeight: 450, width: 400, marginTop: 5, overflow: 'auto' }}>
-                                {
-                                    this.state.liked_product_list.map((product) => (
-                                        <Card key={product._id}>
-                                            <Grid container spacing={0}  >
-                                                <Grid item xs={4}>
-                                                    <CardActionArea>
-                                                        <img alt={product.product_title} src={product.product_imgurl} width="100" onClick={() => { this.onClickProduct(product) }} />
-                                                    </CardActionArea>
-                                                </Grid>
-                                                <Grid item xs={7}>
-                                                    <CardContent >
-                                                        <Typography gutterBottom variant="body2" component="h5">
-                                                            {this.cropTitle(product.product_title)}
-                                                        </Typography>
-                                                    </CardContent>
-                                                </Grid>
-                                                <Grid item xs={1}>
-                                                    <CardActions>
-                                                        <IconButton
-                                                            style={{ padding: 0, height: 18, width: 18 }}
-                                                            onClick={() => this.onDeleteLikedProduct(product._id)}
-                                                        >
-                                                            <DeleteIcon style={{ fontSize: 15 }} />
-                                                        </IconButton>
-                                                    </CardActions>
-                                                </Grid>
+                            {
+                                this.state.liked_product_list.map((product) => (
+                                    <div key={product._id} style={{ padding: "10px" }}>
+                                        <Grid container spacing={2}  >
+                                            <Grid item xs={4}>
+                                                <CardActionArea>
+                                                    <img className="productimage" alt={product.product_title} src={product.product_imgurl} width="100" onClick={() => { this.onClickProduct(product) }} />
+                                                </CardActionArea>
                                             </Grid>
-                                        </Card>
-                                    ))
-                                }
-                            </Paper>
+                                            <Grid item xs={7}>
+                                                <CardContent style={{ padding: "8px", display: "flex", flexDirection: "column", alignItems: "center" }}>
+                                                    <Typography gutterBottom variant="body2" component="h5" style={{ "fontSize": 12 }}>
+                                                        {this.cropTitle(product.product_title)}
+                                                    </Typography>
+
+                                                </CardContent>
+                                            </Grid>
+                                            <Grid item xs={1}>
+                                                <CardActions>
+                                                    <IconButton
+                                                        style={{ padding: 0, height: 18, width: 18 }}
+                                                        onClick={() => this.onDeleteBoughtProduct(product._id)}
+                                                    >
+                                                        <DeleteIcon style={{ fontSize: 15 }} />
+                                                    </IconButton>
+                                                </CardActions>
+                                            </Grid>
+                                        </Grid>
+                                        <Divider />
+                                    </div>
+                                ))
+                            }
                         </Collapse>
 
-                        <Card style={{ width: 400, marginTop: 5, display: 'flex', justifyContent: 'center' }}>
+                        <Card style={{ width: 400, marginTop: 6, display: 'flex', justifyContent: 'center' }}>
                             {this.state.received_friend_requests.length > 0 ?
                                 <CardActions>
                                     <Badge color="secondary" variant="dot" >
@@ -296,72 +361,75 @@ class UserInfoPage extends Component {
                             }
                         </Card>
                         <Collapse in={this.state.show_friends}>
-                            <Paper style={{ maxHeight: 450, width: 400, marginTop: 5, overflow: 'auto' }}>
-                                {
-                                    this.state.received_friend_requests.map((friend) => (
-                                        <Card key={friend._id} >
-                                            <Grid container spacing={0} style={{ display: 'flex', justifyContent: 'center', alignItems: "center" }}>
-                                                <Grid item xs={3}>
-                                                    <Avatar alt={friend.user_name} src={friend.profile_img} style={{ marginLeft: 8 }} />
-                                                </Grid>
-                                                <Grid item xs={4}>
-                                                    <CardContent >
-                                                        <Typography gutterBottom variant="body2" component="h5">
-                                                            {this.cropTitle(friend.user_name)}
-                                                        </Typography>
-                                                    </CardContent>
-                                                </Grid>
-                                                <Grid item xs={5}>
-                                                    <CardActions>
-
-                                                        <div style={{ display: 'flex', flexDirection: "column" }}>
-                                                            <Typography variant="body2" component="h5" style={{ 'color': 'grey' }}>
-                                                                sent you a friend request
-                                                            </Typography>
-                                                            <div style={{ display: 'flex', flexDirection: "row", justifyContent: "space-around"}}>
-                                                                <Button style={{ textTransform: "none", backgroundColor: "#3366FF", color: "white" }}
-                                                                    onClick={() => this.onHandleFriendRequest(friend.user_name, true)} >
-                                                                    Confirm
-                                                                    </Button>
-                                                                <Button style={{ textTransform: "none", backgroundColor: "#D3D3D3" }}
-                                                                    onClick={() => this.onHandleFriendRequest(friend.user_name, false)}>
-                                                                    Delete
-                                                                </Button>
-                                                            </div>
-                                                    </div>
-                                                    </CardActions>
-                                                </Grid>
+                            <div>
+                                {this.state.received_friend_requests.map((friend) => (
+                                    <div key={friend._id}>
+                                        <Grid container spacing={0} style={{ display: 'flex', justifyContent: 'center', alignItems: "center" }}>
+                                            <Grid item xs={2}>
+                                                <Avatar className="avatar" alt={friend.user_name} src={friend.profile_img} onClick={() => this.onClickFriend(friend)} />
                                             </Grid>
-                                        </Card>
-                                    ))
-                                }
-                                {
-                                    this.state.friends_list.map((friend) => (
-                                        <Card key={friend._id} >
-                                            <CardActionArea onClick={() => { this.onClickFriend(friend) }}>
-                                                <Grid container spacing={0} style={{ display: 'flex', justifyContent: 'center', alignItems: "center" }}>
-                                                    <Grid item xs={3}>
-                                                        <Avatar alt={friend.user_name} src={friend.profile_img} style={{ marginLeft: 8 }} />
-                                                    </Grid>
-                                                    <Grid item xs={4}>
-                                                        <CardContent >
-                                                            <Typography gutterBottom variant="body2" component="h5">
-                                                                {this.cropTitle(friend.user_name)}
+                                            <Grid item xs={5}>
+                                                <CardContent >
+                                                    <Typography gutterBottom variant="body2" component="h5">
+                                                        {this.cropTitle(friend.user_name)}
+                                                    </Typography>
+                                                    {friend.mutual_friends.length > 0 &&
+                                                        <Typography variant="body2" component="h5" style={{ 'color': 'grey' }}>
+                                                            {friend.mutual_friends} mutual friends
                                                             </Typography>
-                                                        </CardContent>
-                                                    </Grid>
-                                                    <Grid item xs={5}>
+                                                    }
+                                                </CardContent>
+                                            </Grid>
+                                            <Grid item xs={5}>
+                                                <CardActions>
+                                                    <div style={{ display: 'flex', flexDirection: "column" }}>
+                                                        <Typography variant="body2" component="h5" style={{ 'color': 'grey' }}>
+                                                            sent you a friend request
+                                                            </Typography>
 
-                                                    </Grid>
-                                                </Grid>
-                                            </CardActionArea>
-                                        </Card>
-                                    ))
-                                }
-                            </Paper>
+                                                        <div style={{ display: 'flex', flexDirection: "row", justifyContent: "space-around" }}>
+                                                            <Button style={{ textTransform: "none", backgroundColor: "#3366FF", color: "white" }}
+                                                                onClick={() => this.onHandleFriendRequest(friend.user_name, true)} >
+                                                                Confirm
+                                                            </Button>
+                                                            <Button style={{ textTransform: "none", backgroundColor: "#D3D3D3" }}
+                                                                onClick={() => this.onHandleFriendRequest(friend.user_name, false)}>
+                                                                Delete
+                                                                </Button>
+                                                        </div>
+                                                    </div>
+                                                </CardActions>
+                                            </Grid>
+                                        </Grid>
+                                    </div>
+                                ))}
+                                <Divider variant="middle" />
+                                {this.state.friends_list.map((friend) => (
+                                    <CardActionArea key={friend._id} onClick={() => { this.onClickFriend(friend) }} style={{ padding: 5 }}>
+                                        <Grid container spacing={0} style={{ display: 'flex', justifyContent: 'center', alignItems: "center" }}>
+                                            <Grid item xs={2}>
+                                                <Avatar className="avatar" alt={friend.user_name} src={friend.profile_img} />
+                                            </Grid>
+                                            <Grid item xs={5}>
+                                                <Typography gutterBottom variant="body2" component="h5">
+                                                    {this.cropTitle(friend.user_name)}
+                                                </Typography>
+
+                                            </Grid>
+                                            <Grid item xs={5}>
+                                                {friend.mutual_friends.length > 0 &&
+                                                    <Typography variant="body2" component="h5" style={{ 'color': 'grey' }}>
+                                                        {friend.mutual_friends.length} mutual friends
+                                                                </Typography>
+                                                }
+                                            </Grid>
+
+                                        </Grid>
+                                    </CardActionArea>
+                                ))}
+                            </div>
                         </Collapse>
-
-                        <Card style={{ width: 400, marginTop: 5, display: 'flex', justifyContent: 'center' }}>
+                        <Card style={{ width: 400, marginTop: 6, display: 'flex', justifyContent: 'center' }}>
                             <CardActions>
                                 <Button onClick={this.props.onLogOut} style={{ textTransform: "none" }} >
                                     Log Out
@@ -371,7 +439,7 @@ class UserInfoPage extends Component {
                     </Paper>
 
                 </Grid>
-            </Grid>
+            </Grid >
 
         );
     }
