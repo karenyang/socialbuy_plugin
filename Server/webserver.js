@@ -210,7 +210,7 @@ app.get('/receivedfriendrequests/:user_id', function (request, response) {
             User.aggregate([
                 {
                     $match: {
-                        "_id" : {"$in": user.friend_requests_list}, // my id is in their friends request list
+                        friend_requests_list : ObjectID(user_id), // my id is in their friends request list
                     }
                 },
                 {

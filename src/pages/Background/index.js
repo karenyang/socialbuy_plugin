@@ -239,6 +239,24 @@ chrome.runtime.onMessage.addListener(
                 }
                 return true;
 
+            case "onLoadFriendRequestsList":
+                console.log("Background about to Handle onLoadFriendRequestsList. ");
+                if (userInfo === undefined || userInfo.user_id === undefined) {
+                    console.log("User have not lpogged in");
+                    sendResponse("User have not logged in");
+                } else {
+                    console.log("current user id", userInfo.user_id);
+                    axios.get('http://localhost:8080/receivedfriendrequests/' + userInfo.user_id)
+                        .then(res => {
+                            printResponse('onLoadFriendRequestsList', res);
+                            sendResponse(res);
+                        })
+                        .catch(err => {
+                            console.error(err)
+                        });
+                }
+                return true;
+
             case "onLoadFriendsProductList":
                 console.log("Background about to Handle onLoadFriendsProductList. ");
                 if (userInfo === undefined || userInfo.user_id === undefined) {
@@ -256,7 +274,7 @@ chrome.runtime.onMessage.addListener(
                         });
                 }
                 return true;
-
+                
             case "onHandleFriendRequest":
                 console.log("Background about to Handle onHandleFriendRequest. ");
                 if (userInfo === undefined || userInfo.user_id === undefined) {

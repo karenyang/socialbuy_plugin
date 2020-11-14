@@ -12,6 +12,7 @@ import Register from '../../containers/register/Register';
 import Login from '../../containers/login/Login';
 
 import './Popup.css';
+import { Tune } from '@material-ui/icons';
 
 class Popup extends React.Component {
     constructor(props) {
