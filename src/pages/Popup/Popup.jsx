@@ -10,7 +10,7 @@ import {
 import Greetings from '../../containers/greetings/Greetings';
 import Register from '../../containers/register/Register';
 import Login from '../../containers/login/Login';
-
+import FriendInfoPage from '../../containers/friendinfo_page/friendinfo_page';
 import './Popup.css';
 import { Tune } from '@material-ui/icons';
 
@@ -80,6 +80,9 @@ class Popup extends React.Component {
                             />
                             <Route path="/admin/login"
                                 render={(props) => <Login {...props} onLoggedIn={this.onLoggedIn} />}
+                            />
+                            <Route path="/users/:user_id"
+                                render={(props) => <FriendInfoPage {...props} />}
                             />
                             {this.state.user_id ?
                                 <Redirect to="/greetings" />

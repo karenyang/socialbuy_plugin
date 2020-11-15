@@ -22,6 +22,15 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import Avatar from '@material-ui/core/Avatar';
 import "./userinfo_page.css";
 
+import {
+    BrowserRouter as Router,
+    Switch,
+    Route,
+    useRouteMatch,
+    Link
+  } from "react-router-dom";
+
+  
 
 class UserInfoPage extends Component {
     constructor(props) {
@@ -265,22 +274,6 @@ class UserInfoPage extends Component {
                                                     <Typography gutterBottom variant="body2" component="h5" style={{ "fontSize": 12 }}>
                                                         {this.cropTitle(product.product_title)}
                                                     </Typography>
-
-                                                    {/* <Typography variant="body2" color="textSecondary" component="p" style={{ "fontSize": 10 }}>
-                                                        ${product.product_cost}
-                                                    </Typography> */}
-
-                                                    {/* {product.friends_bought.length > 0  && 
-                                                    <Typography variant="body2" color="textSecondary" component="p">
-                                                        purchased by {product.friends_bought.join(', ')}
-                                                    </Typography>
-                                                    }
-
-                                                    { product.friends_liked.length > 0  && 
-                                                        <Typography variant="body2" color="textSecondary" component="p">
-                                                            liked by {product.friends_liked.join(', ')}
-                                                        </Typography>
-                                                    } */}
                                                 </CardContent>
                                             </Grid>
                                             <Grid item xs={1}>
@@ -405,7 +398,7 @@ class UserInfoPage extends Component {
                                 ))}
                                 <Divider variant="middle" />
                                 {this.state.friends_list.map((friend) => (
-                                    <CardActionArea key={friend._id} onClick={() => { this.onClickFriend(friend) }} style={{ padding: 5 }}>
+                                    <CardActionArea key={friend._id} component="a" href={"#/users/"+friend._id}style={{ padding: 5 }}>
                                         <Grid container spacing={0} style={{ display: 'flex', justifyContent: 'center', alignItems: "center" }}>
                                             <Grid item xs={2}>
                                                 <Avatar className="avatar" alt={friend.user_name} src={friend.profile_img} />
