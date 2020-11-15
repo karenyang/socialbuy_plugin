@@ -61,17 +61,20 @@ chrome.runtime.onMessage.addListener(
                 window.localStorage.clear();
                 return true;
             
-            case "onLoadSelfInfo":
-                console.log("Background about to get onLoadSelfInfo data from background: ");
+            case "onLoadUserInfo":
+                console.log("Background about to get onLoadUserInfo data from background: ");
                 if (userInfo === undefined || userInfo.user_id === undefined) {
                     console.log("User have not logged in");
                     sendResponse("User have not logged in");
                 } else {
                     console.log("current user id", userInfo.user_id);
-
-                    axios.get('http://localhost:8080/userinfo/' + userInfo.user_id)
+                    let user_id = userInfo.user_id;
+                    if (message.data){ //if specify a different user_id than self
+                        user_id = message.data;
+                    }
+                    axios.get('http://localhost:8080/userinfo/' + user_id)
                         .then(res => {
-                            printResponse('onLoadSelfInfo', res);
+                            printResponse('onLoadUserInfo', res);
                             sendResponse(res);
                         })
                         .catch(err => {
@@ -125,17 +128,20 @@ chrome.runtime.onMessage.addListener(
                 }
                 return true;
 
-            case "onLoadSelfBoughtProductList":
+            case "onLoadUserBoughtProductList":
                 console.log("Background about to get LoadSelfProductList data from background: ");
                 if (userInfo === undefined || userInfo.user_id === undefined) {
                     console.log("User have not logged in");
                     sendResponse("User have not logged in");
                 } else {
                     console.log("current user id", userInfo.user_id);
-
-                    axios.get('http://localhost:8080/user_bought_product_list/' + userInfo.user_id)
+                    let user_id = userInfo.user_id;
+                    if (message.data){ //if specify a different user_id than self
+                        user_id = message.data;
+                    }
+                    axios.get('http://localhost:8080/user_bought_product_list/' + user_id)
                         .then(res => {
-                            printResponse('onLoadSelfBoughtProductList', res);
+                            printResponse('onLoadUserBoughtProductList', res);
                             sendResponse(res);
                         })
                         .catch(err => {
@@ -144,17 +150,21 @@ chrome.runtime.onMessage.addListener(
                 }
                 return true;
 
-            case "onLoadSelfLikedProductList":
-                console.log("Background about to get onLoadSelfLikedProductList data from background: ");
+            case "onLoadUserLikedProductList":
+                console.log("Background about to get onLoadUserLikedProductList data from background: ");
                 if (userInfo === undefined || userInfo.user_id === undefined) {
                     console.log("User have not logged in");
                     sendResponse("User have not logged in");
                 } else {
                     console.log("current user id", userInfo.user_id);
-
-                    axios.get('http://localhost:8080/user_liked_product_list/' + userInfo.user_id)
+                    console.log("current user id", userInfo.user_id);
+                    let user_id = userInfo.user_id;
+                    if (message.data){ //if specify a different user_id than self
+                        user_id = message.data;
+                    }
+                    axios.get('http://localhost:8080/user_liked_product_list/' + user_id)
                         .then(res => {
-                            printResponse('onLoadSelfLikedProductList', res);
+                            printResponse('onLoadUserLikedProductList', res);
                             sendResponse(res);
                         })
                         .catch(err => {

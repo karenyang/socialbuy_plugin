@@ -20,6 +20,7 @@ class SearchPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            user_id: this.props.user_id,
             search_value: "",
             search_results: "",
         }

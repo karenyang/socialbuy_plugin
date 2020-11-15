@@ -17,8 +17,7 @@ class RecentActivitiesPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            // user_name: this.props.user_name,
-            // user_id: this.props.user_id,
+            user_id: this.props.user_id,
             search_value: "",
             self_bought_product_list: [],
             friends_product_list: [],

@@ -65,7 +65,6 @@ class Popup extends React.Component {
         });
         console.log("State reset to, ", this.state);
     }
-
  
     render() {
         console.log("done fetch? ", this.state.done_fetch);

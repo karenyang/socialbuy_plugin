@@ -69,9 +69,9 @@ class Greetings extends Component {
     render() {
         return (
             <div className="container">
-                { this.state.tab === 0 &&  <RecentActivitiesPage />}
-                { this.state.tab === 1 &&  <SearchPage /> }
-                { this.state.tab === 2 &&  <UserInfoPage onLogOut={this.onLogOut} />}
+                { this.state.tab === 0 &&  <RecentActivitiesPage user_id={this.state.user_id} />}
+                { this.state.tab === 1 &&  <SearchPage user_id={this.state.user_id}  /> }
+                { this.state.tab === 2 &&  <UserInfoPage onLogOut={this.onLogOut} user_id={this.state.user_id} />}
                 <IconTabs handleTabChange={this.handleTabChange} tab={this.state.tab}/>
             </div >
         );

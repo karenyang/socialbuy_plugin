@@ -21,28 +21,18 @@ import CloseIcon from '@material-ui/icons/Close';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Avatar from '@material-ui/core/Avatar';
 import "./userinfo_page.css";
-
-import {
-    BrowserRouter as Router,
-    Switch,
-    Route,
-    useRouteMatch,
-    Link
-  } from "react-router-dom";
-
+import NameCard from '../modules/name_card'
   
 
 class UserInfoPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            search_value: "",
+            user_id: this.props.user_id,
             bought_product_list: [],
             liked_product_list: [],
             friends_list: [],
             received_friend_requests: [],
-            search_result: "",
-            tab: 0,
             show_collection_bought: false,
             show_collection_liked: false,
             show_friends: false,
@@ -60,32 +50,38 @@ class UserInfoPage extends Component {
         console.log("updated self: ", this.state);
     }
 
+    handleUpdate = (name, value) => { //[name of variable]: value of variable
+        this.setState({ [name]: value, });
+        console.log("Update state-> ", this.state);
+    }
+
+
     componentDidMount = () => {
         // DESIGN choice: arbitrary: load liked products, and friend requests upfront, not friends and bought products
         const handleUpdate = this.handleUpdate;
         const handleUpdateSelf = this.handleUpdateSelf;
-        chrome.runtime.sendMessage({ type: "onLoadSelfInfo" },
+        chrome.runtime.sendMessage({ type: "onLoadUserInfo" },
             function (res) {
-                console.log('Userinfo receives reply from background for onLoadSelfInfo ', res.data);
+                console.log('Userinfo receives reply from background for onLoadUserInfo ', res.data);
                 if (res.status === 200) {
-                    console.log("onLoadSelfInfo succeeded.");
+                    console.log("onLoadUserInfo succeeded.");
                     handleUpdateSelf(res.data);
                 }
                 else {
-                    console.error(res.data + ", onLoadSelfInfo failed.");
+                    console.error(res.data + ", onLoadUserInfo failed.");
                 }
             }
         );
         //assuming people will see liked products more often on this page
-        chrome.runtime.sendMessage({ type: "onLoadSelfLikedProductList" },
+        chrome.runtime.sendMessage({ type: "onLoadUserLikedProductList" },
             function (res) {
-                console.log('Userinfo receives reply from background for onLoadSelfLikedProductList ', res.data);
+                console.log('Userinfo receives reply from background for onLoadUserLikedProductList ', res.data);
                 if (res.status === 200) {
-                    console.log("onLoadSelfLikedProductList succeeded.");
+                    console.log("onLoadUserLikedProductList succeeded.");
                     handleUpdate("liked_product_list", res.data.liked_product_list);
                 }
                 else {
-                    console.error(res.data + ", onLoadSelfLikedProductList failed.");
+                    console.error(res.data + ", onLoadUserLikedProductList failed.");
                 }
             }
         );
@@ -104,12 +100,6 @@ class UserInfoPage extends Component {
         );
 
     }
-
-    handleUpdate = (name, value) => { //[name of variable]: value of variable
-        this.setState({ [name]: value, });
-        console.log("Update state-> ", this.state);
-    }
-
 
     onClickProduct(product) {
         console.log("product clicked.", product.product_title);
@@ -167,11 +157,11 @@ class UserInfoPage extends Component {
 
     onClickCollectionBoughtButton = () => {
         const handleUpdate = this.handleUpdate;
-        chrome.runtime.sendMessage({ type: "onLoadSelfBoughtProductList" },
+        chrome.runtime.sendMessage({ type: "onLoadUserBoughtProductList" },
             function (res) {
-                console.log('Userinfo Page receives reply from background for onLoadSelfBoughtProductList ', res.data);
+                console.log('Userinfo Page receives reply from background for onLoadUserBoughtProductList ', res.data);
                 if (res.status === 200) {
-                    console.log("onLoadSelfBoughtProductList succeeded.");
+                    console.log("onLoadUserBoughtProductList succeeded.");
                     handleUpdate("bought_product_list", res.data.bought_product_list);
                 }
                 else {
@@ -200,7 +190,7 @@ class UserInfoPage extends Component {
                     handleUpdate("friends_list", res.data.friends_list);
                 }
                 else {
-                    console.error(res.data + ", onLoadSelfBoughtProductList failed.");
+                    console.error(res.data + ", onLoadUserBoughtProductList failed.");
                 }
             }
         );
@@ -222,9 +212,6 @@ class UserInfoPage extends Component {
         );
     }
 
-    onUpdateProfileImg = () => {
-        console.log("onUpdateProfileImg --- TODO");
-    }
 
     render() {
         return (
@@ -241,12 +228,7 @@ class UserInfoPage extends Component {
                 </Grid>
                 <Grid item xs={12}>
                     <Divider />
-                    <div style={{ width: 400, margin: 0, padding: 10, display: 'flex', flexDirection: "row", alignItems: "center" }}>
-                        <Avatar className="avatar" alt={this.state.user_name} src={this.state.profile_img} onClick={this.onUpdateProfileImg} />
-                        <Typography variant="body2" component="h5" style={{width: 200}}>
-                            {this.state.user_name}
-                        </Typography>
-                    </div>
+                    <NameCard user_id={this.state.user_id}/>
                 </Grid>
 
                 <Grid item xs={12}>
