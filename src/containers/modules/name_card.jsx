@@ -3,13 +3,7 @@ import React, {
 } from 'react';
 
 import {
-    Grid,
     Typography,
-    Card,
-    Paper,
-    Button,
-    Badge,
-    Divider,
     Avatar,
 } from '@material-ui/core';
 
