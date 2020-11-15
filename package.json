@@ -9,24 +9,19 @@
     "prettier": "prettier --write '**/*.{js,jsx,css,html}' --tab-width 4"
   },
   "dependencies": {
-    "@hot-loader/react-dom": "^16.13.0",
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.9.1",
-    "@types/chrome": "0.0.104",
     "@types/react": "^16.9.26",
     "async": "^3.2.0",
     "axios": "^0.20.0",
-    "bootstrap": "^4.5.3",
-    "clsx": "^1.1.1",
+    "bluebird": "^3.7.2",
+    "body-parser": "^1.19.0",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
-    "material-ui-icons": "^1.0.0-beta.36",
     "mongoose": "^5.10.9",
     "react": "^16.13.1",
-    "react-bootstrap": "^1.4.0",
     "react-dom": "^16.13.1",
     "react-draggable": "^4.4.3",
-    "react-hot-loader": "^4.12.20",
     "react-router-dom": "^5.2.0"
   },
   "devDependencies": {
