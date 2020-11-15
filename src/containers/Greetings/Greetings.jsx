@@ -22,6 +22,13 @@ class Greetings extends Component {
         console.log(this.state);
     }
 
+    componentDidMount = () => {
+        this.setState({
+            tab: this.props.match.params.tab_id,
+        });
+        console.log("this.state: ", this.state);
+    }
+
     componentDidUpdate = (prevProps) => {
         if (prevProps.user_name !== this.props.user_name) {
             if (this.props.user_name === "") {
@@ -65,7 +72,6 @@ class Greetings extends Component {
                 }
             });
     }
-
 
     render() {
         return (

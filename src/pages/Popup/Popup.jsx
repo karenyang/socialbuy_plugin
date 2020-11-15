@@ -12,7 +12,6 @@ import Register from '../../containers/register/Register';
 import Login from '../../containers/login/Login';
 import FriendInfoPage from '../../containers/friendinfo_page/friendinfo_page';
 import './Popup.css';
-import { Tune } from '@material-ui/icons';
 
 class Popup extends React.Component {
     constructor(props) {
@@ -72,7 +71,7 @@ class Popup extends React.Component {
                 (<HashRouter>
                     <div className="App">
                         <Switch>
-                            <Route path="/greetings"
+                            <Route path="/greetings/:tab_id"
                                 render={(props) => <Greetings {...props} user_name={this.state.user_name} user_id={this.state.user_id} />}
                             />
                             <Route path="/admin/register"
@@ -85,7 +84,7 @@ class Popup extends React.Component {
                                 render={(props) => <FriendInfoPage {...props} />}
                             />
                             {this.state.user_id ?
-                                <Redirect to="/greetings" />
+                                <Redirect to="/greetings/2" />
                                 :
                                 <Redirect to="/admin/register" />
                             }
