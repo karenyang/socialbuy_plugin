@@ -13,7 +13,9 @@ import {
 } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 
-class ProductCard extends Component {
+
+// my product card is relatively simpler than others' product card. You might not need to see the price, but and you have the right to delete, and {future} see how much influence you have
+class MyProductCard extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -22,7 +24,6 @@ class ProductCard extends Component {
         }
         console.log(this.state);
     }
-
 
     onDelete(product_id) {
         this.props.delete_func(product_id);
@@ -33,11 +34,20 @@ class ProductCard extends Component {
         return title.slice(0, 10).join(" ");
     }
 
+    onClickProduct(product) {
+        console.log("product clicked.", product.product_title);
+        chrome.runtime.sendMessage({ type: "onClickProduct", data: product.product_link },
+            function (res) {
+                console.log("Page opened for product: ", product.product_title);
+            }
+        );
+    }
+    
     render() {
         const product = this.state.product;
         return (
-            <div key={product._id} style={{ padding: "10px" }}>
-                <Grid container spacing={2}  >
+            <div key={product._id} style={{ padding: "5px", displya:"flex", justifyContent: "center", alignItems: "center"}}>
+                <Grid container spacing={0}  >
                     <Grid item xs={4}>
                         <CardActionArea>
                             <img className="productimage" alt={product.product_title} src={product.product_imgurl} width="100" onClick={() => { this.onClickProduct(product) }} />
@@ -67,4 +77,4 @@ class ProductCard extends Component {
     }
 }
 
-export default ProductCard;
+export default MyProductCard;

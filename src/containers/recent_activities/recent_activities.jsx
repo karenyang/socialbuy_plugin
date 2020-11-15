@@ -12,6 +12,9 @@ import CardContent from '@material-ui/core/CardContent';
 import icon from '../../assets/img/icon-34.png';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
+import OtherProductCard from '../modules/others_product_card';
+import OthersProductCard from '../modules/others_product_card';
+
 
 class RecentActivitiesPage extends Component {
     constructor(props) {
@@ -21,7 +24,6 @@ class RecentActivitiesPage extends Component {
             search_value: "",
             self_bought_product_list: [],
             friends_product_list: [],
-            product_expanded: {},
             search_result: "",
             tab: 0,
         }
@@ -29,18 +31,15 @@ class RecentActivitiesPage extends Component {
     }
 
     updateFriendsProductList = (friends_product_list) => {
-        let product_expanded = [];
         let product_objs = [];
         for (let i = 0; i < friends_product_list.length; i++) {
             let product = friends_product_list[i].product;
             product.friends_bought = friends_product_list[i].bought;
             product.friends_liked = friends_product_list[i].liked;
             product_objs.push(product);
-            product_expanded[product._id] = false;
         }
         this.setState({
             friends_product_list: product_objs,
-            product_expanded: product_expanded,
         });
         console.log("State product list updated: ", this.state);
 
@@ -60,50 +59,6 @@ class RecentActivitiesPage extends Component {
                 }
             }
         );
-    }
-
-    onClickProduct(product) {
-        console.log("product clicked.", product.product_title);
-        chrome.runtime.sendMessage({ type: "onClickProduct", data: product.product_link },
-            function (res) {
-                console.log("Page opened for product: ", product.product_title);
-            }
-        );
-    }
-
-    cropTitle = (product_title) => {
-        let title = product_title.split(" ");
-        return title.slice(0, 10).join(" ");
-    }
-
-    is_expanded = (product_id) => {
-        return this.state.product_expanded[product_id];
-    }
-
-    onExpandClick(product_id) {
-        console.log('Expand Clicked');
-        let new_product_expanded = this.state.product_expanded;
-        if (new_product_expanded[product_id] == true) {
-            console.error("Should not be able to click expand is already expanded.");
-        }
-        new_product_expanded[product_id] = true; //toggle
-        this.setState({
-            product_expanded: new_product_expanded
-        });
-        console.log("state update to", this.state);
-    }
-
-    onCollapesClick(product_id) {
-        console.log('Collapse Clicked');
-        let new_product_expanded = this.state.product_expanded;
-        if (new_product_expanded[product_id] == false) {
-            console.error("Should not be able to click expand is already expanded.");
-        }
-        new_product_expanded[product_id] = false; //toggle
-        this.setState({
-            product_expanded: new_product_expanded
-        });
-        console.log("state update to", this.state);
     }
 
 
@@ -128,79 +83,8 @@ class RecentActivitiesPage extends Component {
                     <Paper style={{ maxHeight: 470, width: 400, overflow: 'auto' }}>
                         {
                             this.state.friends_product_list.map((product) => (
-                                <Card key={product._id}>
-                                    <Grid container spacing={0}  >
-                                        <Grid item xs={4}>
-                                            <CardActionArea>
-                                                <img alt={product.product_title} src={product.product_imgurl} width="100" onClick={() => { this.onClickProduct(product) }} />
-                                            </CardActionArea>
-                                        </Grid>
-                                        <Grid item xs={7}>
-                                            <CardContent >
-                                                <Typography gutterBottom variant="body2" component="h5">
-                                                    {this.cropTitle(product.product_title)}
-                                                </Typography>
-
-                                                <Typography variant="body2" color="textSecondary" component="p">
-                                                    ${product.product_cost}
-                                                </Typography>
-
-                                                {product.friends_bought.length > 0 &&
-                                                    <Typography variant="body2" color="textSecondary" component="p">
-                                                        purchased by {product.friends_bought.join(', ')}
-                                                    </Typography>
-                                                }
-
-                                                {product.friends_liked.length > 0 &&
-                                                    <Typography variant="body2" color="textSecondary" component="p">
-                                                        liked by {product.friends_liked.join(', ')}
-                                                    </Typography>
-                                                }
-                                            </CardContent>
-
-                                            {/* <CardActions>
-                                                <IconButton aria-label="add to favorites">
-                                                    <FavoriteIcon style={{ fontSize: 20 }} />
-                                                </IconButton>
-                                                <IconButton aria-label="share">
-                                                    <ShareIcon style={{ fontSize: 20 }} />
-                                                </IconButton>
-                                                {
-                                                    this.is_expanded(product._id) ?
-                                                        <IconButton
-                                                            onClick={() => this.onCollapesClick(product._id)}
-                                                            aria-expanded={true}
-                                                            aria-label="show less"
-                                                        >
-                                                            <ExpandLessIcon style={{ fontSize: 20 }} />
-                                                        </IconButton>
-                                                        :
-                                                        <IconButton
-                                                            onClick={() => this.onExpandClick(product._id)}
-                                                            aria-expanded={false}
-                                                            aria-label="show more"
-                                                        >
-                                                            <ExpandMoreIcon style={{ fontSize: 20 }} />
-                                                        </IconButton>
-                                                }
-                                            </CardActions>
-                                            <Collapse in={this.is_expanded(product._id)} timeout="auto" unmountOnExit>
-                                                <CardContent>
-                                                    <Typography paragraph>Product Summary:</Typography>
-                                                    <Typography paragraph>
-                                                        {product.product_summary}
-                                                    </Typography>
-                                                    <Typography paragraph>Product Reviews:</Typography>
-                                                    <Typography paragraph>
-                                                        To be added.
-                                                        </Typography>
-
-                                                </CardContent>
-                                            </Collapse> */}
-                                        </Grid>
-
-                                    </Grid>
-                                </Card>
+                                <OthersProductCard product={product}/>
+                        
                             ))
                         }
                     </Paper>

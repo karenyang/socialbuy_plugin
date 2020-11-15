@@ -22,7 +22,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import Avatar from '@material-ui/core/Avatar';
 import "./userinfo_page.css";
 import NameCard from '../modules/name_card';
-import ProductCard from '../modules/product_card';
+import MyProductCard from '../modules/my_product_card';
 import FriendRequestCard from '../modules/friend_request_card';
 import FriendCard from '../modules/friend_card';
 
@@ -195,7 +195,7 @@ class UserInfoPage extends Component {
                         <CloseIcon style={{ fontSize: 15 }} />
                     </IconButton>
                 </Grid>
-                
+
                 <Grid item xs={12}>
                     <Divider />
                     <NameCard user_id={this.state.user_id}/>
@@ -214,7 +214,7 @@ class UserInfoPage extends Component {
                         <Collapse in={this.state.show_collection_bought}>
                             {
                                 this.state.bought_product_list.map((product) => (
-                                    <ProductCard product={product} delete_func={this.onDeleteBoughtProduct}/>
+                                    <MyProductCard product={product} delete_func={this.onDeleteBoughtProduct}/>
                                 ))
                             }
                         </Collapse>
@@ -230,7 +230,7 @@ class UserInfoPage extends Component {
                         <Collapse in={this.state.show_collection_liked}>
                             {
                                 this.state.liked_product_list.map((product) => (
-                                    <ProductCard product={product} delete_func={this.onDeleteLikedProduct}/>
+                                    <MyProductCard product={product} delete_func={this.onDeleteLikedProduct}/>
                                 ))
                             }
                         </Collapse>
