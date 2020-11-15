@@ -60,7 +60,7 @@ chrome.runtime.onMessage.addListener(
                     })
                 window.localStorage.clear();
                 return true;
-            
+
             case "onLoadUserInfo":
                 console.log("Background about to get onLoadUserInfo data from background: ");
                 if (userInfo === undefined || userInfo.user_id === undefined) {
@@ -69,7 +69,7 @@ chrome.runtime.onMessage.addListener(
                 } else {
                     console.log("current user id", userInfo.user_id);
                     let user_id = userInfo.user_id;
-                    if (message.data){ //if specify a different user_id than self
+                    if (message.data) { //if specify a different user_id than self
                         user_id = message.data;
                     }
                     axios.get('http://localhost:8080/userinfo/' + user_id)
@@ -136,7 +136,7 @@ chrome.runtime.onMessage.addListener(
                 } else {
                     console.log("current user id", userInfo.user_id);
                     let user_id = userInfo.user_id;
-                    if (message.data){ //if specify a different user_id than self
+                    if (message.data) { //if specify a different user_id than self
                         user_id = message.data;
                     }
                     axios.get('http://localhost:8080/user_bought_product_list/' + user_id)
@@ -159,7 +159,7 @@ chrome.runtime.onMessage.addListener(
                     console.log("current user id", userInfo.user_id);
                     console.log("current user id", userInfo.user_id);
                     let user_id = userInfo.user_id;
-                    if (message.data){ //if specify a different user_id than self
+                    if (message.data) { //if specify a different user_id than self
                         user_id = message.data;
                     }
                     axios.get('http://localhost:8080/user_liked_product_list/' + user_id)
@@ -322,6 +322,23 @@ chrome.runtime.onMessage.addListener(
                 }
                 return true;
 
+            case "onDeleteFriend":
+                console.log("Background about to Handle onDeleteFriend. ");
+                if (userInfo === undefined || userInfo.user_id === undefined) {
+                    console.log("User have not lpogged in");
+                    sendResponse("User have not logged in");
+                } else {
+                    console.log("current user id", userInfo.user_id);
+                    axios.post('http://localhost:8080/deletefriend/' + userInfo.user_id, message.data)
+                        .then(res => {
+                            printResponse('onDeleteFriend', res);
+                            sendResponse(res);
+                        })
+                        .catch(err => {
+                            console.error(err)
+                        });
+                }
+                return true;
 
             default:
                 console.log('couldnt find matching case for ', message.type);

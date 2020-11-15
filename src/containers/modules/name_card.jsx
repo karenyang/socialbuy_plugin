@@ -5,6 +5,7 @@ import React, {
 import {
     Typography,
     Avatar,
+    Button,
 } from '@material-ui/core';
 
 class NameCard extends Component {
@@ -15,6 +16,7 @@ class NameCard extends Component {
             user_id: this.props.user_id, 
             user_name: "",
             profile_img: "",
+            is_self: this.props.is_self,
         }
         console.log(this.state);
     }
@@ -32,7 +34,7 @@ class NameCard extends Component {
         const handleUpdateUserInfo = this.handleUpdateUserInfo;
         chrome.runtime.sendMessage({ type: "onLoadUserInfo", data: this.state.user_id },
             function (res) {
-                console.log('FriendInfo receives reply from background for onLoadUserInfo ', res.data);
+                console.log('NameCard receives reply from background for onLoadUserInfo ', res.data);
                 if (res.status === 200) {
                     console.log("onLoadUserInfo succeeded.");
                     handleUpdateUserInfo(res.data);
@@ -61,6 +63,12 @@ class NameCard extends Component {
                 <Typography variant="body1" component="h5" style={{ width: 200 }}>
                     {this.state.user_name}
                 </Typography>
+                { !this.state.is_self && 
+                    <Button onClick={this.props.onClickDeleteFriend} style={{ textTransform: "none" , fontSize: 13, backgroundColor: "#EBEBEB", right: 10, position: "absolute"}} >
+                        Unfriend
+                    </Button>
+                }
+
             </div>
         )
     }

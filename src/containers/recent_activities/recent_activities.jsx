@@ -83,8 +83,7 @@ class RecentActivitiesPage extends Component {
                     <Paper style={{ maxHeight: 470, width: 400, overflow: 'auto' }}>
                         {
                             this.state.friends_product_list.map((product) => (
-                                <OthersProductCard product={product}/>
-                        
+                                <OthersProductCard key={product._id} product={product}/>
                             ))
                         }
                     </Paper>

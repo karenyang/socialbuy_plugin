@@ -236,6 +236,68 @@ app.get('/receivedfriendrequests/:user_id', function (request, response) {
 });
 
 
+app.post('/deletefriend/:user_id', function (request, response) {
+    console.log('server receives POST request /deletefriend ',request.body, request.params);
+    const friend_id = request.body.friend_id;
+    let user_id = request.params.user_id;
+    if (user_id) {
+        console.log('request.session.user_id: ', user_id);
+        User.findOne({
+            _id: user_id,
+        }, function (err, user) {
+            if (err) {
+                console.error(err);
+            }
+            if (user === null) {
+                console.log("could not find user", user_id)
+                response.status(421).send('User with id:' + user_id + ' not found.');
+                return;
+            }
+            User.findOne({
+                _id: friend_id,
+            }, function (err, friend) {
+                if (friend === null) {
+                    console.log("could not find friend_id", friend_id)
+
+                    response.status(421).send('Friend with id:' + friend_id + ' not found.');
+                    return;
+                }
+                else {                    
+                    const idx1 = friend.friends_list.indexOf(ObjectID(user._id));
+                    if (idx1=== -1) {
+                        console.error('user with id:' + user._id + " not found in the tobe deletetd friends's friend list");
+                        response.status(421).send('User not found.');
+                        return;
+                    }
+                    else {
+                        friend.friends_list.splice(idx1, 1);
+                        friend.save();
+                    }
+
+                    const idx2 = user.friends_list.indexOf(ObjectID(friend_id));
+                    if (idx2 === -1) {
+                        console.error('friend with id:' + friend_id + " not found in the user's friend list");
+                        response.status(421).send('User not found.');
+                        return;
+                    }
+                    else {
+                        user.friends_list.splice(idx2, 1);
+                        user.save();
+                    }
+
+
+                    console.log("Delete friendship reqeust between ", user.user_name, " and ", friend.user_name);
+                    response.status(200).send("success");
+                    return;
+                }
+
+            });
+
+        });
+    }
+});
+
+
 app.post('/respondfriendrequest/:user_id', function (request, response) {
     console.log('server receives Get request /respondfriendrequest ');
     const friend_username = request.body.friend_username;

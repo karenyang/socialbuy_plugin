@@ -182,7 +182,7 @@ class UserInfoPage extends Component {
 
                 <Grid item xs={12}>
                     <Divider />
-                    <NameCard user_id={this.state.user_id}/>
+                    <NameCard user_id={this.state.user_id} is_self={true}/>
                 </Grid>
 
                 <Grid item xs={12}>
@@ -198,7 +198,7 @@ class UserInfoPage extends Component {
                         <Collapse in={this.state.show_collection_bought}>
                             {
                                 this.state.bought_product_list.map((product) => (
-                                    <MyProductCard product={product} delete_func={this.onDeleteBoughtProduct}/>
+                                    <MyProductCard key={product._id+"_bought"} product={product} delete_func={this.onDeleteBoughtProduct}/>
                                 ))
                             }
                         </Collapse>
@@ -214,7 +214,7 @@ class UserInfoPage extends Component {
                         <Collapse in={this.state.show_collection_liked}>
                             {
                                 this.state.liked_product_list.map((product) => (
-                                    <MyProductCard product={product} delete_func={this.onDeleteLikedProduct}/>
+                                    <MyProductCard  key={product._id+"_liked"}  product={product} delete_func={this.onDeleteLikedProduct}/>
                                 ))
                             }
                         </Collapse>
@@ -239,11 +239,11 @@ class UserInfoPage extends Component {
                         <Collapse in={this.state.show_friends}>
                             <div>
                                 {this.state.received_friend_requests.map((friend) => (
-                                    <FriendRequestCard friend={friend}/>
+                                    <FriendRequestCard  key={friend._id} friend={friend}/>
                                 ))}
                                 <Divider variant="middle" />
                                 {this.state.friends_list.map((friend) => (
-                                   <FriendCard friend={friend}/>
+                                   <FriendCard key={friend._id} friend={friend}/>
                                 ))}
                             </div>
                         </Collapse>

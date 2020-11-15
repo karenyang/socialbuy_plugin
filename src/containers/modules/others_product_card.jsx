@@ -11,23 +11,17 @@ import {
     IconButton,
     CardActions,
 } from '@material-ui/core';
-import DeleteIcon from '@material-ui/icons/Delete';
 
 
-// my product card is relatively simpler than others' product card. You might not need to see the price, but and you have the right to delete, and {future} see how much influence you have
 class OthersProductCard extends Component {
     constructor(props) {
         super(props);
         this.state = {
             product: this.props.product,
-            delete_func: this.props.delete_func,
         }
-        console.log(this.state);
+        console.log("OthersProductCard state: ",this.state);
     }
 
-    onDelete(product_id) {
-        this.props.delete_func(product_id);
-    }
 
     cropTitle = (product_title) => {
         let title = product_title.split(" ");
@@ -59,7 +53,7 @@ class OthersProductCard extends Component {
                                 {this.cropTitle(product.product_title)}
                             </Typography>
 
-                            <Typography variant="body2" color="textSecondary" component="p">
+                            {/* <Typography variant="body2" color="textSecondary" component="p">
                                 ${product.product_cost}
                             </Typography>
 
@@ -73,7 +67,7 @@ class OthersProductCard extends Component {
                                 <Typography variant="body2" color="textSecondary" component="p">
                                     liked by {product.friends_liked.join(', ')}
                                 </Typography>
-                            }
+                            } */}
                         </CardContent>
                     </Grid>
                 </Grid>
