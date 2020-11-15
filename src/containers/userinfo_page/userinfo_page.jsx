@@ -10,16 +10,11 @@ import {
     Badge,
     Divider,
 } from '@material-ui/core';
-import CardActionArea from '@material-ui/core/CardActionArea';
 import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
 import icon from '../../assets/img/icon-34.png';
-import { makeStyles, withStyles } from '@material-ui/core/styles';
 import Collapse from '@material-ui/core/Collapse';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
-import DeleteIcon from '@material-ui/icons/Delete';
-import Avatar from '@material-ui/core/Avatar';
 import "./userinfo_page.css";
 import NameCard from '../modules/name_card';
 import MyProductCard from '../modules/my_product_card';
@@ -39,8 +34,6 @@ class UserInfoPage extends Component {
             show_collection_bought: false,
             show_collection_liked: false,
             show_friends: false,
-            user_name: "", //login user's name 
-            profile_img: "",//login user's profile_img 
         }
         console.log(this.state);
     }
@@ -112,15 +105,6 @@ class UserInfoPage extends Component {
             }
         );
 
-    }
-
-    onClickProduct(product) {
-        console.log("product clicked.", product.product_title);
-        chrome.runtime.sendMessage({ type: "onClickProduct", data: product.product_link },
-            function (res) {
-                console.log("Page opened for product: ", product.title);
-            }
-        );
     }
 
 
