@@ -1,7 +1,7 @@
 import React from 'react';
 import logo from '../../assets/img/logo.svg';
 import {
-    HashRouter, Route, Switch, Redirect
+    HashRouter, Route, Switch, Redirect, withRouter,
 } from 'react-router-dom';
 // import {
 //   Grid, Paper
@@ -13,6 +13,7 @@ import Login from '../../containers/login/Login';
 import FriendInfoPage from '../../containers/friendinfo_page/friendinfo_page';
 import './Popup.css';
 
+
 class Popup extends React.Component {
     constructor(props) {
         super(props);
@@ -20,6 +21,7 @@ class Popup extends React.Component {
             user_name: "",
             user_id: "",
             done_fetch: false,
+            current_tab: 0,
         };
     }
 
@@ -64,6 +66,7 @@ class Popup extends React.Component {
         console.log("State reset to, ", this.state);
     }
 
+ 
     render() {
         console.log("done fetch? ", this.state.done_fetch);
         return (
@@ -71,7 +74,7 @@ class Popup extends React.Component {
                 (<HashRouter>
                     <div className="App">
                         <Switch>
-                            <Route path="/greetings/:tab_id"
+                            <Route path="/greetings/:tab_id/"
                                 render={(props) => <Greetings {...props} user_name={this.state.user_name} user_id={this.state.user_id} />}
                             />
                             <Route path="/admin/register"
@@ -81,10 +84,10 @@ class Popup extends React.Component {
                                 render={(props) => <Login {...props} onLoggedIn={this.onLoggedIn} />}
                             />
                             <Route path="/users/:user_id"
-                                render={(props) => <FriendInfoPage {...props} />}
+                                render={(props) => <FriendInfoPage {...props} return_tab={this.state.current_tab}/>}
                             />
                             {this.state.user_id ?
-                                <Redirect to="/greetings/2" />
+                                <Redirect to={"/greetings/" + this.state.current_tab} />
                                 :
                                 <Redirect to="/admin/register" />
                             }

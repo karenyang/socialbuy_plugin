@@ -8,22 +8,22 @@
 //     Tab,
 // } from '@material-ui/core';
 // import { withStyles } from '@material-ui/core/styles';
-// import PhoneIcon from '@material-ui/icons/Phone';
-// import FavoriteIcon from '@material-ui/icons/Favorite';
-// import PersonPinIcon from '@material-ui/icons/PersonPin';
+// import SearchIcon from '@material-ui/icons/Search';
+// import WhatshotIcon from '@material-ui/icons/Whatshot';
+// import GroupIcon from '@material-ui/icons/Group';
 // // import TabPanel from "./TabPanel";
 
-// const useStyles = theme => ({
-//     root: {
-//         flexGrow: 1,
-//         maxWidth: 500,
-//         top: 'auto',
-//         bottom: 0,
-//     },
-    
-// });
+// // const useStyles = theme => ({
+// //     root: {
+// //         flexGrow: 1,
+// //         maxWidth: 500,
+// //         top: 'auto',
+// //         bottom: 0,
+// //     },
 
-// class Main extends Component {
+// // });
+
+// class IconTabs extends Component {
 //     constructor(props) {
 //         super(props);
 //         this.state = {
@@ -36,28 +36,28 @@
 //         this.setState({
 //             tab_index: new_value,
 //         })
+//         this.props.handleTabChange(new_value);
 //     }
 //     render() {
-//         const { classes } = this.props;
 //         return (
-//                 <AppBar square position="fixed" color="transparent" className={classes.root}>
-//                     <Tabs value={this.tab_index}
-//                         onChange={this.handleTabChange}
-//                         variant="fullWidth"
-//                         indicatorColor="primary"
-//                         textColor="primary"
-//                         aria-label="icon tabs example">
-//                         <Tab icon={<PhoneIcon />} aria-label="phone" />
-//                         <Tab icon={<FavoriteIcon />} aria-label="favorite" />
-//                         <Tab icon={<PersonPinIcon />} aria-label="person" />
-//                     </Tabs>
-//                 </AppBar>
-           
+//             <AppBar square position="fixed" color="transparent" style={{maxWidth: 500, top: 'auto', bottom: 0}} >
+//                 <Tabs value={this.tab_index}
+//                     onChange={this.handleTabChange}
+//                     variant="fullWidth"
+//                     indicatorColor="primary"
+//                     textColor="primary"
+//                     aria-label="icon tabs example">
+//                     <Tab icon={<WhatshotIcon />} aria-label="popular" />
+//                     <Tab icon={<SearchIcon />} aria-label="search" />
+//                     <Tab icon={<GroupIcon />} aria-label="admin" />
+//                 </Tabs>
+//             </AppBar>
+
 //         );
 //     }
 // }
 
-// export default withStyles(useStyles)(Main)
+// export default IconTabs;
 
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
@@ -78,16 +78,17 @@ const useStyles = makeStyles({
 });
 
 
-const IconTabs = ({handleTabChange}) => {
+const IconTabs = ({ handleTabChange, tab }) => {
+    console.log("TAB value: ", tab)
     const classes = useStyles();
-    const [value, setValue] = React.useState(0);
+    const [value, setValue] = React.useState(tab);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
         handleTabChange(newValue);
     };
-    
-    
+
+
     return (
         <AppBar square position="fixed" color="transparent" className={classes.root}>
             <Tabs
@@ -98,13 +99,13 @@ const IconTabs = ({handleTabChange}) => {
                 textColor="primary"
                 aria-label="icon tabs example"
             >
-                <Tab icon={<WhatshotIcon />} aria-label="popular"  />
+                <Tab icon={<WhatshotIcon />} aria-label="popular" />
                 <Tab icon={<SearchIcon />} aria-label="search" />
                 <Tab icon={<GroupIcon />} aria-label="admin" />
             </Tabs>
         </AppBar>
-    
-  );
+
+    );
 }
 
 export default IconTabs;

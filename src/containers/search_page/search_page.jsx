@@ -78,7 +78,7 @@ class SearchPage extends Component {
 
     render() {
         return (
-            <Grid container spacing={0} alignItems="center" justifyContent="center"  >
+            <Grid container spacing={0} alignItems="center" justify="center"  >
                 <Grid item xs={2}>
                     <img src={icon} alt="extension icon" width="25px" />
                 </Grid>
@@ -103,7 +103,7 @@ class SearchPage extends Component {
                     <Paper style={{ maxHeight: 540, width: 400, marginTop: 5, overflow: 'auto' }}>
                         {
                             this.state.search_results.results.map((result) => (
-                                <Card key={result.user_name} style={{ width: 400, marginTop: 5, display: 'flex', justifyContent: 'center' }}>
+                                <Card key={result.user_name} style={{ width: 400, marginTop: 5, display: 'flex', justify: 'center' }}>
                                     <Grid container spacing={0}  >
 
                                         <Grid item xs={5}>

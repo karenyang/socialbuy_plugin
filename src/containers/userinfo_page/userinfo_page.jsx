@@ -250,7 +250,7 @@ class UserInfoPage extends Component {
                 </Grid>
 
                 <Grid item xs={12}>
-                    <Paper style={{ maxHeight: 490, width: 400, marginTop: 5, overflowY: 'auto' }}>
+                    <Paper style={{ maxHeight: 490, width: 400, margin: 5, overflowY: 'auto' }}>
                         <Card style={{ width: 400, marginTop: 6, display: 'flex', justifyContent: 'center' }}>
                             <CardActions>
                                 <Button onClick={this.onClickCollectionBoughtButton} style={{ textTransform: "none" }} >
@@ -262,7 +262,7 @@ class UserInfoPage extends Component {
                         <Collapse in={this.state.show_collection_bought}>
                             {
                                 this.state.bought_product_list.map((product) => (
-                                    <div style={{ padding: "10px" }}>
+                                    <div key={product._id} style={{ padding: "10px" }}>
                                         <Grid container spacing={2}  >
                                             <Grid item xs={4}>
                                                 <CardActionArea>
@@ -398,7 +398,7 @@ class UserInfoPage extends Component {
                                 ))}
                                 <Divider variant="middle" />
                                 {this.state.friends_list.map((friend) => (
-                                    <CardActionArea key={friend._id} component="a" href={"#/users/"+friend._id}style={{ padding: 5 }}>
+                                    <CardActionArea key={friend._id} component="a" href={"#/users/"+friend._id+"/2"}style={{ padding: 5 }}>
                                         <Grid container spacing={0} style={{ display: 'flex', justifyContent: 'center', alignItems: "center" }}>
                                             <Grid item xs={2}>
                                                 <Avatar className="avatar" alt={friend.user_name} src={friend.profile_img} />

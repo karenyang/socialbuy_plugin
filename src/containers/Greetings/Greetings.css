@@ -23,3 +23,6 @@
     justify-content: 'center';
 }
 
+.container{
+    overflow: hidden;
+}

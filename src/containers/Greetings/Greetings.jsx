@@ -14,19 +14,10 @@ class Greetings extends Component {
         this.state = {
             user_name: this.props.user_name,
             user_id: this.props.user_id,
-            search_value: "",
-            product_expanded: {},
-            search_result: "",
-            tab: 0,
+            tab: parseInt(this.props.match.params.tab_id),
         }
-        console.log(this.state);
-    }
+        window.localStorage.setItem("tab",  this.props.match.params.tab_id);
 
-    componentDidMount = () => {
-        this.setState({
-            tab: this.props.match.params.tab_id,
-        });
-        console.log("this.state: ", this.state);
     }
 
     componentDidUpdate = (prevProps) => {
@@ -54,6 +45,8 @@ class Greetings extends Component {
         this.setState({
             tab: value
         })
+        window.localStorage.setItem("tab",  value);
+
     }
 
     onLogOut = () => {
@@ -79,7 +72,7 @@ class Greetings extends Component {
                 { this.state.tab === 0 &&  <RecentActivitiesPage />}
                 { this.state.tab === 1 &&  <SearchPage /> }
                 { this.state.tab === 2 &&  <UserInfoPage onLogOut={this.onLogOut} />}
-                <IconTabs handleTabChange={this.handleTabChange}/>
+                <IconTabs handleTabChange={this.handleTabChange} tab={this.state.tab}/>
             </div >
         );
     }

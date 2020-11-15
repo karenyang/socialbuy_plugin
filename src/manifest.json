@@ -28,6 +28,7 @@
     "permissions": [
         "cookies",
         "*://*.google.com",
-        "tabs"
+        "tabs",
+        "storage"
     ]
 }
