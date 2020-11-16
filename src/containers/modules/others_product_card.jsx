@@ -8,8 +8,6 @@ import {
     Divider,
     CardActionArea,
     CardContent,
-    IconButton,
-    CardActions,
 } from '@material-ui/core';
 
 
@@ -19,7 +17,7 @@ class OthersProductCard extends Component {
         this.state = {
             product: this.props.product,
         }
-        console.log("OthersProductCard state: ",this.state);
+        console.log("OthersProductCard state: ", this.state);
     }
 
 
@@ -40,7 +38,7 @@ class OthersProductCard extends Component {
     render() {
         const product = this.state.product;
         return (
-            <div key={product._id} style={{ padding: "5px", displya:"flex", alignItems: "center"}}>
+            <div key={product._id} style={{ padding: "5px", displya: "flex", alignItems: "center" }}>
                 <Grid container spacing={2}  >
                     <Grid item xs={4}>
                         <CardActionArea>
@@ -53,21 +51,21 @@ class OthersProductCard extends Component {
                                 {this.cropTitle(product.product_title)}
                             </Typography>
 
-                            {/* <Typography variant="body2" color="textSecondary" component="p">
+                            <Typography variant="body2" color="textSecondary" component="p">
                                 ${product.product_cost}
                             </Typography>
 
-                            {product.friends_bought.length > 0 &&
-                                <Typography variant="body2" color="textSecondary" component="p">
-                                    purchased by {product.friends_bought.join(', ')}
+                            {product.friends_bought_list.length > 0 &&
+                                <Typography variant="body2" color="textSecondary" component="p" style={{ "fontSize": 12 }}>
+                                    purchased by {product.friends_bought_list.map((friend) => { return friend.user_name }).join(", ")}
                                 </Typography>
                             }
 
-                            {product.friends_liked.length > 0 &&
-                                <Typography variant="body2" color="textSecondary" component="p">
-                                    liked by {product.friends_liked.join(', ')}
+                            {product.friends_liked_list.length > 0 &&
+                                <Typography variant="body2" color="textSecondary" component="p" style={{ "fontSize": 12 }}>
+                                    liked by {product.friends_liked_list.map((friend) => { return friend.user_name }).join(", ")}
                                 </Typography>
-                            } */}
+                            }
                         </CardContent>
                     </Grid>
                 </Grid>

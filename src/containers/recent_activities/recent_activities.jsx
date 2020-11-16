@@ -21,25 +21,14 @@ class RecentActivitiesPage extends Component {
         super(props);
         this.state = {
             user_id: this.props.user_id,
-            search_value: "",
-            self_bought_product_list: [],
             friends_product_list: [],
-            search_result: "",
-            tab: 0,
         }
         console.log(this.state);
     }
 
     updateFriendsProductList = (friends_product_list) => {
-        let product_objs = [];
-        for (let i = 0; i < friends_product_list.length; i++) {
-            let product = friends_product_list[i].product;
-            product.friends_bought = friends_product_list[i].bought;
-            product.friends_liked = friends_product_list[i].liked;
-            product_objs.push(product);
-        }
         this.setState({
-            friends_product_list: product_objs,
+            friends_product_list: friends_product_list,
         });
         console.log("State product list updated: ", this.state);
 

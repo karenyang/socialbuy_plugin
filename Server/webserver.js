@@ -52,6 +52,101 @@ app.use(session({
 // *************************************************************
 
 
+// app.get('/friends_productlist/:user_id', function (request, response) {
+//     console.log('server receives Get request /friends_productlist/ ');
+//     let user_id = request.params.user_id;
+//     if (user_id) {
+//         console.log('request.session.user_id: ', user_id);
+//         User.findOne({
+//             _id: user_id,
+//         }, function (err, user) {
+//             if (err) {
+//                 console.error(err);
+//             }
+//             if (user === null) {
+//                 console.error('User with id:' + user_id + ' not found.');
+//                 response.status(421).send('User not found.');
+//                 return;
+//             }
+//             let products = [];
+//             let product_links = [];
+
+//             async.each(user.friends_list, function (friend_id, callback) {
+//                 User.findOne({
+//                     _id: friend_id,
+//                 }, async function (err, friend) {
+//                     if (err) {
+//                         callback(err);
+//                     }
+//                     if (friend === null) {
+//                         callback('friend with id:' + friend_id + ' not found.');
+//                     }
+//                     else {
+//                         for (let i = 0; i < friend.bought_product_list.length; i++) {
+//                             if (friend.bought_product_list[i] in product_links) {
+//                                 products[product_links.indexOf(friend.bought_product_list[i])].friends_bought_list.push(friend);
+//                                 // products[product_links.indexOf(friend.bought_product_list[i])].liked.push(friend.user_name);
+//                             }
+//                             else {
+//                                 product_links.push(friend.bought_product_list[i]);
+//                                 await Product.findOne({
+//                                     product_link: friend.bought_product_list[i]
+//                                 }, function (err, product) {
+//                                     if (err) {
+//                                         callback(err);
+//                                     }
+//                                     product.friends_bought_list =  [friend.user_name];
+//                                     product.friends_liked_list  = [];
+//                                     products.push(product);
+
+//                                 });
+//                                 // console.log("added a product link to product lists: ", products.length)
+//                             }
+//                         }
+//                         for (let i = 0; i < friend.liked_product_list.length; i++) {
+//                             if (friend.liked_product_list[i] in product_links) {
+//                                 products[product_links.indexOf(friend.liked_product_list[i])].liked.push(friend);
+//                                 // products[product_links.indexOf(friend.bought_product_list[i])].liked.push(friend.user_name);
+//                             }
+//                             else {
+//                                 product_links.push(friend.liked_product_list[i]);
+//                                 await Product.findOne({
+//                                     product_link: friend.liked_product_list[i]
+//                                 }, function (err, product) {
+//                                     if (err) {
+//                                         callback(err);
+//                                     }
+//                                     products.push({
+//                                         product: product,
+//                                         bought: [],
+//                                         liked: [friend.user_name]
+//                                     });
+
+//                                 });
+//                                 // console.log("added a product link to product lists: ", products.length)
+//                             }
+//                         }
+//                         callback(null);
+//                     }
+//                 });
+//             }, function (err) {
+//                 if (err) {
+//                     console.error("Failed to fetch user's products list");
+//                     response.status(400).send("Failed to fetch user's products list ");
+//                 } else {
+//                     products.sort((a, b) => b.liked.length + 2 * b.bought.length > a.liked.length + 2 * a.bought.length ? 1 : -1);
+//                     console.log("Done fetching product lists: length=", products.length);
+//                     let output = {
+//                         "user_name": user.user_name,
+//                         "friends_productlist": products,
+//                     }
+//                     response.status(200).send(JSON.stringify(output));
+//                 }
+//             });
+//         });
+//     }
+// });
+
 app.get('/friends_productlist/:user_id', function (request, response) {
     console.log('server receives Get request /friends_productlist/ ');
     let user_id = request.params.user_id;
@@ -68,86 +163,90 @@ app.get('/friends_productlist/:user_id', function (request, response) {
                 response.status(421).send('User not found.');
                 return;
             }
-            let products = [];
-            let product_links = [];
 
-            async.each(user.friends_list, function (friend_id, callback) {
-                User.findOne({
-                    _id: friend_id,
-                }, async function (err, friend) {
-                    if (err) {
-                        callback(err);
-                    }
-                    if (friend === null) {
-                        callback('friend with id:' + friend_id + ' not found.');
-                    }
-                    else {
-                        for (let i = 0; i < friend.bought_product_list.length; i++) {
-                            if (friend.bought_product_list[i] in product_links) {
-                                products[product_links.indexOf(friend.bought_product_list[i])].bought.push(friend.user_name);
-                                // products[product_links.indexOf(friend.bought_product_list[i])].liked.push(friend.user_name);
+            let product_result = Product.aggregate([
+                {
+                    $match: {
+                        $expr: {
+                                $gt: [
+                                    {
+                                        $sum: [
+                                            { $size: { $setIntersection: ['$liker_list', user.friends_list] } }, //liker or buyer has my friends in it
+                                            { $size: { $setIntersection: ['$buyer_list', user.friends_list] } }
+                                        ]
+                                    },
+                                    0
+                                ]
                             }
-                            else {
-                                product_links.push(friend.bought_product_list[i]);
-                                await Product.findOne({
-                                    product_link: friend.bought_product_list[i]
-                                }, function (err, product) {
-                                    if (err) {
-                                        callback(err);
-                                    }
-                                    products.push({
-                                        product: product,
-                                        bought: [friend.user_name],
-                                        liked: [],
-                                    });
+                    }
+                },
+                {
+                    $project: {
+                        _id: 1, product_title: 1, product_link: 1, product_cost: 1, product_imgurl: 1,
+                        bought_friends_id_list: { $setIntersection: ['$buyer_list', user.friends_list] },
+                        liked_friends_id_list: { $setIntersection: ['$liker_list', user.friends_list] },
+                    }
+                },
+                { $sort: { createdAt: 1 } },
+            ]).exec();
 
-                                });
-                                // console.log("added a product link to product lists: ", products.length)
+            product_result.then(function (items) {
+                console.log("fetched products: ", items);
+                let queries = [];
+                for (let i = 0; i < items.length; i++) {
+                    let item = items[i];
+                    queries.push(User.aggregate([
+                        {
+                            $match: {
+                                $or: [
+                                    { "_id": { "$in": item.bought_friends_id_list } },
+                                    { "_id": { "$in": item.liked_friends_id_list } },
+
+                                ]
+                            },
+                        },
+                        {
+                            $project: {
+                                _id: 1, user_name: 1, profile_img: 1,
+                                bought: { "$in": ["$_id", item.bought_friends_id_list] },
+                                liked: { "$in": ["$_id", item.liked_friends_id_list] },
                             }
                         }
-                        for (let i = 0; i < friend.liked_product_list.length; i++) {
-                            if (friend.liked_product_list[i] in product_links) {
-                                products[product_links.indexOf(friend.liked_product_list[i])].liked.push(friend.user_name);
-                                // products[product_links.indexOf(friend.bought_product_list[i])].liked.push(friend.user_name);
-                            }
-                            else {
-                                product_links.push(friend.liked_product_list[i]);
-                                await Product.findOne({
-                                    product_link: friend.liked_product_list[i]
-                                }, function (err, product) {
-                                    if (err) {
-                                        callback(err);
-                                    }
-                                    products.push({
-                                        product: product,
-                                        bought: [],
-                                        liked: [friend.user_name]
-                                    });
-
-                                });
-                                // console.log("added a product link to product lists: ", products.length)
-                            }
-                        }
-                        callback(null);
-                    }
-                });
-            }, function (err) {
-                if (err) {
-                    console.error("Failed to fetch user's products list");
-                    response.status(400).send("Failed to fetch user's products list ");
-                } else {
-                    products.sort((a, b) => b.liked.length + 2 * b.bought.length > a.liked.length + 2 * a.bought.length ? 1 : -1);
-                    console.log("Done fetching product lists: length=", products.length);
-                    let output = {
-                        "user_name": user.user_name,
-                        "friends_productlist": products,
-                    }
-                    response.status(200).send(JSON.stringify(output));
+                    ]).exec());
+                    console.log("Done with querying a item's friend details: ", i);
                 }
+
+                Promise.all(queries).then((friend_details) => {
+                    console.log("friend_details are: ", friend_details);
+                    for (let i = 0; i < items.length; i++) {
+                        items[i].friends_bought_list = [];
+                        items[i].friends_liked_list = [];
+                        for (let j = 0; j < friend_details[i].length; j++) {
+                            const friend_detail = friend_details[i][j];
+                            if (friend_detail.bought) {
+                                items[i].friends_bought_list.push(friend_detail);
+                            }
+                            if (friend_detail.liked) {
+                                items[i].friends_liked_list.push(friend_detail);
+                            }
+                        }
+
+                    }
+                    let output = {
+                        user_name: user.user_name,
+                        friends_productlist: items,
+                    }
+                    console.log("fetch friends_productlist list: ", items);
+                    response.status(200).send(JSON.stringify(output));
+                })
             });
-        });
+
+        }
+        )
     }
 });
+
+
 
 app.get('/friendslist/:user_id', function (request, response) {
     console.log('server receives Get request /friendslist ');
@@ -237,7 +336,7 @@ app.get('/receivedfriendrequests/:user_id', function (request, response) {
 
 
 app.post('/deletefriend/:user_id', function (request, response) {
-    console.log('server receives POST request /deletefriend ',request.body, request.params);
+    console.log('server receives POST request /deletefriend ', request.body, request.params);
     const friend_id = request.body.friend_id;
     let user_id = request.params.user_id;
     if (user_id) {
@@ -262,9 +361,9 @@ app.post('/deletefriend/:user_id', function (request, response) {
                     response.status(421).send('Friend with id:' + friend_id + ' not found.');
                     return;
                 }
-                else {                    
+                else {
                     const idx1 = friend.friends_list.indexOf(ObjectID(user._id));
-                    if (idx1=== -1) {
+                    if (idx1 === -1) {
                         console.error('user with id:' + user._id + " not found in the tobe deletetd friends's friend list");
                         response.status(421).send('User not found.');
                         return;
@@ -449,7 +548,7 @@ app.post('/search/:user_id', function (request, response) {
                     search_string = search_key.concat(" " + search_category);
                 }
                 console.log("search string is: ", search_string);
-                Product.aggregate([
+                let product_result = Product.aggregate([
                     {
                         $match: {
                             $text: { $search: search_string },  //match with string query.
@@ -470,23 +569,70 @@ app.post('/search/:user_id', function (request, response) {
                         $project: {
                             _id: 1, product_title: 1, product_cost: 1, product_link: 1, product_imgurl: 1,
                             score: { $meta: "textScore" },
+                            bought_friends_id_list: { $setIntersection: ['$buyer_list', user.friends_list] },
+                            liked_friends_id_list: { $setIntersection: ['$liker_list', user.friends_list] }
                         }
                     },
                     {
                         $match: { score: { $gt: 6.0 } }
-                    }
-                ]).exec(function (err, items) {
-                    if (err) {
-                        console.log("Error Finding Query " + err)
-                    };
+                    },
+                    { $sort: { score: { $meta: "textScore" } } },
 
-                    let output = {
-                        user_name: user.user_name,
-                        results: items,
+                ]).exec();
+
+                product_result.then(function (items) {
+
+                    console.log("fetched products: ", items);
+                    let queries = [];
+                    for (let i = 0; i < items.length; i++) {
+                        let item = items[i];
+                        queries.push(User.aggregate([
+                            {
+                                $match: {
+                                    $or: [
+                                        { "_id": { "$in": item.bought_friends_id_list } },
+                                        { "_id": { "$in": item.liked_friends_id_list } },
+
+                                    ]
+                                },
+                            },
+                            {
+                                $project: {
+                                    _id: 1, user_name: 1, profile_img: 1,
+                                    bought: { "$in": ["$_id", item.bought_friends_id_list] },
+                                    liked: { "$in": ["$_id", item.liked_friends_id_list] },
+                                }
+                            }
+                        ]).exec());
+                        console.log("Done with querying a item's friend details: ", i);
                     }
-                    console.log("search results are: ", items);
-                    response.status(200).send(JSON.stringify(output));
-                });
+                    Promise.all(queries).then((friend_details) => {
+                        console.log("friend_details are: ", friend_details);
+                        for (let i = 0; i < items.length; i++) {
+                            items[i].friends_bought_list = [];
+                            items[i].friends_liked_list = [];
+                            for (let j = 0; j < friend_details[i].length; j++) {
+                                const friend_detail = friend_details[i][j];
+                                if (friend_detail.bought) {
+                                    items[i].friends_bought_list.push(friend_detail);
+                                }
+                                if (friend_detail.liked) {
+                                    items[i].friends_liked_list.push(friend_detail);
+                                }
+                            }
+
+                        }
+
+                        let output = {
+                            user_name: user.user_name,
+                            results: items,
+                        }
+                        console.log("search results are: ", items);
+                        response.status(200).send(JSON.stringify(output));
+                    })
+                }
+
+                )
             }
         });
     }
@@ -511,7 +657,7 @@ app.get('/user_liked_product_list/:user_id', function (request, response) {
                 return;
             }
 
-            Product.aggregate([
+            let product_result = Product.aggregate([
                 {
                     $match: {
                         "product_link": { "$in": user.liked_product_list },
@@ -520,24 +666,65 @@ app.get('/user_liked_product_list/:user_id', function (request, response) {
                 {
                     $project: {
                         _id: 1, product_title: 1, product_link: 1, product_cost: 1, product_imgurl: 1,
+                        bought_friends_id_list: { $setIntersection: ['$buyer_list', user.friends_list] },
+                        liked_friends_id_list: { $setIntersection: ['$liker_list', user.friends_list] }
                     }
                 },
                 { $sort: { createdAt: 1 } },
-            ])
-                .exec(function (err, liked_product_list) {
-                    if (err) {
-                        console.error("Failed to fetch user's product list");
-                        response.status(400).send("Failed to fetch user's product list ");
-                    } else {
-                        console.log("Done fetching all product lists.");
-                        let output = {
-                            "user_name": user.user_name,
-                            "liked_product_list": liked_product_list,
+            ]).exec();
+
+            product_result.then(function (items) {
+                console.log("fetched products: ", items);
+                let queries = [];
+                for (let i = 0; i < items.length; i++) {
+                    let item = items[i];
+                    queries.push(User.aggregate([
+                        {
+                            $match: {
+                                $or: [
+                                    { "_id": { "$in": item.bought_friends_id_list } },
+                                    { "_id": { "$in": item.liked_friends_id_list } },
+
+                                ]
+                            },
+                        },
+                        {
+                            $project: {
+                                _id: 1, user_name: 1, profile_img: 1,
+                                bought: { "$in": ["$_id", item.bought_friends_id_list] },
+                                liked: { "$in": ["$_id", item.liked_friends_id_list] },
+                            }
                         }
-                        response.status(200).send(JSON.stringify(output));
+                    ]).exec());
+                    console.log("Done with querying a item's friend details: ", i);
+                }
+
+                Promise.all(queries).then((friend_details) => {
+                    console.log("friend_details are: ", friend_details);
+                    for (let i = 0; i < items.length; i++) {
+                        items[i].friends_bought_list = [];
+                        items[i].friends_liked_list = [];
+                        for (let j = 0; j < friend_details[i].length; j++) {
+                            const friend_detail = friend_details[i][j];
+                            if (friend_detail.bought) {
+                                items[i].friends_bought_list.push(friend_detail);
+                            }
+                            if (friend_detail.liked) {
+                                items[i].friends_liked_list.push(friend_detail);
+                            }
+                        }
+
                     }
-                });
-        });
+
+                    let output = {
+                        user_name: user.user_name,
+                        liked_product_list: items,
+                    }
+                    console.log("fetch liked product list: ", items);
+                    response.status(200).send(JSON.stringify(output));
+                })
+            });
+        })
     }
     else {
         response.status(400).send('Not logged in yet.');
@@ -545,6 +732,7 @@ app.get('/user_liked_product_list/:user_id', function (request, response) {
     }
 
 });
+
 
 app.get('/user_bought_product_list/:user_id', function (request, response) {
     console.log('server receives Get request /user_bought_product_list/ ');
@@ -563,7 +751,8 @@ app.get('/user_bought_product_list/:user_id', function (request, response) {
                 response.status(421).send('User not found.');
                 return;
             }
-            Product.aggregate([
+
+            let product_result = Product.aggregate([
                 {
                     $match: {
                         "product_link": { "$in": user.bought_product_list },
@@ -572,24 +761,64 @@ app.get('/user_bought_product_list/:user_id', function (request, response) {
                 {
                     $project: {
                         _id: 1, product_title: 1, product_link: 1, product_cost: 1, product_imgurl: 1,
+                        bought_friends_id_list: { $setIntersection: ['$buyer_list', user.friends_list] },
+                        liked_friends_id_list: { $setIntersection: ['$liker_list', user.friends_list] }
                     }
                 },
                 { $sort: { createdAt: 1 } },
-            ])
-                .exec(function (err, bought_product_list) {
-                    if (err) {
-                        console.error("Failed to fetch user's product list");
-                        response.status(400).send("Failed to fetch user's product list ");
-                    } else {
-                        console.log("Done fetching all product lists.");
-                        let output = {
-                            "user_name": user.user_name,
-                            "bought_product_list": bought_product_list,
+            ]).exec();
+
+            product_result.then(function (items) {
+                console.log("fetched products: ", items);
+                let queries = [];
+                for (let i = 0; i < items.length; i++) {
+                    let item = items[i];
+                    queries.push(User.aggregate([
+                        {
+                            $match: {
+                                $or: [
+                                    { "_id": { "$in": item.bought_friends_id_list } },
+                                    { "_id": { "$in": item.liked_friends_id_list } },
+
+                                ]
+                            },
+                        },
+                        {
+                            $project: {
+                                _id: 1, user_name: 1, profile_img: 1,
+                                bought: { "$in": ["$_id", item.bought_friends_id_list] },
+                                liked: { "$in": ["$_id", item.liked_friends_id_list] },
+                            }
                         }
-                        response.status(200).send(JSON.stringify(output));
+                    ]).exec());
+                    console.log("Done with querying a item's friend details: ", i);
+                }
+
+                Promise.all(queries).then((friend_details) => {
+                    console.log("friend_details are: ", friend_details);
+                    for (let i = 0; i < items.length; i++) {
+                        items[i].friends_bought_list = [];
+                        items[i].friends_liked_list = [];
+                        for (let j = 0; j < friend_details[i].length; j++) {
+                            const friend_detail = friend_details[i][j];
+                            if (friend_detail.bought) {
+                                items[i].friends_bought_list.push(friend_detail);
+                            }
+                            if (friend_detail.liked) {
+                                items[i].friends_liked_list.push(friend_detail);
+                            }
+                        }
                     }
-                });
-        });
+
+                    let output = {
+                        user_name: user.user_name,
+                        bought_product_list: items,
+                    }
+                    console.log("fetch bought product list: ", items);
+                    response.status(200).send(JSON.stringify(output));
+                })
+            });
+        })
     }
     else {
         response.status(400).send('Not logged in yet.');
@@ -1004,6 +1233,7 @@ var WebpackDevServer = require('webpack-dev-server'),
     env = require('./env'),
     path = require('path');
 const Product = require('./schema/product.js');
+const { promises } = require('dns');
 
 var options = config.chromeExtensionBoilerplate || {};
 var excludeEntriesToHotReload = options.notHotReload || [];

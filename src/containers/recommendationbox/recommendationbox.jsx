@@ -93,17 +93,17 @@ class RecommendationBox extends Component {
                                                         ${product.product_cost}
                                                     </Typography>
 
-                                                    {/* {product.friends_bought.length > 0  && 
-                                                    <Typography variant="body2" color="textSecondary" component="p">
-                                                        purchased by {product.friends_bought.join(', ')}
+                                                    {product.friends_bought_list.length > 0  && 
+                                                    <Typography variant="body2" color="textSecondary" component="p" style={{ "fontSize": 10 }}>
+                                                        purchased by {product.friends_bought_list.map((friend) => { return friend.user_name}).join(", ")}
                                                     </Typography>
                                                 }
 
-                                                { product.friends_liked.length > 0  && 
-                                                    <Typography variant="body2" color="textSecondary" component="p">
-                                                        liked by {product.friends_liked.join(', ')}
+                                                { product.friends_liked_list.length > 0  && 
+                                                    <Typography variant="body2" color="textSecondary" component="p" style={{ "fontSize": 10 }}>
+                                                        liked by {product.friends_liked_list.map((friend) => { return friend.user_name}).join(", ")}
                                                     </Typography>
-                                                } */}
+                                                }
                                                 </CardContent>
                                             </Grid>
                                         </Grid>
