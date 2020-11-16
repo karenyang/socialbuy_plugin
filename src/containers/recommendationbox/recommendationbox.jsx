@@ -12,6 +12,7 @@ import CardContent from '@material-ui/core/CardContent';
 import "./recommendationpage.css"
 import CloseIcon from '@material-ui/icons/Close';
 import IconButton from '@material-ui/core/IconButton';
+import OthersProductCard from '../modules/others_product_card';
 
 
 const icon_url = "https://lh3.googleusercontent.com/1IJ60N360-Z6JxbS77UnKYPug2JmjXd40vX0-PRkT1VbjB4GGxLF1gfXMCiPs09Hj-2Lfo8=s85";
@@ -52,71 +53,39 @@ class RecommendationBox extends Component {
             return {};
         }
         return (
-            <div style={{ display: "inline-block", position: "fixed", top: "5px", right: "50px", margin: "0px", zIndex: 285, backgroundColor: "white" }} >
-                <Paper style={{ maxHeight: 420, width: 300, overflow: 'auto' }}>
-                    <Grid container spacing={0} justify="center">
-                        <Grid item xs={3}>
-                            <img src={icon_url} alt="icon" width="32" height="32" style={{ padding: 5 }} />
-                        </Grid>
-                        <Grid item xs={7}>
-                        </Grid>
-                        <Grid item xs={2}>
-                            <IconButton
-                                onClick={() => this.setState({close: true})}
-                            >
-                                <CloseIcon style={{ fontSize: 15 }} />
-                            </IconButton>
-                        </Grid>
-                        <Grid item xs={6}>
-                            <Typography variant="h1" style={{ "fontSize": 16, "paddingTop": 5, "paddingBottom": 5 }}>
-                                Endorsed by friends
-                            </Typography>
-                        </Grid>
-
-                        <Grid item xs={12}>
+            <Paper style={{
+                padding: 2, margin: 'auto', display: "flex", alignItems: "center", zIndex: 285, maxWidth: 400,
+                position: "fixed", top: "1px", right: "50px"
+            }} >
+                <Grid container spacing={0} alignItems="center" justify="center" >
+                    <Grid item xs={2}>
+                        <img src={icon_url} alt="icon" width="32" height="32" style={{ padding: 5 }} />
+                    </Grid>
+                    <Grid item xs={8}>
+                    </Grid>
+                    <Grid item xs={2}>
+                        <IconButton
+                            onClick={() => this.setState({ close: true })}
+                        >
+                            <CloseIcon style={{ fontSize: 15 }} />
+                        </IconButton>
+                    </Grid>
+                    <Grid item xs={12} align="center">
+                        <Typography variant="h4" color="inherit" style={{ "fontSize": 16, "paddingTop": 5, "paddingBottom": 10 }}>
+                            Endorsed by friends
+                        </Typography>
+                        <Paper style={{ maxHeight: 400, width: 400, overflowY: 'auto', overflowX: "hidden", margin: 0 }}>
                             {
                                 this.state.products.map((product) => (
-                                    <div style={{ padding: "10px" }}>
-                                        <Grid container spacing={2}  >
-                                            <Grid item xs={5}>
-                                                <CardActionArea>
-                                                    <img className="productimage" alt={product.product_title} src={product.product_imgurl} onClick={() => { this.onClickProduct(product) }} />
-                                                </CardActionArea>
-                                            </Grid>
-                                            <Grid item xs={7}>
-                                                <CardContent style={{ padding: "8px", display: "flex", flexDirection: "column", alignItems: "center" }}>
-                                                    <Typography gutterBottom variant="body2" component="h5" style={{ "fontSize": 12 }}>
-                                                        {this.cropTitle(product.product_title)}
-                                                    </Typography>
-
-                                                    <Typography variant="body2" color="textSecondary" component="p" style={{ "fontSize": 10 }}>
-                                                        ${product.product_cost}
-                                                    </Typography>
-
-                                                    {product.friends_bought_list.length > 0  && 
-                                                    <Typography variant="body2" color="textSecondary" component="p" style={{ "fontSize": 10 }}>
-                                                        purchased by {product.friends_bought_list.map((friend) => { return friend.user_name}).join(", ")}
-                                                    </Typography>
-                                                }
-
-                                                { product.friends_liked_list.length > 0  && 
-                                                    <Typography variant="body2" color="textSecondary" component="p" style={{ "fontSize": 10 }}>
-                                                        liked by {product.friends_liked_list.map((friend) => { return friend.user_name}).join(", ")}
-                                                    </Typography>
-                                                }
-                                                </CardContent>
-                                            </Grid>
-                                        </Grid>
-                                        <Divider variant="inset" />
-                                    </div>
+                                    <OthersProductCard key={product._id} product={product} />
                                 ))
                             }
-                        </Grid>
+                        </Paper>
                     </Grid>
-                </Paper>
-            </div>
-        );
-    }
-}
+                </Grid>
+            </ Paper>
+                );
+                }
+                }
 
 export default RecommendationBox;
