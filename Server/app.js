@@ -17,6 +17,8 @@ var passwordsalt = require('./utils/passwordsalt.js');
 var async = require('async');
 
 var User = require('./schema/user.js');
+var Product = require('./schema/product.js');
+
 var mongoose = require('mongoose');
 var ObjectID = mongoose.Types.ObjectId;
 
