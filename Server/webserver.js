@@ -89,9 +89,10 @@ app.get('/friends_productlist/:user_id', function (request, response) {
                         _id: 1, product_title: 1, product_link: 1, product_cost: 1, product_imgurl: 1,
                         bought_friends_id_list: { $setIntersection: ['$buyer_list', user.friends_list] },
                         liked_friends_id_list: { $setIntersection: ['$liker_list', user.friends_list] },
+                        createdAt: 1,
                     }
                 },
-                { $sort: { createdAt: -1 } },
+                { $sort: { "createdAt": -1 } },
             ]).exec();
 
             product_result.then(function (items) {
@@ -570,10 +571,11 @@ app.get('/user_liked_product_list/:user_id', function (request, response) {
                     $project: {
                         _id: 1, product_title: 1, product_link: 1, product_cost: 1, product_imgurl: 1,
                         bought_friends_id_list: { $setIntersection: ['$buyer_list', user.friends_list] },
-                        liked_friends_id_list: { $setIntersection: ['$liker_list', user.friends_list] }
+                        liked_friends_id_list: { $setIntersection: ['$liker_list', user.friends_list] },
+                        createdAt: 1,
                     }
                 },
-                { $sort: { createdAt: -1 } },
+                { $sort: { "createdAt": -1 } },
             ]).exec();
 
             product_result.then(function (items) {
@@ -665,10 +667,11 @@ app.get('/user_bought_product_list/:user_id', function (request, response) {
                     $project: {
                         _id: 1, product_title: 1, product_link: 1, product_cost: 1, product_imgurl: 1,
                         bought_friends_id_list: { $setIntersection: ['$buyer_list', user.friends_list] },
-                        liked_friends_id_list: { $setIntersection: ['$liker_list', user.friends_list] }
+                        liked_friends_id_list: { $setIntersection: ['$liker_list', user.friends_list] },
+                        createdAt: 1,
                     }
                 },
-                { $sort: { createdAt: -1 } },
+                { $sort: { "createdAt": -1 } },
             ]).exec();
 
             product_result.then(function (items) {

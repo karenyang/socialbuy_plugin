@@ -187,7 +187,7 @@ class UserInfoPage extends Component {
 
                 <Grid item xs={12}>
                     <Paper style={{ maxHeight: 440, width: 400, marginTop: 5, marginBottom: 5, overflowY: 'auto' }}>
-                        <Card style={{ width: 400, marginTop: 6, display: 'flex', justifyContent: 'center' }}>
+                        <Card style={{ width: 400, display: 'flex', justifyContent: 'center' }}>
                             <CardActions>
                                 <Button onClick={this.onClickCollectionShowBoughtButton} style={{ textTransform: "none" }} >
                                     Your Collection - purchased

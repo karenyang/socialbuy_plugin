@@ -148,7 +148,6 @@ class SearchPage extends Component {
 
                                 <Card key={result.user_name} style={{ width: 400, marginTop: 5, marginBottom: 5, display: 'flex', justify: 'center' }}>
                                     <Grid container spacing={0}  >
-
                                         <Grid item xs={5}>
                                             <CardContent >
                                                 <Typography gutterBottom variant="body2" component="h5">
