@@ -198,7 +198,7 @@ class UserInfoPage extends Component {
                         <Collapse in={this.state.show_collection_bought}>
                             {
                                 this.state.bought_product_list.map((product) => (
-                                    <MyProductCard key={product._id+"_bought"} product={product} delete_func={this.onDeleteBoughtProduct}/>
+                                    <MyProductCard key={product._id+"_bought"} product={product}  show_details={false} delete_func={this.onDeleteBoughtProduct}/>
                                 ))
                             }
                         </Collapse>
@@ -214,7 +214,7 @@ class UserInfoPage extends Component {
                         <Collapse in={this.state.show_collection_liked}>
                             {
                                 this.state.liked_product_list.map((product) => (
-                                    <MyProductCard  key={product._id+"_liked"}  product={product} delete_func={this.onDeleteLikedProduct}/>
+                                    <MyProductCard  key={product._id+"_liked"}  product={product} show_details={true} delete_func={this.onDeleteLikedProduct}/>
                                 ))
                             }
                         </Collapse>

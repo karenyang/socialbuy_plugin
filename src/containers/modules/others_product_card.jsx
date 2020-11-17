@@ -38,8 +38,8 @@ class OthersProductCard extends Component {
     render() {
         const product = this.state.product;
         return (
-            <div key={product._id} style={{ padding: "5px", displya: "flex", alignItems: "center" }}>
-                <Grid container spacing={2}  >
+            <div key={product._id} style={{ padding: "5px", display: "flex", alignItems: "center" }}>
+                <Grid container spacing={0}  >
                     <Grid item xs={4}>
                         <CardActionArea>
                             <img alt={product.product_title} src={product.product_imgurl} width="100" onClick={() => { this.onClickProduct(product) }} />
@@ -68,8 +68,11 @@ class OthersProductCard extends Component {
                             }
                         </CardContent>
                     </Grid>
+                    <Grid item xs={12}>
+                        <Divider variant="middle"/>
+                    </Grid>
                 </Grid>
-                <Divider />
+               
             </div>
         )
     }

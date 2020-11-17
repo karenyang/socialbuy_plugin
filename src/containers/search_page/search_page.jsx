@@ -17,6 +17,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import TextField from '@material-ui/core/TextField';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
+import OthersProductCard from '../modules/others_product_card';
 
 class SearchPage extends Component {
     constructor(props) {
@@ -24,7 +25,7 @@ class SearchPage extends Component {
         this.state = {
             user_id: this.props.user_id,
             search_value: "",
-            search_results: "",
+            search_results: [],
             search_category: "user",
             is_no_result: false,
         }
@@ -42,13 +43,15 @@ class SearchPage extends Component {
     }
 
     updateSearchResult = (res) => {
-        console.log("res status", res.status)
-        if (res.status === 200) {
-            this.setState({ search_results: res.data });
+        console.log("res status", res.status,  "search results:",res.data.results  )
+        if (res.status === 200 &&  res.data.results.length > 0) {
+            this.setState({ 
+                search_results: res.data.results 
+            });
         }
         else {
             this.setState({
-                search_results: "",
+                search_results: [],
                 is_no_result: true
             });
             console.log("should update with no result")
@@ -91,6 +94,8 @@ class SearchPage extends Component {
 
     handleTabChange = (event, value) => {
         this.setState({
+            search_value: "",
+            search_results: [],
             search_category: value,
         })
     };
@@ -119,6 +124,7 @@ class SearchPage extends Component {
                     </IconButton>
 
                 </Grid>
+                <Grid item xs={12}>
 
                 <Tabs
                     value={this.state.search_category}
@@ -127,10 +133,10 @@ class SearchPage extends Component {
                     indicatorColor="primary"
                     textColor="primary"
                     aria-label="search-tabs"
-                    style={{width: 400}}
+                    style={{ width: 400 }}
                 >
-                    <Tab label="User" aria-label="user" value="user" style={{textTransform: "none", fontSize: 12 }}/>
-                    <Tab label="Product" aria-label="product" value="product" style={{textTransform: "none", fontSize: 12 }}/>
+                    <Tab label="User" aria-label="user" value="user" style={{ textTransform: "none", fontSize: 12 }} />
+                    <Tab label="Product" aria-label="product" value="product" style={{ textTransform: "none", fontSize: 12 }} />
                 </Tabs>
 
                 {this.state.is_no_result &&
@@ -141,10 +147,19 @@ class SearchPage extends Component {
                     )
                 }
 
-                {this.state.search_results !== "" && this.state.search_category === "user" &&
+                {this.state.search_results !== [] && this.state.search_category === "product" &&
+                    <Paper style={{ maxHeight: 540, width: 400, margin:0, marginTop: 5, marginoverflow: 'auto' }}>
+                        {
+                            this.state.search_results.map((product) => (
+                                <OthersProductCard key={product._id} product={product} />
+                            ))
+                        }
+                    </Paper>}
+
+                {this.state.search_results !== [] && this.state.search_category === "user" &&
                     <Paper style={{ maxHeight: 540, width: 400, marginTop: 5, overflow: 'auto' }}>
                         {
-                            this.state.search_results.results.map((result) => (
+                            this.state.search_results.map((result) => (
 
                                 <Card key={result.user_name} style={{ width: 400, marginTop: 5, marginBottom: 5, display: 'flex', justify: 'center' }}>
                                     <Grid container spacing={0}  >
@@ -212,6 +227,8 @@ class SearchPage extends Component {
                             ))
                         }
                     </Paper>}
+
+                </Grid>
             </Grid>
         );
     }

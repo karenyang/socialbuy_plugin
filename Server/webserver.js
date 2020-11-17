@@ -448,7 +448,7 @@ app.post('/search/:user_id', function (request, response) {
             }
             else {
                 let search_string = search_key;
-                if (search_category !== null) {
+                if (search_category !== null && search_category!= "product") {
                     search_string = search_key.concat(" " + search_category);
                 }
                 console.log("search string is: ", search_string);
@@ -477,9 +477,9 @@ app.post('/search/:user_id', function (request, response) {
                             liked_friends_id_list: { $setIntersection: ['$liker_list', user.friends_list] }
                         }
                     },
-                    {
-                        $match: { score: { $gt: 6.0 } }
-                    },
+                    // {
+                    //     $match: { score: { $gt: 6.0 } }
+                    // },
                     { $sort: { score: { $meta: "textScore" } } },
 
                 ]).exec();
