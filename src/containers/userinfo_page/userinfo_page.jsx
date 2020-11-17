@@ -108,7 +108,7 @@ class UserInfoPage extends Component {
     }
 
 
-    onDeleteBoughtProduct(product_id) {
+    onDeleteBoughtProduct = (product_id) => {
         console.log("product to be delete has id", product_id);
         let new_bought_product_list = this.state.bought_product_list.filter(item => item['_id'] !== product_id);
 
@@ -128,7 +128,7 @@ class UserInfoPage extends Component {
         );
     }
 
-    onDeleteLikedProduct(product_id) {
+    onDeleteLikedProduct = (product_id) => {
         console.log("product to be delete has id", product_id);
         let new_liked_product_list = this.state.liked_product_list.filter(item => item['_id'] !== product_id);
         this.setState({

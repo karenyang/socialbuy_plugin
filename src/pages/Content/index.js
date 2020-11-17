@@ -16,15 +16,37 @@ let onBoughtProductsToBeAdded = [];
 
 
 if (url.includes('amazon.com/gp/cart')) {
-    console.log("Grabbing all products in cart...");
-    grabAllProductsInCart();
+    if (document.getElementsByName("proceedToRetailCheckout") !== null) {
+        console.log("Grabbing all products in cart...");
+        grabAllProductsInCart();
+        let checkout_button = document.getElementsByName("proceedToRetailCheckout")[0];
+
+        checkout_button.addEventListener("click", function () {
+            console.log(
+                "Clicked Check Out Button. Adding products in cart to bought"
+            )
+            chrome.runtime.sendMessage({ type: "onBoughtProductsToBeAdded", data: onBoughtProductsToBeAdded },
+                function (response) {
+                    console.log('this is the response from the background page for the onBoughtProductsToBeAdded Event: ', response);
+                    if (response.status === 200) {
+                        console.log("onBoughtProductsToBeAdded succeeded.", response.data);
+                    } else {
+                        console.log("onBoughtProductsToBeAdded failed.", response.data);
+                    }
+                    onBoughtProductsToBeAdded = []; //clear
+                });
+            
+        });
+    }
+
 }
 else if (url.includes('amazon.com/s?k=')) {
     console.log("Searching from URL  .....");
     searchFromUrl();
 }
-else if (url.includes('amazon.com/')) {//Creating the side box
-    console.log("Adding button .....");
+else if (url.includes('amazon.com/') && !url.includes('amazon.com/gp/buy')) { //on a product page: Creating the side box
+    console.log("Adding side box .....");
+
     ReactDOM.render(
         <SideBox />,
         document.body.appendChild(document.createElement("DIV"))
@@ -34,7 +56,7 @@ else if (url.includes('amazon.com/')) {//Creating the side box
 
 console.log("================================================================================================");
 
-function searchFromUrl(){
+function searchFromUrl() {
     const query_url = new URL(url);
     const key = query_url.searchParams.get('k');
     const category = query_url.searchParams.get('i');
@@ -43,14 +65,14 @@ function searchFromUrl(){
         search_key: key,
         search_category: category,
     }
-    chrome.runtime.sendMessage({type: "onHandleSearch", data: query},
+    chrome.runtime.sendMessage({ type: "onHandleSearch", data: query },
         function (response) {
             console.log('this is the response from the background page for onHandleSearch: ', response);
             if (response.status === 200) {
                 console.log("onHandleSearch succeeded.", response.data);
-                if (response.data.results.length > 0 ){
+                if (response.data.results.length > 0) {
                     ReactDOM.render(
-                        <RecommendationBox recommendated_products={response.data.results}/>,
+                        <RecommendationBox recommendated_products={response.data.results} />,
                         document.body.appendChild(document.createElement("DIV"))
                     )
                 }
@@ -73,7 +95,7 @@ function grabAllProductsInCart() {
         let item = {};
         item.product_title = cleanedUpValues[0];
         console.log("product_title: ", item.product_title)
-        let cost_str = cleanedUpValues[cleanedUpValues.length - 1];
+        let cost_str = cleanedUpValues.filter(value => value.startsWith("$"))[0];
         cost_str = cost_str.substring(1);
         item.product_cost = parseFloat(cost_str);
         console.log("product_cost: ", item.product_cost);
@@ -128,25 +150,25 @@ function fetchMoreBoughtProductInfo(item) {
     }
 }
 
-setInterval(function () {
-    if (onBoughtProductsToBeAdded.length > 0) {
-        sendToBackground("onBoughtProductsToBeAdded", onBoughtProductsToBeAdded);
-    }
-},
-    5000); //update every 5 sec
+// setInterval(function () {
+//     if (onBoughtProductsToBeAdded.length > 0) {
+//         sendToBackground("onBoughtProductsToBeAdded", onBoughtProductsToBeAdded);
+//     }
+// },
+//     5000); //update every 5 sec
 
-function sendToBackground(eventName, eventData, callback) {
-    console.log("sending to background.");
-    chrome.runtime.sendMessage({ type: eventName, data: eventData },
-        function (response) {
-            console.log('this is the response from the background page for the ' + eventName + ' Event: ', response);
-            if (response.status === 200) {
-                console.log(eventName, " succeeded.", response.data);
-            } else {
-                console.log(eventName, " failed.", response.data);
-            }
-            onBoughtProductsToBeAdded = []; //clear
-        }
-    );
-}
+// function sendToBackground(eventName, eventData, callback) {
+//     console.log("sending to background.");
+//     chrome.runtime.sendMessage({ type: eventName, data: eventData },
+//         function (response) {
+//             console.log('this is the response from the background page for the ' + eventName + ' Event: ', response);
+//             if (response.status === 200) {
+//                 console.log(eventName, " succeeded.", response.data);
+//             } else {
+//                 console.log(eventName, " failed.", response.data);
+//             }
+//             onBoughtProductsToBeAdded = []; //clear
+//         }
+//     );
+// }
 

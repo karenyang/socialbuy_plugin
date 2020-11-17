@@ -10,11 +10,14 @@ function fetchLikedProductInfo() {
         item.product_title = document.querySelector("#productTitle").innerText;
         console.log("product_title: ", item.product_title)
         let cost_str = "";
-        if (document.querySelector("#priceblock_ourprice") == null){
+        if (document.querySelector("#priceblock_dealprice") !== null){
+            cost_str = document.querySelector("#priceblock_dealprice").innerText;
+        } else if (document.querySelector("#priceblock_saleprice") !== null){
             cost_str = document.querySelector("#priceblock_saleprice").innerText;
-        } else {
+        }  else if (document.querySelector("#priceblock_ourprice") !== null){
             cost_str =  document.querySelector("#priceblock_ourprice").innerText;
         }
+
         cost_str = cost_str.substring(1);
         item.product_cost = parseFloat(cost_str);
         console.log("product_cost: ", item.product_cost);

@@ -91,7 +91,7 @@ app.get('/friends_productlist/:user_id', function (request, response) {
                         liked_friends_id_list: { $setIntersection: ['$liker_list', user.friends_list] },
                     }
                 },
-                { $sort: { createdAt: 1 } },
+                { $sort: { createdAt: -1 } },
             ]).exec();
 
             product_result.then(function (items) {
@@ -574,7 +574,7 @@ app.get('/user_liked_product_list/:user_id', function (request, response) {
                         liked_friends_id_list: { $setIntersection: ['$liker_list', user.friends_list] }
                     }
                 },
-                { $sort: { createdAt: 1 } },
+                { $sort: { createdAt: -1 } },
             ]).exec();
 
             product_result.then(function (items) {
@@ -669,7 +669,7 @@ app.get('/user_bought_product_list/:user_id', function (request, response) {
                         liked_friends_id_list: { $setIntersection: ['$liker_list', user.friends_list] }
                     }
                 },
-                { $sort: { createdAt: 1 } },
+                { $sort: { createdAt: -1 } },
             ]).exec();
 
             product_result.then(function (items) {

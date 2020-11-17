@@ -32,6 +32,23 @@ class SideBox extends Component {
         this.setState({
             product: product,
         });
+        document.getElementById("buy-now-button").addEventListener("click", function() {
+            console.log( 
+                "Clicked Buy Now Button. Adding products in cart to bought"
+            )
+            chrome.runtime.sendMessage({ type: "onBoughtProductsToBeAdded", data: [product] },
+                function (response) {
+                    console.log('Sidebox: is the response from the background page for the  onBoughtProductsToBeAdded  Event', response.data);
+                    if (response.status === 200) {
+                        console.log("onBoughtProductsToBeAdded", " succeeded.", response.data);
+                    } else {
+                        console.log("onBoughtProductsToBeAdded", " failed.", response.data);
+                    }
+                }
+            );
+          });
+
+
     }
 
     onMouseOverIcon = () => {

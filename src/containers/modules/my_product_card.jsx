@@ -22,11 +22,11 @@ class MyProductCard extends Component {
             product: this.props.product,
             delete_func: this.props.delete_func,
         }
-        console.log(this.state);
     }
 
     onDelete(product_id) {
-        this.props.delete_func(product_id);
+        console.log("delete product:")
+        this.state.delete_func(product_id);
     }
 
     cropTitle = (product_title) => {
@@ -46,7 +46,7 @@ class MyProductCard extends Component {
     render() {
         const product = this.state.product;
         return (
-            <div key={product._id} style={{ padding: "5px", displya:"flex", justifyContent: "center", alignItems: "center"}}>
+            <div key={product._id} style={{ padding: "5px", displya:"flex", alignItems: "center"}}>
                 <Grid container spacing={0}  >
                     <Grid item xs={4}>
                         <CardActionArea>
