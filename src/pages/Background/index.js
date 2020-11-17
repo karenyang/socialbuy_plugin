@@ -2,9 +2,8 @@ import '../../assets/img/icon-34.png';
 import '../../assets/img/icon-128.png';
 import axios from "axios";
 
-console.log("Process ENV", process.env.NODE_ENV);
-
-
+console.log("Process ENV", process.env.NODE_ENV );
+const DOMAIN = process.env.NODE_ENV === "production" ? process.env.PROD_DOMAIN : process.env.DEV_DOMAIN;
 console.log('This is the background page.');
 
 chrome.runtime.onMessage.addListener(
@@ -18,7 +17,7 @@ chrome.runtime.onMessage.addListener(
 
             case "onRegister":
                 console.log("About to register: ", message.data);
-                axios.post('http://localhost:8080/admin/register', message.data, {
+                axios.post(DOMAIN + 'admin/register', message.data, {
                     headers: {
                         'content-type': 'application/json',
                     }
@@ -34,7 +33,7 @@ chrome.runtime.onMessage.addListener(
 
             case "onLogin":
                 console.log("About to login: ", message.data);
-                axios.post('http://localhost:8080/admin/login', message.data, {
+                axios.post(DOMAIN + 'admin/login', message.data, {
                     headers: {
                         'content-type': 'application/json',
                     }
@@ -51,7 +50,7 @@ chrome.runtime.onMessage.addListener(
                 return true;
 
             case "onLogout":
-                axios.post('http://localhost:8080/admin/logout')
+                axios.post(DOMAIN + 'admin/logout')
                     .then(res => {
                         printResponse('onLogout', res);
                         sendResponse(res);
@@ -73,7 +72,7 @@ chrome.runtime.onMessage.addListener(
                     if (message.data) { //if specify a different user_id than self
                         user_id = message.data;
                     }
-                    axios.get('http://localhost:8080/userinfo/' + user_id)
+                    axios.get(DOMAIN + 'userinfo/' + user_id)
                         .then(res => {
                             printResponse('onLoadUserInfo', res);
                             sendResponse(res);
@@ -92,7 +91,7 @@ chrome.runtime.onMessage.addListener(
                 } else {
                     console.log("current user id", userInfo.user_id);
                     let user_id = userInfo.user_id;
-                    axios.post('http://localhost:8080/userinfo/' + user_id,  message.data, {
+                    axios.post(DOMAIN + 'userinfo/' + user_id,  message.data, {
                         headers: {
                             'content-type': 'application/json',
                         }
@@ -114,7 +113,7 @@ chrome.runtime.onMessage.addListener(
                 } else {
                     console.log("Background about to send product data to background: ", message.data);
                     console.log("current user id", userInfo.user_id);
-                    axios.post('http://localhost:8080/add_bought_products/' + userInfo.user_id, message.data, {
+                    axios.post(DOMAIN + 'add_bought_products/' + userInfo.user_id, message.data, {
                         headers: {
                             'content-type': 'application/json',
                         }
@@ -137,7 +136,7 @@ chrome.runtime.onMessage.addListener(
                 } else {
                     console.log("Background about to send product data to background: ", message.data);
                     console.log("current user id", userInfo.user_id);
-                    axios.post('http://localhost:8080/add_liked_products/' + userInfo.user_id, message.data, {
+                    axios.post(DOMAIN + 'add_liked_products/' + userInfo.user_id, message.data, {
                         headers: {
                             'content-type': 'application/json',
                         }
@@ -163,7 +162,7 @@ chrome.runtime.onMessage.addListener(
                     if (message.data) { //if specify a different user_id than self
                         user_id = message.data;
                     }
-                    axios.get('http://localhost:8080/user_bought_product_list/' + user_id)
+                    axios.get(DOMAIN + 'user_bought_product_list/' + user_id)
                         .then(res => {
                             printResponse('onLoadUserBoughtProductList', res);
                             sendResponse(res);
@@ -186,7 +185,7 @@ chrome.runtime.onMessage.addListener(
                     if (message.data) { //if specify a different user_id than self
                         user_id = message.data;
                     }
-                    axios.get('http://localhost:8080/user_liked_product_list/' + user_id)
+                    axios.get(DOMAIN + 'user_liked_product_list/' + user_id)
                         .then(res => {
                             printResponse('onLoadUserLikedProductList', res);
                             sendResponse(res);
@@ -209,7 +208,7 @@ chrome.runtime.onMessage.addListener(
                     sendResponse("User have not logged in");
                 } else {
                     console.log("current user id", userInfo.user_id);
-                    axios.post('http://localhost:8080/delete_bought_product/' + userInfo.user_id, { "product_id": message.data })
+                    axios.post(DOMAIN + 'delete_bought_product/' + userInfo.user_id, { "product_id": message.data })
                         .then(res => {
                             printResponse('onDeleteSelfBoughtProduct', res);
                             sendResponse(res);
@@ -227,7 +226,7 @@ chrome.runtime.onMessage.addListener(
                     sendResponse("User have not logged in");
                 } else {
                     console.log("current user id", userInfo.user_id);
-                    axios.post('http://localhost:8080/delete_liked_product/' + userInfo.user_id, { "product_id": message.data })
+                    axios.post(DOMAIN + 'delete_liked_product/' + userInfo.user_id, { "product_id": message.data })
                         .then(res => {
                             printResponse('onDeleteSelfLikedProduct', res);
                             sendResponse(res);
@@ -245,7 +244,7 @@ chrome.runtime.onMessage.addListener(
                     sendResponse("User have not logged in");
                 } else {
                     console.log("current user id", userInfo.user_id);
-                    axios.post('http://localhost:8080/search/' + userInfo.user_id, message.data)
+                    axios.post(DOMAIN + 'search/' + userInfo.user_id, message.data)
                         .then(res => {
                             printResponse('onHandleSearch', res);
                             sendResponse(res);
@@ -263,7 +262,7 @@ chrome.runtime.onMessage.addListener(
                     sendResponse("User have not logged in");
                 } else {
                     console.log("current user id", userInfo.user_id);
-                    axios.post('http://localhost:8080/requestfriend/' + userInfo.user_id, message.data)
+                    axios.post(DOMAIN + 'requestfriend/' + userInfo.user_id, message.data)
                         .then(res => {
                             printResponse('onRequestFriend', res);
                             sendResponse(res);
@@ -281,7 +280,7 @@ chrome.runtime.onMessage.addListener(
                     sendResponse("User have not logged in");
                 } else {
                     console.log("current user id", userInfo.user_id);
-                    axios.get('http://localhost:8080/friendslist/' + userInfo.user_id)
+                    axios.get(DOMAIN + 'friendslist/' + userInfo.user_id)
                         .then(res => {
                             printResponse('onLoadFriendsList', res);
                             sendResponse(res);
@@ -299,7 +298,7 @@ chrome.runtime.onMessage.addListener(
                     sendResponse("User have not logged in");
                 } else {
                     console.log("current user id", userInfo.user_id);
-                    axios.get('http://localhost:8080/receivedfriendrequests/' + userInfo.user_id)
+                    axios.get(DOMAIN + 'receivedfriendrequests/' + userInfo.user_id)
                         .then(res => {
                             printResponse('onLoadFriendRequestsList', res);
                             sendResponse(res);
@@ -317,7 +316,7 @@ chrome.runtime.onMessage.addListener(
                     sendResponse("User have not logged in");
                 } else {
                     console.log("current user id", userInfo.user_id);
-                    axios.get('http://localhost:8080/friends_productlist/' + userInfo.user_id)
+                    axios.get(DOMAIN + 'friends_productlist/' + userInfo.user_id)
                         .then(res => {
                             printResponse('onLoadFriendsProductList', res);
                             sendResponse(res);
@@ -335,7 +334,7 @@ chrome.runtime.onMessage.addListener(
                     sendResponse("User have not logged in");
                 } else {
                     console.log("current user id", userInfo.user_id);
-                    axios.post('http://localhost:8080/respondfriendrequest/' + userInfo.user_id, message.data)
+                    axios.post(DOMAIN + 'respondfriendrequest/' + userInfo.user_id, message.data)
                         .then(res => {
                             printResponse('onHandleFriendRequest', res);
                             sendResponse(res);
@@ -353,7 +352,7 @@ chrome.runtime.onMessage.addListener(
                     sendResponse("User have not logged in");
                 } else {
                     console.log("current user id", userInfo.user_id);
-                    axios.post('http://localhost:8080/deletefriend/' + userInfo.user_id, message.data)
+                    axios.post(DOMAIN + 'deletefriend/' + userInfo.user_id, message.data)
                         .then(res => {
                             printResponse('onDeleteFriend', res);
                             sendResponse(res);

@@ -36,7 +36,7 @@ const IconTabs = ({ handleTabChange, tab }) => {
                 variant="fullWidth"
                 indicatorColor="primary"
                 textColor="primary"
-                aria-label="icon tabs example"
+                aria-label="icon tabs"
             >
                 <Tab icon={<WhatshotIcon />} aria-label="popular" />
                 <Tab icon={<SearchIcon />} aria-label="search" />
