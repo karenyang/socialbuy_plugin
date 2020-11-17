@@ -1,7 +1,8 @@
 import '../../assets/img/icon-34.png';
 import '../../assets/img/icon-128.png';
 import axios from "axios";
-// import { response } from 'express';
+
+console.log("Process ENV", process.env.NODE_ENV);
 
 
 console.log('This is the background page.');

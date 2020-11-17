@@ -1,30 +1,47 @@
 // Do this as the first thing so that any code reading it knows the right env.
-process.env.BABEL_ENV = 'development';
-process.env.NODE_ENV = 'development';
+// process.env.BABEL_ENV = 'development';
+// process.env.NODE_ENV = 'development';
 
 // *************************************************************
 // Configure
 // *************************************************************
 const express = require('express');
-const app = express();
-var session = require('express-session');
+const dotenv = require('dotenv');
+console.log(dotenv.config({path: "./Server/.env"}));
 
+const app = express();
+
+var session = require('express-session');
 var bodyParser = require('body-parser');
 var passwordsalt = require('./utils/passwordsalt.js');
 var async = require('async');
 
 var User = require('./schema/user.js');
-
-
 var mongoose = require('mongoose');
 var ObjectID = mongoose.Types.ObjectId;
 
+console.log("process.env", process.env.NODE_ENV)
+
 mongoose.Promise = require('bluebird');
-mongoose.connect('mongodb://localhost/socialbuy_plugin', {
+const db = process.env.NODE_ENV === "production" ? process.env.PROD_DB : process.env.DEV_DB;
+console.log("process.env DB", db);
+
+mongoose.connect(db, {
     useNewUrlParser: true,
     useUnifiedTopology: true
-});
+}).then(() => console.log('DB Connected'))
+    .catch(err => {
+        console.log(err);
+    })
 
+// const MongoClient = require('mongodb').MongoClient;
+// const uri = "mongodb+srv://admin:<password>@cluster0.6cr1n.mongodb.net/<dbname>?retryWrites=true&w=majority";
+// const client = new MongoClient(uri, { useNewUrlParser: true });
+// client.connect(err => {
+//     const collection = client.db("test").collection("devices");
+//     // perform actions on the collection object
+//     client.close();
+// });
 
 app.use(express.static(__dirname));
 app.use(session({
@@ -72,16 +89,16 @@ app.get('/friends_productlist/:user_id', function (request, response) {
                 {
                     $match: {
                         $expr: {
-                                $gt: [
-                                    {
-                                        $sum: [
-                                            { $size: { $setIntersection: ['$liker_list', user.friends_list] } }, //liker or buyer has my friends in it
-                                            { $size: { $setIntersection: ['$buyer_list', user.friends_list] } }
-                                        ]
-                                    },
-                                    0
-                                ]
-                            }
+                            $gt: [
+                                {
+                                    $sum: [
+                                        { $size: { $setIntersection: ['$liker_list', user.friends_list] } }, //liker or buyer has my friends in it
+                                        { $size: { $setIntersection: ['$buyer_list', user.friends_list] } }
+                                    ]
+                                },
+                                0
+                            ]
+                        }
                     }
                 },
                 {
@@ -448,7 +465,7 @@ app.post('/search/:user_id', function (request, response) {
             }
             else {
                 let search_string = search_key;
-                if (search_category !== null && search_category!= "product") {
+                if (search_category !== null && search_category != "product") {
                     search_string = search_key.concat(" " + search_category);
                 }
                 console.log("search string is: ", search_string);
