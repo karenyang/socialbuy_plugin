@@ -111,7 +111,7 @@ app.get('/friends_productlist/:user_id', function (request, response) {
                         },
                         {
                             $project: {
-                                _id: 1, user_name: 1, profile_img: 1,
+                                _id: 1, email: 1, user_name: 1, profile_img: 1,
                                 bought: { "$in": ["$_id", item.bought_friends_id_list] },
                                 liked: { "$in": ["$_id", item.liked_friends_id_list] },
                             }
@@ -176,7 +176,7 @@ app.get('/friendslist/:user_id', function (request, response) {
                 },
                 {
                     $project: {
-                        _id: 1, user_name: 1, profile_img: 1,
+                        _id: 1, email: 1, user_name: 1, profile_img: 1,
                         mutual_friends: { $setIntersection: ["$friends_list", user.friends_list] },
                     }
                 }
@@ -219,7 +219,7 @@ app.get('/receivedfriendrequests/:user_id', function (request, response) {
                 },
                 {
                     $project: {
-                        _id: 1, user_name: 1, profile_img: 1,
+                        _id: 1, email: 1, user_name: 1, profile_img: 1,
                         mutual_friends: { $setIntersection: ["$friends_list", user.friends_list] },
                     }
                 }
@@ -419,7 +419,7 @@ app.post('/search/:user_id', function (request, response) {
                 response.status(421).send('User not found.');
                 return;
             }
-            if (search_category === 'friends') {
+            if (search_category === 'user') {
                 User.findOne({
                     user_name: search_key,
                 }, function (err, friend) {
@@ -438,7 +438,6 @@ app.post('/search/:user_id', function (request, response) {
                             user_name: user.user_name,
                             results: [result]
                         }
-
                         console.log("Found a friend: ", result);
                         response.status(200).send(JSON.stringify(output));
                         return;
@@ -502,7 +501,7 @@ app.post('/search/:user_id', function (request, response) {
                             },
                             {
                                 $project: {
-                                    _id: 1, user_name: 1, profile_img: 1,
+                                    _id: 1, email: 1, user_name: 1, profile_img: 1,
                                     bought: { "$in": ["$_id", item.bought_friends_id_list] },
                                     liked: { "$in": ["$_id", item.liked_friends_id_list] },
                                 }
@@ -594,7 +593,7 @@ app.get('/user_liked_product_list/:user_id', function (request, response) {
                         },
                         {
                             $project: {
-                                _id: 1, user_name: 1, profile_img: 1,
+                                _id: 1, email: 1, user_name: 1, profile_img: 1,
                                 bought: { "$in": ["$_id", item.bought_friends_id_list] },
                                 liked: { "$in": ["$_id", item.liked_friends_id_list] },
                             }
@@ -689,7 +688,7 @@ app.get('/user_bought_product_list/:user_id', function (request, response) {
                         },
                         {
                             $project: {
-                                _id: 1, user_name: 1, profile_img: 1,
+                                _id: 1, email: 1, user_name: 1, profile_img: 1,
                                 bought: { "$in": ["$_id", item.bought_friends_id_list] },
                                 liked: { "$in": ["$_id", item.liked_friends_id_list] },
                             }
@@ -1009,6 +1008,7 @@ app.get('/userinfo/:user_id', function (request, response) {
         // console.log("products: ", products);
         let output = {
             user_id: user_id,
+            email: user.email,
             user_name: user.user_name,
             profile_img: user.profile_img,
         };
@@ -1040,6 +1040,7 @@ app.post('/userinfo/:user_id', function (request, response) {
         console.log("updated after post /user_info: ", user);
         let output = {
             user_id: user_id,
+            email: user.email,
             user_name: user.user_name,
             profile_img: user.profile_img,
         };
@@ -1049,17 +1050,18 @@ app.post('/userinfo/:user_id', function (request, response) {
 
 app.post('/admin/login', function (request, response) {
     console.log('server receives POST request /admin/login : ', request.body);
-    const user_name = request.body.user_name;
+    const email = request.body.email;
+
     User.findOne({
-        user_name: user_name
+        email: email
     }, function (err, user) {
         if (err) {
             response.status(500).send(JSON.stringify(err));
             return;
         }
         if (!user) {
-            console.error('User with user_name:' + user_name + ' not found');
-            response.status(250).send('User of this user_name not registered: ' + user_name);
+            console.error('User with email:' + email + ' not found');
+            response.status(250).send('User of this email not registered: ' + email);
             return;
         }
         if (!passwordsalt.doesPasswordMatch(user.password_digest, user.salt, request.body.password)) {
@@ -1068,14 +1070,15 @@ app.post('/admin/login', function (request, response) {
             return;
         }
         request.session.user_id = user._id;
-        request.session.user_name = user_name;
+        request.session.user_name = user.user_name;
+        request.session.email = user.email;
         delete request.body.password; //make it safe
 
         let output = {
             user_id: user._id,
-            user_name: user_name,
+            user_name: user.user_name,
+            email: email,
         };
-
         response.status(200).send(JSON.stringify(output));
     });
     return;
@@ -1093,6 +1096,7 @@ app.post('/admin/logout', function (request, response) {
             });
         response.clearCookie("user_id");
         response.clearCookie("user_name");
+        response.clearCookie("email");
         response.status(200).send("Logged out.");
     } else {
         console.error("Not user is logged in.");
@@ -1125,12 +1129,12 @@ app.post('/admin/register', function (request, response) {
     delete newUser.password; //delete the password
 
     User.findOne({
-        'user_name': newUser.user_name
+        'email': newUser.email
     },
         function (err, user) {
             if (user !== null) {
-                console.log("User already existed before register");
-                response.status(250).send('user_name already exists');
+                console.log("Email has already been used for registration.");
+                response.status(250).send('Email already exists');
             } else {
                 User.create(newUser,
                     function (err, userObj) {
@@ -1140,7 +1144,6 @@ app.post('/admin/register', function (request, response) {
                         userObj.profile_img = "https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png";  // default profile img
                         userObj.save();
                         console.log("new userObj created, ", userObj);
-
                         response.status(200).send('New user registered');
                     })
             }

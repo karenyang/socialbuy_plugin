@@ -50,6 +50,7 @@ class Popup extends React.Component {
 
     onLoggedIn = (data) => {
         this.setState({
+            email: data.email,
             user_name: data.user_name,
             user_id: data.user_id,
             done_fetch: true,
@@ -59,6 +60,7 @@ class Popup extends React.Component {
 
     reset_state = () => {
         this.setState({
+            email: "",
             user_name: "",
             user_id: "",
             done_fetch: true,
@@ -74,7 +76,7 @@ class Popup extends React.Component {
                     <div className="App">
                         <Switch>
                             <Route path="/greetings/:tab_id/"
-                                render={(props) => <Greetings {...props} user_name={this.state.user_name} user_id={this.state.user_id} />}
+                                render={(props) => <Greetings {...props} email={this.state.email} user_name={this.state.user_name} user_id={this.state.user_id} />}
                             />
                             <Route path="/admin/register"
                                 render={(props) => <Register {...props} />}

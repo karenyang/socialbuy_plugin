@@ -186,7 +186,7 @@ class UserInfoPage extends Component {
                 </Grid>
 
                 <Grid item xs={12}>
-                    <Paper style={{ maxHeight: 440, width: 400, margin: 5, overflowY: 'auto' }}>
+                    <Paper style={{ maxHeight: 440, width: 400, marginTop: 5, marginBottom: 5, overflowY: 'auto' }}>
                         <Card style={{ width: 400, marginTop: 6, display: 'flex', justifyContent: 'center' }}>
                             <CardActions>
                                 <Button onClick={this.onClickCollectionShowBoughtButton} style={{ textTransform: "none" }} >

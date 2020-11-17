@@ -6,6 +6,7 @@ import './Login.css';
 import {
     Link
 } from 'react-router-dom';
+import icon from '../../assets/img/icon-34.png';
 
 
 
@@ -13,7 +14,7 @@ class Login extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            user_name: "",
+            email: "",
             password: "",
             user_id: "",
         };
@@ -32,12 +33,12 @@ class Login extends React.Component {
     handleSubmit = (event) => {
         event.preventDefault();
         let request = {
-            user_name: this.state.user_name,
+            email: this.state.email,
             password: this.state.password,
         };
 
         this.setState({
-            user_name: "",
+            email: "",
             password: "",
         });
 
@@ -48,7 +49,7 @@ class Login extends React.Component {
                 console.log('Login receives reply from backgroumd: ', res.data);
                 if (res.status === 200) {
                     console.log("Login succeeded. Proceed.");
-                    onLoggedIn({"user_name": res.data.user_name, "user_id": res.data.user_id});
+                    onLoggedIn({ "email": res.data.email, "user_name": res.data.user_name, "user_id": res.data.user_id });
                     let redirect_path = "/greetings";
                     history.push(redirect_path);
                 } else if (res.status === 250) {
@@ -64,39 +65,38 @@ class Login extends React.Component {
 
     render() {
         return (
-            <div className="container">
-                <div className='login-form'>
-                    <form onSubmit={this.handleSubmit}>
-                        <div>
-                            <h1>Login</h1>
-                        </div>
-                        <div>
-                            <label>Username: </label>
-                            <input
-                                type="text"
-                                name="user_name"
-                                placeholder="Enter Login Name"
-                                value={this.state.user_name}
-                                onChange={this.handleInputChange}
-                                required
-                            />
-                        </div>
-                        <div>
-                            <label>Password: </label>
-                            <input
-                                type="password"
-                                name="password"
-                                placeholder="Enter Password"
-                                value={this.state.password}
-                                onChange={this.handleInputChange}
-                                required
-                            />
-                        </div>
-                        <div>
-                            <input type="submit" value="Submit" />
-                        </div>
-                    </form>
-                </div>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                <form onSubmit={this.handleSubmit}>
+                    <div style={{ margin: "5px" }}>
+                        <img src={icon} alt="icon" width="40" height="40" style={{ padding: 5 }} />
+                        <h1>Login</h1>
+                    </div>
+                    <div style={{ margin: "5px" }}>
+                        <label>Email: </label>
+                        <input
+                            type="text"
+                            name="email"
+                            placeholder="Enter Email"
+                            value={this.state.email}
+                            onChange={this.handleInputChange}
+                            required
+                        />
+                    </div>
+                    <div style={{ margin: "5px" }}>
+                        <label>Password: </label>
+                        <input
+                            type="password"
+                            name="password"
+                            placeholder="Enter Password"
+                            value={this.state.password}
+                            onChange={this.handleInputChange}
+                            required
+                        />
+                    </div>
+                    <div>
+                        <input type="submit" value="Submit" />
+                    </div>
+                </form>
                 <Link to="/admin/register" className="btn btn-primary">Create new account</Link>
             </div>
         );

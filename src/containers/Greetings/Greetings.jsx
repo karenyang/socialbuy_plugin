@@ -12,6 +12,7 @@ class Greetings extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            email: this.props.email,
             user_name: this.props.user_name,
             user_id: this.props.user_id,
             tab: parseInt(this.props.match.params.tab_id),
@@ -21,6 +22,14 @@ class Greetings extends Component {
     }
 
     componentDidUpdate = (prevProps) => {
+        if (prevProps.email !== this.props.email) {
+            if (this.props.email === "") {
+                this.props.history.push("/admin/login");
+            }
+            this.setState({
+                user_name: this.props.user_name
+            });
+        }
         if (prevProps.user_name !== this.props.user_name) {
             if (this.props.user_name === "") {
                 this.props.history.push("/admin/login");

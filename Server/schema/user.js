@@ -8,10 +8,9 @@ var mongoose = require('mongoose');
 var ObjectID = mongoose.Types.ObjectId;
 // create a schema for User
 var userSchema = new mongoose.Schema({
-    // first_name: String,  
-    // last_name: String,
     // email: String, //unique login name
-    user_name: String,  // unique login name, will be replaced by email
+    email: String, 
+    user_name: String,
     password_digest: String,  //the digest of user set password
     salt: String,  //8byte hex string salt to concat to the user set password
     profile_img: String, //url to the photo
