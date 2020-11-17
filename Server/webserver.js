@@ -1017,6 +1017,36 @@ app.get('/userinfo/:user_id', function (request, response) {
     });
 });
 
+app.post('/userinfo/:user_id', function (request, response) {
+    console.log('server receives POST request /user_info ', request.body);
+    let user_id = request.params.user_id;
+    let new_userinfo = request.body;
+    User.findOne({
+        _id: user_id,
+    }, function (err, user) {
+        if (err) {
+            console.error(err);
+            response.status(422).send(err);
+
+        }
+        if (user === null) {
+            console.error('User with id:' + user_id + ' not found.');
+            response.status(421).send('User not found.');
+            return;
+        }
+        // console.log("products: ", products);
+        Object.assign(user, new_userinfo);
+        user.save();
+        console.log("updated after post /user_info: ", user);
+        let output = {
+            user_id: user_id,
+            user_name: user.user_name,
+            profile_img: user.profile_img,
+        };
+        response.status(200).send(JSON.stringify(output));
+    });
+});
+
 app.post('/admin/login', function (request, response) {
     console.log('server receives POST request /admin/login : ', request.body);
     const user_name = request.body.user_name;

@@ -83,6 +83,29 @@ chrome.runtime.onMessage.addListener(
                 }
                 return true;
 
+            case "onUploadUserInfo":
+                console.log("Background about to get onLoadUserInfo data from background: ");
+                if (userInfo === undefined || userInfo.user_id === undefined) {
+                    console.log("User have not logged in");
+                    sendResponse("User have not logged in");
+                } else {
+                    console.log("current user id", userInfo.user_id);
+                    let user_id = userInfo.user_id;
+                    axios.post('http://localhost:8080/userinfo/' + user_id,  message.data, {
+                        headers: {
+                            'content-type': 'application/json',
+                        }
+                    })
+                        .then(res => {
+                            printResponse('onLoadUserInfo', res);
+                            sendResponse(res);
+                        })
+                        .catch(err => {
+                            console.error(err)
+                        });
+                }
+                return true;
+
             case 'onBoughtProductsToBeAdded':
                 if (userInfo === undefined || userInfo.user_id === undefined) {
                     console.log("User have not logged in");
