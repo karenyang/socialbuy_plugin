@@ -34,14 +34,6 @@ mongoose.connect(db, {
         console.log(err);
     })
 
-// const MongoClient = require('mongodb').MongoClient;
-// const uri = "mongodb+srv://admin:<password>@cluster0.6cr1n.mongodb.net/<dbname>?retryWrites=true&w=majority";
-// const client = new MongoClient(uri, { useNewUrlParser: true });
-// client.connect(err => {
-//     const collection = client.db("test").collection("devices");
-//     // perform actions on the collection object
-//     client.close();
-// });
 
 app.use(express.static(__dirname));
 app.use(session({
@@ -1180,47 +1172,47 @@ app.listen(8080, function () {
 
 
 
-// *************************************************************
-// Webpack dev server
-// *************************************************************
+// // *************************************************************
+// // Webpack dev server
+// // *************************************************************
 
-var WebpackDevServer = require('webpack-dev-server'),
-    webpack = require('webpack'),
-    config = require('../webpack.config'),
-    env = require('./env'),
-    path = require('path');
-const Product = require('./schema/product.js');
-const { promises } = require('dns');
+// var WebpackDevServer = require('webpack-dev-server'),
+//     webpack = require('webpack'),
+//     config = require('../webpack.config'),
+//     env = require('./env'),
+//     path = require('path');
+// const Product = require('./schema/product.js');
+// const { promises } = require('dns');
 
-var options = config.chromeExtensionBoilerplate || {};
-var excludeEntriesToHotReload = options.notHotReload || [];
+// var options = config.chromeExtensionBoilerplate || {};
+// var excludeEntriesToHotReload = options.notHotReload || [];
 
-for (var entryName in config.entry) {
-    if (excludeEntriesToHotReload.indexOf(entryName) === -1) {
-        config.entry[entryName] = [
-            'webpack-dev-server/client?http://localhost:' + env.PORT,
-            'webpack/hot/dev-server',
-        ].concat(config.entry[entryName]);
-    }
-}
+// for (var entryName in config.entry) {
+//     if (excludeEntriesToHotReload.indexOf(entryName) === -1) {
+//         config.entry[entryName] = [
+//             'webpack-dev-server/client?http://localhost:' + env.PORT,
+//             'webpack/hot/dev-server',
+//         ].concat(config.entry[entryName]);
+//     }
+// }
 
-config.plugins = [new webpack.HotModuleReplacementPlugin()].concat(
-    config.plugins || []
-);
+// config.plugins = [new webpack.HotModuleReplacementPlugin()].concat(
+//     config.plugins || []
+// );
 
-delete config.chromeExtensionBoilerplate;
+// delete config.chromeExtensionBoilerplate;
 
-var compiler = webpack(config);
+// var compiler = webpack(config);
 
-var server = new WebpackDevServer(compiler, {
-    hot: true,
-    contentBase: path.join(__dirname, '../build'),
-    sockPort: env.PORT,
-    port: env.PORT,
-    headers: {
-        'Access-Control-Allow-Origin': '*',
-    },
-    disableHostCheck: true,
-});
+// var server = new WebpackDevServer(compiler, {
+//     hot: true,
+//     contentBase: path.join(__dirname, '../build'),
+//     sockPort: env.PORT,
+//     port: env.PORT,
+//     headers: {
+//         'Access-Control-Allow-Origin': '*',
+//     },
+//     disableHostCheck: true,
+// });
 
-server.listen(env.PORT);
+// server.listen(env.PORT);
