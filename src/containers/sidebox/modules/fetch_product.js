@@ -16,6 +16,8 @@ function fetchLikedProductInfo() {
             cost_str = document.querySelector("#priceblock_saleprice").innerText;
         }  else if (document.querySelector("#priceblock_ourprice") !== null){
             cost_str =  document.querySelector("#priceblock_ourprice").innerText;
+        } else if (document.querySelector("#price") !== null){
+            cost_str =  document.querySelector("#price").innerText;
         }
 
         cost_str = cost_str.substring(1);
@@ -26,7 +28,14 @@ function fetchLikedProductInfo() {
             item.product_link = item.product_link.split('ref=')[0];
         }
         console.log("product_link:  ", item.product_link);
-        item.product_imgurl = document.querySelector("#main-image-container > ul > li.image.item.itemNo0.maintain-height.selected > span > span > div > img").src;
+
+        let img_element = document.querySelector("#main-image-container > ul > li.image.item.itemNo0.maintain-height.selected > span > span > div > img");
+        if (img_element != null){
+            item.product_imgurl = img_element.src;
+        } else if (document.querySelector("#imgBlkFront") != null){
+            img_element = document.querySelector("#imgBlkFront");
+            item.product_imgurl = img_element.src;
+        }
         
         console.log("product_imgurl:  ", item.product_imgurl);
         item.product_by = "Amazon";
@@ -43,6 +52,7 @@ function fetchLikedProductInfo() {
                             product_summary = product_summary.concat(summary_list[i].innerHTML);
                         }
                     }
+                    
                     item.product_summary = product_summary;
                     // console.log("product_summary: ", product_summary);
                     let variation_imgs = page.querySelectorAll("button > div > div > img");
