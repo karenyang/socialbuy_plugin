@@ -2,9 +2,10 @@ import '../../assets/img/icon-34.png';
 import '../../assets/img/icon-128.png';
 import axios from "axios";
 
+
 console.log("Process ENV", process.env.NODE_ENV );
-const DOMAIN = process.env.NODE_ENV === "production" ? process.env.PROD_DOMAIN : process.env.DEV_DOMAIN;
-console.log('This is the background page.');
+const DOMAIN = process.env.NODE_ENV === "production" ? "http://ec2-18-188-234-4.us-east-2.compute.amazonaws.com:8080/" : "http://localhost:8080/";
+console.log('DOMAIN: ', DOMAIN);
 
 chrome.runtime.onMessage.addListener(
     function (message, sender, sendResponse) {
