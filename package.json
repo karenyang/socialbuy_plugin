@@ -1,7 +1,7 @@
 {
-  "name": "social-buy-plugin",
+  "name": "friend-tribe",
   "version": "0.0.1",
-  "description": "A chrome extension for Social Ecomm built with React 16 and Webpack 4",
+  "description": "Discover products from your friends' endorsement.",
   "license": "MIT",
   "scripts": {
     "build": "node Server/build.js",

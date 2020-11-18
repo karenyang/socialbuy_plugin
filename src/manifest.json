@@ -1,6 +1,6 @@
 {
     "manifest_version": 2,
-    "name": "Social Ecommerce Chrome Extension with React & Webpack",
+    "name": "FrienTribe",
     "version": "0.1",
     "options_page": "options.html",
     "background": {
