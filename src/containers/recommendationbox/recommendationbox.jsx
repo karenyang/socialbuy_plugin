@@ -7,9 +7,6 @@ import {
     Paper,
     Divider,
 } from '@material-ui/core';
-import CardActionArea from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
-import "./recommendationpage.css"
 import CloseIcon from '@material-ui/icons/Close';
 import IconButton from '@material-ui/core/IconButton';
 import OthersProductCard from '../modules/others_product_card';
@@ -21,22 +18,9 @@ class RecommendationBox extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            products: [],
+            products: this.props.recommendated_products,
             close: false,
         }
-    }
-
-    componentDidMount = () => {
-        console.log("RecommendationBox: this.props", this.props);
-        this.setState({
-            products: this.props.recommendated_products,
-        });
-
-    }
-
-    cropTitle = (product_title) => {
-        let title = product_title.split(" ");
-        return title.slice(0, 10).join(" ");
     }
 
     onClickProduct(product) {

@@ -107,12 +107,12 @@ chrome.runtime.onMessage.addListener(
                 }
                 return true;
 
-            case 'soonWillBuyProducts':
+            case 'onBoughtProductsToBeAdded':
                 if (userInfo === undefined || userInfo.user_id === undefined) {
                     console.log("User have not logged in");
                     sendResponse("User have not logged in");
                 } else {
-                    console.log("Background about to send product data to background: ", message.data);
+                    console.log("ChoiceBox about to send product data to background: ", message.data);
                     console.log("current user id", userInfo.user_id);
                     axios.post(DOMAIN + 'add_bought_products/' + userInfo.user_id, message.data, {
                         headers: {
@@ -120,7 +120,7 @@ chrome.runtime.onMessage.addListener(
                         }
                     })
                         .then(res => {
-                            printResponse('soonWillBuyProducts', res);
+                            printResponse('onBoughtProductsToBeAdded', res);
                             sendResponse(res);
                         })
                         .catch(err => {

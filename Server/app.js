@@ -954,34 +954,40 @@ app.post('/add_bought_products/:user_id', function (request, response) {
                     if (err) {
                         callback(err);
                     }
-                    if (product) {
-                        console.log("product existed: ", product.product_title);
-                        if (!product.buyer_list.includes(user_id)) {
-                            product.buyer_list.push(user_id);
-                            product.save();
-                            console.log("Add buyer to an existing product,  user:", user.user_name, " product: ", product.product_title);
-
-                        }
-                        if (!user.bought_product_list.includes(product.product_link)) {
-                            user.bought_product_list.push(product.product_link);
-                            console.log("Add product to an user's  product list,  user:", user.user_name, " product: ", product.product_title);
-                        }
-                    }
                     else {
-                        Object.assign(item, { "buyer_list": [user_id] });
-                        user.bought_product_list.push(item.product_link);
-                        console.log("Add product to an user's  product list,  user:", user.user_name, " product: ", item.product_title);
+                        if (product) {
+                            console.log("product existed: ", product.product_title);
+                            if (!product.buyer_list.includes(user_id)) {
+                                product.buyer_list.push(user_id);
+                                product.save();
+                                console.log("Add buyer to an existing product,  user:", user.user_name, " product: ", product.product_title);
 
-                        Product.create(item,
-                            function (err, newProduct) {
-                                if (err) {
-                                    callback(err);
-                                }
-                                console.log("new newProduct created, ", newProduct.product_title);
-                            })
+                            }
+                            if (!user.bought_product_list.includes(product.product_link)) {
+                                user.bought_product_list.push(product.product_link);
+                                console.log("Add product to an user's  product list,  user:", user.user_name, " product: ", product.product_title);
+                            }
+                            callback(null);
+                        }
+                        else {
+                            Object.assign(item, { "buyer_list": [user_id] });
+                            user.bought_product_list.push(item.product_link);
+                            console.log("Add product to an user's  product list,  user:", user.user_name, " product: ", item.product_title);
 
+                            Product.create(item,
+                                function (err, newProduct) {
+                                    if (err) {
+                                        callback(err);
+                                    }
+                                    else {
+                                        console.log("new newProduct created, ", newProduct.product_title);
+                                        callback(null);
+                                    }
+                                })
+
+                        }
                     }
-                    callback(null);
+
                 })
             }, function (err) {
                 if (err) {
