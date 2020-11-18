@@ -107,7 +107,7 @@ chrome.runtime.onMessage.addListener(
                 }
                 return true;
 
-            case 'onBoughtProductsToBeAdded':
+            case 'soonWillBuyProducts':
                 if (userInfo === undefined || userInfo.user_id === undefined) {
                     console.log("User have not logged in");
                     sendResponse("User have not logged in");
@@ -120,7 +120,7 @@ chrome.runtime.onMessage.addListener(
                         }
                     })
                         .then(res => {
-                            printResponse('onBoughtProductsToBeAdded', res);
+                            printResponse('soonWillBuyProducts', res);
                             sendResponse(res);
                         })
                         .catch(err => {

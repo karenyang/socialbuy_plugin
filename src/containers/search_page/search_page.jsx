@@ -24,7 +24,7 @@ class SearchPage extends Component {
         super(props);
         this.state = {
             user_id: this.props.user_id,
-            search_value: "",
+            search_input: "",
             search_results: [],
             search_category: "user",
             is_no_result: false,
@@ -94,7 +94,6 @@ class SearchPage extends Component {
 
     handleTabChange = (event, value) => {
         this.setState({
-            search_value: "",
             search_results: [],
             search_category: value,
         })
@@ -111,8 +110,8 @@ class SearchPage extends Component {
                 <Grid item xs={8}>
                     <div className="searchbox">
                         <TextField placeholder="Search…" style={{ "paddingLeft": 4, "width": '100%' }}
-                            name="search_value"
-                            value={this.state.search_value}
+                            name="search_input"
+                            value={this.state.search_input}
                             onChange={this.handleInputChange}
                             onKeyPress={this.handleSearch}
                         />

@@ -10,7 +10,6 @@ import {
 import CardActionArea from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Draggable from 'react-draggable';
-import fetchLikedProductInfo from './modules/fetch_product';
 import "./sidebox.css";
 
 const icon_url = "https://lh3.googleusercontent.com/1IJ60N360-Z6JxbS77UnKYPug2JmjXd40vX0-PRkT1VbjB4GGxLF1gfXMCiPs09Hj-2Lfo8=s85";
@@ -22,37 +21,35 @@ class SideBox extends Component {
             liked: false,
             show_product: false,
             cursor: "default",
-            product: null,
+            product: this.props.product,
             added_product: false,
         }
     }
 
     componentDidMount = () => {
-        let product = fetchLikedProductInfo();
-        this.setState({
-            product: product,
-        });
-        document.getElementById("buy-now-button").addEventListener("click", function() {
-            console.log( 
-                "Clicked Buy Now Button. Adding products in cart to bought"
+        // TODO: check whether product has been added to like list before
+
+        document.getElementById("buy-now-button").addEventListener("click", function () {
+            console.log(
+                "Clicked Buy Now Button."
             )
             chrome.runtime.sendMessage({ type: "onBoughtProductsToBeAdded", data: [product] },
-                function (response) {
-                    console.log('Sidebox: is the response from the background page for the  onBoughtProductsToBeAdded  Event', response.data);
-                    if (response.status === 200) {
-                        console.log("onBoughtProductsToBeAdded", " succeeded.", response.data);
-                    } else {
-                        console.log("onBoughtProductsToBeAdded", " failed.", response.data);
+                    function (response) {
+                        console.log('Sidebox: is the response from the background page for the  onBoughtProductsToBeAdded  Event', response.data);
+                        if (response.status === 200) {
+                            console.log("onBoughtProductsToBeAdded", " succeeded.", response.data);
+                        } else {
+                            console.log("onBoughtProductsToBeAdded", " failed.", response.data);
+                        }
                     }
-                }
-            );
+                );
+
           });
 
 
     }
 
     onMouseOverIcon = () => {
-        console.log("mouse over. ")
         this.setState({
             transform: "translate(0px, 50px)",
             show_product: true,
@@ -60,14 +57,12 @@ class SideBox extends Component {
     }
 
     onMouseLeaveIcon = () => {
-        console.log("mouse leave. ")
         this.setState({
             transform: "translate(0px, 0px)",
         });
     }
 
     onMouseLeaveBlock = () => {
-        console.log("mouse leave block. ")
         this.setState({
             show_product: false,
         });
@@ -117,7 +112,7 @@ class SideBox extends Component {
                                 </CardContent>
                             </div>
                             <Divider />
-                            <CardActionArea style={{ paddingBottom: "20px"}}>
+                            <CardActionArea style={{ paddingBottom: "20px" }}>
                                 {this.state.added_product ?
                                     <Button onClick={this.onClickAddCollection} style={{ textTransform: "none", width: "180px", backgroundColor: "#E9967A", color: "#F5F5DC" }} >
                                         Added
