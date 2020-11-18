@@ -49,36 +49,42 @@ class MyProductCard extends Component {
         return (
             <div key={product._id} style={{ padding: "5px", display: "flex", alignItems: "center" }}>
                 <Grid container spacing={0}  >
-                    <Grid item xs={4}>
-                        <CardActionArea>
-                            <img className="productimage" alt={product.product_title} src={product.product_imgurl} width="100" onClick={() => { this.onClickProduct(product) }} />
+                    <Grid item xs={11}>
+                        <CardActionArea style={{ display: "flex" }} onClick={() => { this.onClickProduct(product) }}>
+                            <Grid container spacing={0}  >
+                                <Grid item xs={4}>
+                                    <img className="productimage" alt={product.product_title} src={product.product_imgurl} style={{ maxWidth: "100px", maxHeight: "100px" }} />
+                                </Grid>
+                                <Grid item xs={8}>
+                                    <CardContent style={{ padding: "8px", display: "flex", flexDirection: "column", alignItems: "center" }}>
+                                        <Typography gutterBottom variant="body2" component="h5" style={{ "fontSize": 12 }}>
+                                            {this.cropTitle(product.product_title)}
+                                        </Typography>
+
+                                        {this.state.show_details &&
+                                            <Typography variant="body2" color="textSecondary" component="p">
+                                                ${product.product_cost}
+                                            </Typography>
+                                        }
+
+                                        {this.state.show_details && product.friends_bought_list.length > 0 &&
+                                            <Typography variant="body2" color="textSecondary" component="p" style={{ "fontSize": 12 }}>
+                                                purchased by {product.friends_bought_list.map((friend) => { return friend.user_name }).join(", ")}
+                                            </Typography>
+                                        }
+
+                                        {this.state.show_details && product.friends_liked_list.length > 0 &&
+                                            <Typography variant="body2" color="textSecondary" component="p" style={{ "fontSize": 12 }}>
+                                                liked by {product.friends_liked_list.map((friend) => { return friend.user_name }).join(", ")}
+                                            </Typography>
+                                        }
+                                    </CardContent>
+                                </Grid>
+                            </Grid>
                         </CardActionArea>
                     </Grid>
-                    <Grid item xs={7}>
-                        <CardContent style={{ padding: "8px", display: "flex", flexDirection: "column", alignItems: "center" }}>
-                            <Typography gutterBottom variant="body2" component="h5" style={{ "fontSize": 12 }}>
-                                {this.cropTitle(product.product_title)}
-                            </Typography>
 
-                            {this.state.show_details &&
-                                <Typography variant="body2" color="textSecondary" component="p">
-                                    ${product.product_cost}
-                                </Typography>
-                            }
 
-                            {this.state.show_details && product.friends_bought_list.length > 0 &&
-                                <Typography variant="body2" color="textSecondary" component="p" style={{ "fontSize": 12 }}>
-                                    purchased by {product.friends_bought_list.map((friend) => { return friend.user_name }).join(", ")}
-                                </Typography>
-                            }
-
-                            {this.state.show_details && product.friends_liked_list.length > 0 &&
-                                <Typography variant="body2" color="textSecondary" component="p" style={{ "fontSize": 12 }}>
-                                    liked by {product.friends_liked_list.map((friend) => { return friend.user_name }).join(", ")}
-                                </Typography>
-                            }
-                        </CardContent>
-                    </Grid>
                     <Grid item xs={1}>
                         <CardActions>
                             <IconButton
@@ -90,7 +96,7 @@ class MyProductCard extends Component {
                         </CardActions>
                     </Grid>
                     <Grid item xs={12}>
-                        <Divider variant="middle"/>
+                        <Divider variant="middle" />
                     </Grid>
 
                 </Grid>

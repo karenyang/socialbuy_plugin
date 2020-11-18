@@ -6,6 +6,7 @@
   "scripts": {
     "build": "node Server/build.js",
     "start": "node Server/webserver.js",
+    "server": "node Server/app.js",
     "prettier": "prettier --write '**/*.{js,jsx,css,html}' --tab-width 4"
   },
   "dependencies": {
