@@ -7,7 +7,8 @@ import {
     Card,
     Paper,
     Tab,
-    Tabs
+    Tabs,
+    Avatar
 } from '@material-ui/core';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
@@ -43,10 +44,10 @@ class SearchPage extends Component {
     }
 
     updateSearchResult = (res) => {
-        console.log("res status", res.status,  "search results:",res.data.results  )
-        if (res.status === 200 &&  res.data.results.length > 0) {
-            this.setState({ 
-                search_results: res.data.results 
+        console.log("res status", res.status, "search results:", res.data.results)
+        if (res.status === 200 && res.data.results.length > 0) {
+            this.setState({
+                search_results: res.data.results
             });
         }
         else {
@@ -60,7 +61,7 @@ class SearchPage extends Component {
 
     handleSearch = (event) => {
         const updateSearchResult = this.updateSearchResult;
-        if (event.key === 'Enter') {
+        if (event.key === 'Enter' && event.target.value!=="") {
             console.log('Searching for: ', event.target.value);
             this.setState({
                 is_no_result: false,
@@ -125,107 +126,113 @@ class SearchPage extends Component {
                 </Grid>
                 <Grid item xs={12}>
 
-                <Tabs
-                    value={this.state.search_category}
-                    onChange={this.handleTabChange}
-                    variant="fullWidth"
-                    indicatorColor="primary"
-                    textColor="primary"
-                    aria-label="search-tabs"
-                    style={{ width: 400 }}
-                >
-                    <Tab label="User" aria-label="user" value="user" style={{ textTransform: "none", fontSize: 12 }} />
-                    <Tab label="Product" aria-label="product" value="product" style={{ textTransform: "none", fontSize: 12 }} />
-                </Tabs>
+                    <Tabs
+                        value={this.state.search_category}
+                        onChange={this.handleTabChange}
+                        variant="fullWidth"
+                        indicatorColor="primary"
+                        textColor="primary"
+                        aria-label="search-tabs"
+                        style={{ width: 400 }}
+                    >
+                        <Tab label="User" aria-label="user" value="user" style={{ textTransform: "none", fontSize: 12 }} />
+                        <Tab label="Product" aria-label="product" value="product" style={{ textTransform: "none", fontSize: 12 }} />
+                    </Tabs>
 
-                {this.state.is_no_result &&
-                    (
-                        <Typography gutterBottom variant="body2" component="h5">
-                            No result found
-                        </Typography>
-                    )
-                }
+                    {this.state.is_no_result &&
+                        (
+                            <Typography gutterBottom variant="body2" component="h5">
+                                No result found
+                            </Typography>
+                        )
+                    }
 
-                {this.state.search_results !== [] && this.state.search_category === "product" &&
-                    <Paper style={{ maxHeight: 540, width: 400, margin:0, marginTop: 5, marginoverflow: 'auto' }}>
-                        {
-                            this.state.search_results.map((product) => (
-                                <OthersProductCard key={product._id} product={product} />
-                            ))
-                        }
-                    </Paper>}
+                    {this.state.search_results !== [] && this.state.search_category === "product" &&
+                        <Paper style={{ maxHeight: 540, width: 400, margin: 0, marginTop: 5, marginoverflow: 'auto' }}>
+                            {
+                                this.state.search_results.map((product) => (
+                                    <OthersProductCard key={product._id} product={product} />
+                                ))
+                            }
+                        </Paper>}
 
-                {this.state.search_results !== [] && this.state.search_category === "user" &&
-                    <Paper style={{ maxHeight: 540, width: 400, marginTop: 5, overflow: 'auto' }}>
-                        {
-                            this.state.search_results.map((result) => (
+                    {this.state.search_results !== [] && this.state.search_category === "user" &&
+                        <Paper style={{ maxHeight: 540, width: 400, marginTop: 5, overflow: 'auto'}}>
+                            {
+                                this.state.search_results.map((result) => (
 
-                                <Card key={result.user_name} style={{ width: 400, marginTop: 5, marginBottom: 5, display: 'flex', justify: 'center' }}>
-                                    <Grid container spacing={0}  >
-                                        <Grid item xs={5}>
-                                            <CardContent >
-                                                <Typography gutterBottom variant="body2" component="h5">
-                                                    {result.user_name}
-                                                </Typography>
-                                            </CardContent>
-                                        </Grid>
-
-                                        <Grid item xs={7}>
-                                            {!result.is_friend && !result.is_self && !result.is_received_friend_reqeust && !result.is_sent_friend_reqeust &&
-                                                <CardActions>
-                                                    <Button style={{ textTransform: "none" }}
-                                                        onClick={() => this.onRequestFriend(result.user_name)}
-                                                    >
-                                                        Add Friend
-                                                    </Button>
-                                                </CardActions>
-                                            }
-                                            {result.is_friend && !result.is_self &&
-                                                <CardContent >
-                                                    <Typography variant="body2" component="h5" style={{ 'color': 'grey' }}>
-                                                        Your friend
+                                    <Card key={result.user_name} style={{ width: 400, marginTop: 5, marginBottom: 5}}>
+                                        <Grid container spacing={24} justify="center" align="center">
+                                            <Grid item xs={1} > 
+                                                <Avatar alt={result.user_name} src={result.profile_img} />
+                                            </Grid>
+                                            <Grid item xs={4} >
+                                                <CardContent style={{display:"flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
+                                                    <Typography gutterBottom variant="body1" component="h5">
+                                                        {result.user_name}
                                                     </Typography>
+                                                    {/* <Typography gutterBottom variant="body2" component="h5" style={{ fontSize: 10 }}>
+                                                        {result.email}
+                                                    </Typography> */}
                                                 </CardContent>
-                                            }
-                                            {result.is_self && !result.is_friend &&
-                                                <CardContent >
-                                                    <Typography variant="body2" component="h5" style={{ 'color': 'grey' }}>
-                                                        Me
-                                                    </Typography>
-                                                </CardContent>
-                                            }
-                                            {result.is_sent_friend_reqeust && !result.is_friend &&
-                                                <CardContent >
-                                                    <Typography variant="body2" component="h5" style={{ 'color': 'grey' }}>
-                                                        Friend request sent
-                                                    </Typography>
-                                                </CardContent>
-                                            }
-                                            {result.is_received_friend_reqeust && !result.is_friend &&
-                                                <CardActions>
-                                                    <Typography variant="body2" component="h5" style={{ 'color': 'grey' }}>
-                                                        Friend request received
-                                                    </Typography>
-                                                    <div style={{ display: 'flex' }}>
+                                            </Grid>
+
+                                            <Grid item xs={7} >
+                                                {!result.is_friend && !result.is_self && !result.is_received_friend_reqeust && !result.is_sent_friend_reqeust &&
+                                                    <CardActions style={{justifyContent: "center"}}>
                                                         <Button style={{ textTransform: "none" }}
-                                                            onClick={() => this.onHandleFriendRequest(result.user_name, true)}
+                                                            onClick={() => this.onRequestFriend(result.user_name)}
                                                         >
-                                                            Accept
+                                                            Add Friend
                                                     </Button>
-                                                        <Button style={{ textTransform: "none" }}
-                                                            onClick={() => this.onHandleFriendRequest(result.user_name, false)}
-                                                        >
-                                                            Deny
+                                                    </CardActions>
+                                                }
+                                                {result.is_friend && !result.is_self &&
+                                                    <CardContent >
+                                                        <Typography variant="body2" component="h5" style={{ 'color': 'grey' }}>
+                                                            Your friend
+                                                    </Typography>
+                                                    </CardContent>
+                                                }
+                                                {result.is_self && !result.is_friend &&
+                                                    <CardContent >
+                                                        <Typography variant="body2" component="h5" style={{ 'color': 'grey' }}>
+                                                            Me
+                                                    </Typography>
+                                                    </CardContent>
+                                                }
+                                                {result.is_sent_friend_reqeust && !result.is_friend &&
+                                                    <CardContent >
+                                                        <Typography variant="body2" component="h5" style={{ 'color': 'grey' }}>
+                                                            Friend request sent
+                                                    </Typography>
+                                                    </CardContent>
+                                                }
+                                                {result.is_received_friend_reqeust && !result.is_friend &&
+                                                    <CardActions>
+                                                        <Typography variant="body2" component="h5" style={{ 'color': 'grey' }}>
+                                                            Friend request received
+                                                    </Typography>
+                                                        <div style={{ display: 'flex' }}>
+                                                            <Button style={{ textTransform: "none" }}
+                                                                onClick={() => this.onHandleFriendRequest(result.user_name, true)}
+                                                            >
+                                                                Accept
                                                     </Button>
-                                                    </div>
-                                                </CardActions>
-                                            }
+                                                            <Button style={{ textTransform: "none" }}
+                                                                onClick={() => this.onHandleFriendRequest(result.user_name, false)}
+                                                            >
+                                                                Deny
+                                                    </Button>
+                                                        </div>
+                                                    </CardActions>
+                                                }
+                                            </Grid>
                                         </Grid>
-                                    </Grid>
-                                </Card>
-                            ))
-                        }
-                    </Paper>}
+                                    </Card>
+                                ))
+                            }
+                        </Paper>}
 
                 </Grid>
             </Grid>

@@ -44,7 +44,7 @@ class OthersProductCard extends Component {
                         <CardActionArea style={{ display: "flex" }} onClick={() => { this.onClickProduct(product) }}>
                             <Grid container spacing={0}  >
                                 <Grid item xs={4}>
-                                    <img alt={product.product_title} src={product.product_imgurl}  style={{ maxWidth: "100px", maxHeight: "100px" }} />
+                                    <img alt={product.product_title} src={product.product_imgurl} style={{ maxWidth: "100px", maxHeight: "100px" }} />
                                 </Grid>
                                 <Grid item xs={8}>
                                     <CardContent >
@@ -52,9 +52,9 @@ class OthersProductCard extends Component {
                                             {this.cropTitle(product.product_title)}
                                         </Typography>
 
-                                        <Typography variant="body2" color="textSecondary" component="p">
+                                        {/* <Typography variant="body2" color="textSecondary" component="p">
                                             ${product.product_cost}
-                                        </Typography>
+                                        </Typography> */}
 
                                         {product.friends_bought_list.length > 0 &&
                                             <Typography variant="body2" color="textSecondary" component="p" style={{ "fontSize": 12 }}>

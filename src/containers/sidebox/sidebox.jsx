@@ -20,7 +20,6 @@ class SideBox extends Component {
         this.state = {
             liked: false,
             show_product: false,
-            cursor: "default",
             product: this.props.product,
             added_product: false,
         }

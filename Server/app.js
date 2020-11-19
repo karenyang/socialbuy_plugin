@@ -432,31 +432,36 @@ app.post('/search/:user_id', function (request, response) {
                 return;
             }
             if (search_category === 'user') {
-                User.findOne({
-                    user_name: search_key,
-                }, function (err, friend) {
-                    if (friend === null) {
-                        response.status(201).send('friend not found.');
-                        return;
-                    }
-                    else {
-                        let result = {};
-                        result["user_name"] = friend.user_name;
-                        result["is_friend"] = user.friends_list.includes(friend._id); //whether is already friend or is users themselves;
-                        result["is_self"] = user.user_name === friend.user_name; //whether is already friend or is users themselves;
-                        result["is_sent_friend_reqeust"] = user.friend_requests_list.includes(friend._id); //whether i have sent friend request to others
-                        result["is_received_friend_reqeust"] = friend.friend_requests_list.includes(user._id); //whether others have sent friend request to me
-                        let output = {
-                            user_name: user.user_name,
-                            results: [result]
+                let user_result = User.aggregate([
+                    {
+                        $match: {
+                            // $text: { $search: search_key },  //match with string query.
+                            "user_name": {$regex: search_key, $options: "ix"}, //use regex is better
                         }
-                        console.log("Found a friend: ", result);
+                    },
+                    {
+                        $project: {
+                            _id: 1, user_name: 1, email: 1,
+                            is_friend:  { "$in": ["$_id", user.friends_list] },
+                            is_self: { "$eq": ["$_id", user._id] },
+                            is_sent_friend_reqeust: { "$in": ["$_id", user.friend_requests_list] },
+                            is_received_friend_reqeust: { "$in": [ user._id, "$friend_requests_list"] },
+                        }
+                    },
+                ]).exec();
+
+                user_result.then(function (results) {
+                    let output = {
+                        user_name: user.user_name,
+                        results: results
+                    }
+                    console.log("Found friend: ", results);
                         response.status(200).send(JSON.stringify(output));
                         return;
-                    }
 
                 });
             }
+
             else {
                 let search_string = search_key;
                 if (search_category !== null && search_category != "product") {

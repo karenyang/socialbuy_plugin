@@ -88,26 +88,6 @@ else if (url.includes('amazon.com/gp/buy/')) {
     let buy_button_bottom = document.querySelector("#bottomSubmitOrderButtonId > span > input");
     let soonWillBuyProducts = getStorageItem("soonWillBuyProducts")
     console.log("Before buy soonWillBuyProducts: ", soonWillBuyProducts);
-    // let products_checkout = document.querySelectorAll("#spc-orders > div > div > div.a-row.shipment > div > div > div > div> div > div > div.a-row > div > div > div.a-fixed-left-grid-col.item-details-right-column.a-col-right > div.a-row.breakword > span")
-    // let data = []
-    // if (products_checkout !== null && products_checkout!==[]) {
-    //     let product_names = [];
-    //     product_names = Array.from(products_checkout).map((a) => a.innerText);
-    //     console.log("product_names: ", product_names);
-
-    //     if (product_names.length > 0) {
-    //         for (let i = 0; i < soonWillBuyProducts.length; i++) {
-    //             for (let j=0; j < product_names.length; j++) {
-    //                 if (product_names[j].includes(soonWillBuyProducts[i].product_title)) {
-    //                     data.push(soonWillBuyProducts[i]);
-    //                     console.log("Data added:", soonWillBuyProducts[i].product_title)
-
-    //                 }
-    //             }
-    //         }
-    //         setStorageItem("LastPurchase", data);
-    //     }
-    // }
     const after_placing_order_func = function () {
         console.log(
             "Clicked Place Your Order Button. Adding products in page to bought List"

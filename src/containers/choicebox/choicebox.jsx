@@ -68,6 +68,7 @@ class ChoiceBox extends Component {
                 if (response.status === 200) {
                     console.log("onBoughtProductsToBeAdded succeeded.", response.data);
                     updateState("close", true);
+                    window.localStorage.setItem("LastPurchase", []);
                 } else {
                     console.log("onBoughtProductsToBeAdded failed.", response.data);
                 }
