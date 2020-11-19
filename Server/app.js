@@ -448,6 +448,13 @@ app.post('/search/:user_id', function (request, response) {
                             is_received_friend_reqeust: { "$in": [ user._id, "$friend_requests_list"] },
                         }
                     },
+                    {
+                        $sort: {
+                            is_received_friend_reqeust: -1,
+                            is_sent_friend_reqeust: -1,
+                            is_friend: -1,
+                        }
+                    }
                 ]).exec();
 
                 user_result.then(function (results) {
@@ -1103,6 +1110,7 @@ app.post('/admin/login', function (request, response) {
             user_id: user._id,
             user_name: user.user_name,
             email: email,
+            received_friend_requests: user.received_friend_requests,
         };
         response.status(200).send(JSON.stringify(output));
     });
