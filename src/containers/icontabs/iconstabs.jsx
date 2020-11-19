@@ -6,6 +6,8 @@ import Tab from '@material-ui/core/Tab';
 import SearchIcon from '@material-ui/icons/Search';
 import WhatshotIcon from '@material-ui/icons/Whatshot';
 import GroupIcon from '@material-ui/icons/Group';
+import Badge from '@material-ui/core/Badge';
+
 
 const useStyles = makeStyles({
     root: {
@@ -17,8 +19,8 @@ const useStyles = makeStyles({
 });
 
 
-const IconTabs = ({ handleTabChange, tab }) => {
-    console.log("TAB value: ", tab)
+const IconTabs = ({ handleTabChange, tab, num_friend_requests }) => {
+    console.log("TAB value: ", tab, "num_friend_requests", num_friend_requests)
     const classes = useStyles();
     const [value, setValue] = React.useState(tab);
 
@@ -40,7 +42,12 @@ const IconTabs = ({ handleTabChange, tab }) => {
             >
                 <Tab icon={<WhatshotIcon />} aria-label="popular" />
                 <Tab icon={<SearchIcon />} aria-label="search" />
-                <Tab icon={<GroupIcon />} aria-label="admin" />
+                {num_friend_requests > 0 ? 
+                    <Tab icon={<Badge badgeContent={num_friend_requests} color="secondary"><GroupIcon /></Badge>} aria-label="admin" />
+                    :
+                    <Tab icon={<GroupIcon />} aria-label="admin" />
+                }
+
             </Tabs>
         </AppBar>
 

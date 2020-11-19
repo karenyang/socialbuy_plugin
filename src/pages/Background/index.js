@@ -19,9 +19,11 @@ if (userInfo !== null) {
             printResponse('onLoadFriendRequestsList', res);
             const friend_requests = res.data.received_friend_requests;
             num_requests = friend_requests.length;
-            console.log("there arefriend request:", num_requests, friend_requests);
+            console.log("there are friend request:", num_requests, friend_requests);
             if (num_requests > 0) {
                 chrome.browserAction.setBadgeText({ text: num_requests.toString() });
+            } else {
+                chrome.browserAction.setBadgeText({ text: "" });
             }
         })
         .catch(err => {
@@ -29,15 +31,37 @@ if (userInfo !== null) {
         });
 }
 
+chrome.runtime.onStartup.addListener(function() {
+    console.log('open');
+  })
 
+  
 chrome.runtime.onMessage.addListener(
+
     function (message, sender, sendResponse) {
         if (userInfo == null) {
             userInfo = getStorageItem('user');
         }
         switch (message.type) {
             case "onPopupInit":
+                console.log("onPopupInit");
                 sendResponse(userInfo);
+                console.log("grabbing friend requests.")
+                axios.get(DOMAIN + 'receivedfriendrequests/' + userInfo.user_id)
+                    .then(res => {
+                        printResponse('onLoadFriendRequestsList', res);
+                        const friend_requests = res.data.received_friend_requests;
+                        num_requests = friend_requests.length;
+                        console.log("there are friend request:", num_requests, friend_requests);
+                        if (num_requests > 0) {
+                            chrome.browserAction.setBadgeText({ text: num_requests.toString() });
+                        } else {
+                            chrome.browserAction.setBadgeText({ text: "" });
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err)
+                    });
                 return true;
 
             case "onRegister":
@@ -74,7 +98,7 @@ chrome.runtime.onMessage.addListener(
                         num_requests = friend_requests.length;
                         console.log("there are friend requests:", num_requests, friend_requests);
                         if (num_requests > 0) {
-                            chrome.browserAction.setBadgeText({ text: num_requests.toString()});
+                            chrome.browserAction.setBadgeText({ text: num_requests.toString() });
                         }
                     })
                     .catch(err => {
@@ -378,6 +402,8 @@ chrome.runtime.onMessage.addListener(
                             num_requests = num_requests - 1;
                             if (num_requests > 0) {
                                 chrome.browserAction.setBadgeText({ text: num_requests.toString() });
+                            } else {
+                                chrome.browserAction.setBadgeText({ text: "" });
                             }
                         })
                         .catch(err => {

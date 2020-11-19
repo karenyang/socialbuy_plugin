@@ -77,6 +77,12 @@ class SearchPage extends Component {
 
     onRequestFriend = (name) => {
         console.log("onRequestFriend: ", name);
+        let friend_requests = this.state.search_results;
+        friend_requests.map( r => {if(r.user_name==name){r.is_sent_friend_reqeust = true}});
+        this.setState({
+            search_results: friend_requests,
+        })
+
         chrome.runtime.sendMessage({ type: "onRequestFriend", data: { "friend_username": name } },
             function (res) {
                 console.log('SearchPage receives reply from background for onRequestFriend ', res.data);

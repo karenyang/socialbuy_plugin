@@ -31,11 +31,14 @@ class FriendRequestCard extends Component {
     onHandleFriendRequest = (name, is_accept_friend) => {
         console.log("onHandleFriendRequest: ", name);
         const updateState = this.updateState; 
+        const  onUpdateFriendRequestStatus = this.props.onUpdateFriendRequestStatus;
+
         chrome.runtime.sendMessage({ type: "onHandleFriendRequest", data: { "friend_username": name, "is_accept_friend": is_accept_friend } },
             function (res) {
-                console.log('useringo receives reply from background for onHandleFriendRequest ', res.data);
+                console.log('FriendRequestCard receives reply from background for onHandleFriendRequest ', res.data);
+                onUpdateFriendRequestStatus();
                 updateState("show",false);
-                
+
             }
         );
         
