@@ -8,7 +8,8 @@ import {
     Paper,
     Tab,
     Tabs,
-    Avatar
+    Avatar,
+    CardActionArea,
 } from '@material-ui/core';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
@@ -19,6 +20,18 @@ import TextField from '@material-ui/core/TextField';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import OthersProductCard from '../modules/others_product_card';
+
+
+function setStorageItem(message_type, data) {
+    console.log("setStorage",message_type, ":", data);
+    window.localStorage.setItem(message_type, JSON.stringify(data));
+}
+
+function getStorageItem(message_type) {
+    return JSON.parse(window.localStorage.getItem(message_type));
+}
+
+
 
 class SearchPage extends Component {
     constructor(props) {
@@ -33,6 +46,24 @@ class SearchPage extends Component {
         console.log(this.state);
     }
 
+    componentDidMount = () => {
+        const stored_search_input = getStorageItem("search_input")
+        if (stored_search_input){
+            this.setState(
+                {
+                    search_input: stored_search_input
+                }
+            )
+        }
+        const stored_search_results = getStorageItem("search_results")
+        if (stored_search_input){
+            this.setState(
+                {
+                    search_results: stored_search_results
+                }
+            )
+        }
+    }
     handleInputChange = (event) => {
         const {
             value,
@@ -49,19 +80,24 @@ class SearchPage extends Component {
             this.setState({
                 search_results: res.data.results
             });
+            setStorageItem("search_results", res.data.results)
+            setStorageItem("search_input", this.state.search_input)
+
         }
         else {
             this.setState({
                 search_results: [],
                 is_no_result: true
             });
+            setStorageItem("search_results", "")
+            setStorageItem("search_input", "")
             console.log("should update with no result")
         }
     }
 
     handleSearch = (event) => {
         const updateSearchResult = this.updateSearchResult;
-        if (event.key === 'Enter' && event.target.value!=="") {
+        if (event.key === 'Enter' && event.target.value !== "") {
             console.log('Searching for: ', event.target.value);
             this.setState({
                 is_no_result: false,
@@ -73,12 +109,18 @@ class SearchPage extends Component {
                 }
             );
         }
+        else if (event.key === 'Enter' && event.target.value === "") {
+            this.setState({
+                is_no_result: false,
+                search_results: [],
+            });
+        }
     }
 
     onRequestFriend = (name) => {
         console.log("onRequestFriend: ", name);
         let friend_requests = this.state.search_results;
-        friend_requests.map( r => {if(r.user_name==name){r.is_sent_friend_reqeust = true}});
+        friend_requests.map(r => { if (r.user_name == name) { r.is_sent_friend_reqeust = true } });
         this.setState({
             search_results: friend_requests,
         })
@@ -163,29 +205,32 @@ class SearchPage extends Component {
                         </Paper>}
 
                     {this.state.search_results !== [] && this.state.search_category === "user" &&
-                        <Paper style={{ maxHeight: 540, width: 400, marginTop: 5, overflow: 'auto'}}>
+                        <Paper style={{ maxHeight: 540, width: 400, marginTop: 5, overflow: 'auto' }}>
                             {
                                 this.state.search_results.map((result) => (
 
-                                    <Card key={result.user_name} style={{ width: 400, marginTop: 5, marginBottom: 5}}>
-                                        <Grid container spacing={24} justify="center" align="center">
-                                            <Grid item xs={1} > 
-                                                <Avatar alt={result.user_name} src={result.profile_img} />
-                                            </Grid>
-                                            <Grid item xs={4} >
-                                                <CardContent style={{display:"flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
-                                                    <Typography gutterBottom variant="body1" component="h5">
-                                                        {result.user_name}
-                                                    </Typography>
-                                                    {/* <Typography gutterBottom variant="body2" component="h5" style={{ fontSize: 10 }}>
+                                    <Card key={result.user_name} style={{ width: 400, marginTop: 5, marginBottom: 5 }}>
+                                        <Grid container spacing={2} justify="center" align="center">
+                                            <CardActionArea key={result.user_name} component="a" href={"#/users/" + result._id} style={{ padding: 5 }}>
+                                                <Grid item xs={1} >
+                                                    <Avatar alt={result.user_name} src={result.profile_img} />
+                                                </Grid>
+                                                <Grid item xs={4} >
+                                                    <CardContent style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
+                                                        <Typography gutterBottom variant="body1" component="h5">
+                                                            {result.user_name}
+                                                        </Typography>
+                                                        {/* <Typography gutterBottom variant="body2" component="h5" style={{ fontSize: 10 }}>
                                                         {result.email}
                                                     </Typography> */}
-                                                </CardContent>
-                                            </Grid>
+                                                    </CardContent>
+                                                </Grid>
+                                            </CardActionArea>
+
 
                                             <Grid item xs={7} >
                                                 {!result.is_friend && !result.is_self && !result.is_received_friend_reqeust && !result.is_sent_friend_reqeust &&
-                                                    <CardActions style={{justifyContent: "center"}}>
+                                                    <CardActions style={{ justifyContent: "center" }}>
                                                         <Button style={{ textTransform: "none" }}
                                                             onClick={() => this.onRequestFriend(result.user_name)}
                                                         >

@@ -31,13 +31,8 @@ if (userInfo !== null) {
         });
 }
 
-chrome.runtime.onStartup.addListener(function() {
-    console.log('open');
-  })
 
-  
 chrome.runtime.onMessage.addListener(
-
     function (message, sender, sendResponse) {
         if (userInfo == null) {
             userInfo = getStorageItem('user');
@@ -447,7 +442,7 @@ function printResponse(message_type, res) {
 }
 
 function setStorageItem(message_type, data) {
-    console.log("setStorage", data);
+    console.log("setStorage",message_type, ":", data);
     window.localStorage.setItem(message_type, JSON.stringify(data));
 }
 

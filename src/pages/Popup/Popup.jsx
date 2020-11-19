@@ -84,8 +84,8 @@ class Popup extends React.Component {
                             <Route path="/admin/login"
                                 render={(props) => <Login {...props} onLoggedIn={this.onLoggedIn} />}
                             />
-                            <Route path="/users/:user_id"
-                                render={(props) => <FriendInfoPage {...props} return_tab={this.state.current_tab}/>}
+                            <Route path="/users/:user_id/"
+                                render={(props) => <FriendInfoPage {...props}/>}
                             />
                             {this.state.user_id ?
                                 <Redirect to={"/greetings/" + this.state.current_tab} />
