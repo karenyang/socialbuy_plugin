@@ -12,8 +12,7 @@ import IconButton from '@material-ui/core/IconButton';
 import MyProductCard from '../modules/my_product_card';
 
 
-const icon_url = "https://lh3.googleusercontent.com/1IJ60N360-Z6JxbS77UnKYPug2JmjXd40vX0-PRkT1VbjB4GGxLF1gfXMCiPs09Hj-2Lfo8=s85";
-
+const icon_url = "https://i.ibb.co/1rgS6hX/icon-noborder.png"
 class ChoiceBox extends Component {
     constructor(props) {
         super(props);

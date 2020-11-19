@@ -86,11 +86,11 @@ class MyProductCard extends Component {
                                             {this.cropTitle(product.product_title)}
                                         </Typography>
 
-                                        {this.state.show_details &&
+                                        {/* {this.state.show_details &&
                                             <Typography variant="body2" color="textSecondary" component="p">
                                                 ${product.product_cost}
                                             </Typography>
-                                        }
+                                        } */}
 
                                         {this.state.show_details && product.friends_bought_list.length > 0 &&
                                             <Typography variant="body2" color="textSecondary" component="p" style={{ "fontSize": 12 }}>

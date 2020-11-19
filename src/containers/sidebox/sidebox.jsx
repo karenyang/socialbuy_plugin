@@ -12,8 +12,7 @@ import CardContent from '@material-ui/core/CardContent';
 import Draggable from 'react-draggable';
 import "./sidebox.css";
 
-const icon_url = "https://lh3.googleusercontent.com/1IJ60N360-Z6JxbS77UnKYPug2JmjXd40vX0-PRkT1VbjB4GGxLF1gfXMCiPs09Hj-2Lfo8=s85";
-
+const icon_url = "https://i.ibb.co/1rgS6hX/icon-noborder.png"
 class SideBox extends Component {
     constructor(props) {
         super(props);
@@ -83,8 +82,8 @@ class SideBox extends Component {
                     </CardActionArea>
                     {this.state.product !== null && this.state.show_product &&
                         <Card style={{ backgroundColor: "white", width: 250, position: "absolute", right: "0px", display: "flex", flexDirection: 'column', justifyContent: "space-between", alignItems: "center" }}>
-                            <div style={{ display: "flex", flexDirection: 'row', justifyContent: "space-between" }}>
-                                <img className="productimage" alt={this.state.product.product_title} src={this.state.product.product_imgurl} />
+                            <div style={{ padding: 5, display: "flex", flexDirection: 'row', justifyContent: "space-between" }}>
+                                <img className="productimage" alt={this.state.product.product_title} src={this.state.product.product_imgurl} style={{padding: 5}} />
                                 <CardContent style={{ paddingTop: "10px", paddingRight: "5px", paddingLeft: "5px" }} >
                                     <Typography gutterBottom variant="body2" component="h5" style={{ fontSize: 12, padding: "5px" }}>
                                         {this.cropTitle(this.state.product.product_title)}
