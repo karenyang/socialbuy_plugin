@@ -135,7 +135,7 @@ class SearchPage extends Component {
     onRequestFriend = (name) => {
         console.log("onRequestFriend: ", name);
         let friend_requests = this.state.search_results;
-        friend_requests.map(r => { if (r.user_name == name) { r.is_sent_friend_reqeust = true } });
+        friend_requests.map(r => { if (r.user_name === name) { r.is_sent_friend_reqeust = true } });
         this.setState({
             search_results: friend_requests,
         })
@@ -251,7 +251,7 @@ class SearchPage extends Component {
                                                     </Button>
                                                     </CardActions>
                                                 }
-                                                {result.is_friend && !result.is_self &&
+                                                {result.is_friend && !result.is_self && !result.is_sent_friend_reqeust && !result.is_received_friend_reqeust &&
                                                     <CardContent >
                                                         <Typography variant="body2" component="h5" style={{ 'color': 'grey' }}>
                                                             Your friend
@@ -265,14 +265,14 @@ class SearchPage extends Component {
                                                     </Typography>
                                                     </CardContent>
                                                 }
-                                                {result.is_sent_friend_reqeust && !result.is_friend &&
+                                                {result.is_sent_friend_reqeust && 
                                                     <CardContent >
                                                         <Typography variant="body2" component="h5" style={{ 'color': 'grey' }}>
                                                             Friend request sent
                                                     </Typography>
                                                     </CardContent>
                                                 }
-                                                {result.is_received_friend_reqeust && !result.is_friend &&
+                                                {result.is_received_friend_reqeust && 
                                                     <CardActions>
                                                         <Typography variant="body2" component="h5" style={{ 'color': 'grey' }}>
                                                             Friend request received

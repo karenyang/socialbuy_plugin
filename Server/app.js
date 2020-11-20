@@ -398,7 +398,7 @@ app.post('/requestfriend/:user_id', function (request, response) {
                 }
                 else {
                     console.log("Will send a request for friend: ", friend_username);
-                    // user.friends_list.push(ObjectID(friend._id));
+                    user.friends_list.push(ObjectID(friend._id)); //Follower model? 
                     user.friend_requests_list.push(ObjectID(friend._id));
                     user.save();
                     console.log("requested a friend: ", user.friends_list);
