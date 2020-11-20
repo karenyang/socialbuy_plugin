@@ -398,7 +398,7 @@ app.post('/requestfriend/:user_id', function (request, response) {
                 }
                 else {
                     console.log("Will send a request for friend: ", friend_username);
-                    user.friends_list.push(ObjectID(friend._id)); //Follower model? 
+                    user.friends_list.push(ObjectID(friend._id)); // One line change from frind -> Follower model!!! 
                     user.friend_requests_list.push(ObjectID(friend._id));
                     user.save();
                     console.log("requested a friend: ", user.friends_list);
@@ -446,10 +446,12 @@ app.post('/search/:user_id', function (request, response) {
                             is_self: { "$eq": ["$_id", user._id] },
                             is_sent_friend_reqeust: { "$in": ["$_id", user.friend_requests_list] },
                             is_received_friend_reqeust: { "$in": [ user._id, "$friend_requests_list"] },
+                            num_mutual_friends: { $size: { $setIntersection: ["$friends_list", user.friends_list] }},
                         }
                     },
                     {
                         $sort: {
+                            mutual_friends: -1,
                             is_received_friend_reqeust: -1,
                             is_sent_friend_reqeust: -1,
                             is_friend: -1,

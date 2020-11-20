@@ -55,14 +55,14 @@ class SearchPage extends Component {
                 }
             )
         }
-        const stored_search_results = getStorageItem("search_results")
-        if (stored_search_input) {
-            this.setState(
-                {
-                    search_results: stored_search_results
-                }
-            )
-        }
+        // const stored_search_results = getStorageItem("search_results")
+        // if (stored_search_input) {
+        //     this.setState(
+        //         {
+        //             search_results: stored_search_results
+        //         }
+        //     )
+        // }
         const stored_search_category = getStorageItem("search_category")
         if (stored_search_category) {
             this.setState(
@@ -70,6 +70,22 @@ class SearchPage extends Component {
                     search_category: stored_search_category
                 }
             )
+        }
+
+        if (stored_search_category && stored_search_input && stored_search_input !== "") {
+            console.log('Searching for: ', stored_search_input);
+            const updateSearchResult = this.updateSearchResult;
+            let query = {
+                search_category: this.state.search_category,
+                search_key: stored_search_input,
+                is_include_self_products: true,
+            }
+            chrome.runtime.sendMessage({ type: "onHandleSearch", data: query },
+                function (res) {
+                    console.log('SearchPage receives reply from background for onHandleSearch ', res.data);
+                    updateSearchResult(res);
+                }
+            );
         }
     }
     handleInputChange = (event) => {
@@ -112,8 +128,8 @@ class SearchPage extends Component {
             this.setState({
                 is_no_result: false,
             });
-            let query = { 
-                search_category: this.state.search_category, 
+            let query = {
+                search_category: this.state.search_category,
                 search_key: event.target.value,
                 is_include_self_products: true,
             }
@@ -220,28 +236,32 @@ class SearchPage extends Component {
                         </Paper>}
 
                     {this.state.search_results !== [] && this.state.search_category === "user" &&
-                        <Paper style={{ maxHeight: 540, width: 400, marginTop: 5, overflow: 'auto' }}>
+                        <Paper style={{ maxHeight: 450, width: 400, marginTop: 5, overflow: 'auto' }}>
                             {
                                 this.state.search_results.map((result) => (
 
-                                    <Card key={result.user_name} style={{ width: 400, marginTop: 5, marginBottom: 5 }}>
+                                    <Card key={result.user_name} style={{ width: 400, marginTop: 5 }}>
                                         <Grid container spacing={2} justify="center" align="center">
-                                            <Grid item xs={5} ><CardActionArea key={result.user_name} component="a" href={"#/users/" + result._id} style={{ padding: 5 }}>
-                                                <Avatar alt={result.user_name} src={result.profile_img} />
+                                            <Grid item xs={3} >
+                                                <CardActionArea key={result.user_name} component="a" href={"#/users/" + result._id} style={{ display: "flex", alignItems: "center", justifyContent: "space-around" }}>
+                                                    <CardContent style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
+                                                        <Avatar alt={result.user_name} src={result.profile_img} />
+                                                        <Typography gutterBottom variant="body1" component="h5">
+                                                            {result.user_name}
+                                                        </Typography>
+                                                    </CardContent>
+                                                </CardActionArea>
+                                            </Grid>
+                                            <Grid item xs={3} >
                                                 <CardContent style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
-                                                    <Typography gutterBottom variant="body1" component="h5">
-                                                        {result.user_name}
-                                                    </Typography>
-                                                    {/* <Typography gutterBottom variant="body2" component="h5" style={{ fontSize: 10 }}>
-                                                        {result.email}
-                                                    </Typography> */}
+                                                    {result.num_mutual_friends > 0 && !result.is_self &&
+                                                        <Typography gutterBottom variant="body2" component="h5" style={{ fontSize: 12}}>
+                                                            {result.num_mutual_friends} mutual friends
+                                                        </Typography>}
                                                 </CardContent>
-                                            </CardActionArea>
                                             </Grid>
 
-
-
-                                            <Grid item xs={7} >
+                                            <Grid item xs={6} >
                                                 {!result.is_friend && !result.is_self && !result.is_received_friend_reqeust && !result.is_sent_friend_reqeust &&
                                                     <CardActions style={{ justifyContent: "center" }}>
                                                         <Button style={{ textTransform: "none" }}
@@ -265,14 +285,14 @@ class SearchPage extends Component {
                                                     </Typography>
                                                     </CardContent>
                                                 }
-                                                {result.is_sent_friend_reqeust && 
+                                                {result.is_sent_friend_reqeust &&
                                                     <CardContent >
                                                         <Typography variant="body2" component="h5" style={{ 'color': 'grey' }}>
                                                             Friend request sent
                                                     </Typography>
                                                     </CardContent>
                                                 }
-                                                {result.is_received_friend_reqeust && 
+                                                {result.is_received_friend_reqeust &&
                                                     <CardActions>
                                                         <Typography variant="body2" component="h5" style={{ 'color': 'grey' }}>
                                                             Friend request received
