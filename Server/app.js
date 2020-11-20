@@ -282,7 +282,7 @@ app.post('/deletefriend/:user_id', function (request, response) {
                     if (idx1 === -1) {
                         console.error('user with id:' + user._id + " not found in the tobe deletetd friends's friend list");
                         // response.status(421).send('User not found.');
-                        return;
+                        // return;
                     }
                     else {
                         friend.friends_list.splice(idx1, 1);
@@ -293,7 +293,7 @@ app.post('/deletefriend/:user_id', function (request, response) {
                     if (idx2 === -1) {
                         console.error('friend with id:' + friend_id + " not found in the user's friend list");
                         // response.status(421).send('User not found.');
-                        return;
+                        // return;
                     }
                     else {
                         user.friends_list.splice(idx2, 1);
