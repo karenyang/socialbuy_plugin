@@ -62,18 +62,18 @@ class FriendInfoPage extends Component {
                 }
             }
         );
-        chrome.runtime.sendMessage({ type: "onLoadFriendsList", data: this.state.user_id },
-            function (res) {
-                console.log('FriendInfo receives reply from background for onLoadFriendsList ', res.data);
-                if (res.status === 200) {
-                    console.log("onLoadFriendsList succeeded.");
-                    handleUpdate("friends_list", res.data.friends_list);
-                }
-                else {
-                    console.error(res.data + ", onLoadUserBoughtProductList failed.");
-                }
-            }
-        );
+        // chrome.runtime.sendMessage({ type: "onLoadFriendsList", data: this.state.user_id },
+        //     function (res) {
+        //         console.log('FriendInfo receives reply from background for onLoadFriendsList ', res.data);
+        //         if (res.status === 200) {
+        //             console.log("onLoadFriendsList succeeded.");
+        //             handleUpdate("friends_list", res.data.friends_list);
+        //         }
+        //         else {
+        //             console.error(res.data + ", onLoadUserBoughtProductList failed.");
+        //         }
+        //     }
+        // );
     }
 
     onClickBack = () => {
@@ -187,7 +187,7 @@ class FriendInfoPage extends Component {
                             }
                         </Collapse>
 
-                        <Card style={{ width: 400, marginTop: 6, display: 'flex', justifyContent: 'center' }}>
+                        {/* <Card style={{ width: 400, marginTop: 6, display: 'flex', justifyContent: 'center' }}>
 
                             <CardActions>
                                 <Button onClick={this.onClickShowFriendsButton} style={{ textTransform: "none" }} >
@@ -200,7 +200,7 @@ class FriendInfoPage extends Component {
                             {this.state.friends_list.map((friend) => (
                                 <FriendCard key={friend._id} friend={friend}/>
                             ))}
-                        </Collapse>
+                        </Collapse> */}
 
                     </Paper>
 

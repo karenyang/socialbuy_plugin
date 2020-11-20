@@ -245,8 +245,8 @@ class SearchPage extends Component {
                                             <Grid item xs={3} >
                                                 <CardActionArea key={result.user_name} component="a" href={"#/users/" + result._id} style={{ display: "flex", alignItems: "center", justifyContent: "space-around" }}>
                                                     <CardContent style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
-                                                        <Avatar alt={result.user_name} src={result.profile_img} />
-                                                        <Typography gutterBottom variant="body1" component="h5">
+                                                        <Avatar alt={result.user_name} src={result.profile_img} sytle= {{padding: 5}}/>
+                                                        <Typography gutterBottom variant="body2" component="h5" style={{ fontSize: 14}}>
                                                             {result.user_name}
                                                         </Typography>
                                                     </CardContent>

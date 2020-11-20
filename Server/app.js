@@ -1171,6 +1171,7 @@ app.post('/admin/register', function (request, response) {
                 console.log("Email has already been used for registration.");
                 response.status(250).send('Email already exists');
             } else {
+                newUser.friends_list = [ObjectID("5fb37be4c84a9d047c76659c")]; // WARNING!!!!! Add karenyang as friend automatically upon register.
                 User.create(newUser,
                     function (err, userObj) {
                         if (err) {
