@@ -7,36 +7,19 @@ import {
     Paper,
     Divider,
 } from '@material-ui/core';
-import CardActionArea from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
-import "./recommendationpage.css"
 import CloseIcon from '@material-ui/icons/Close';
 import IconButton from '@material-ui/core/IconButton';
 import OthersProductCard from '../modules/others_product_card';
 
 
-const icon_url = "https://lh3.googleusercontent.com/1IJ60N360-Z6JxbS77UnKYPug2JmjXd40vX0-PRkT1VbjB4GGxLF1gfXMCiPs09Hj-2Lfo8=s85";
-
+const icon_url = "https://i.ibb.co/1rgS6hX/icon-noborder.png"
 class RecommendationBox extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            products: [],
+            products: this.props.recommendated_products,
             close: false,
         }
-    }
-
-    componentDidMount = () => {
-        console.log("RecommendationBox: this.props", this.props);
-        this.setState({
-            products: this.props.recommendated_products,
-        });
-
-    }
-
-    cropTitle = (product_title) => {
-        let title = product_title.split(" ");
-        return title.slice(0, 10).join(" ");
     }
 
     onClickProduct(product) {

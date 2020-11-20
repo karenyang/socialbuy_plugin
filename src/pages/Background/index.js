@@ -3,17 +3,60 @@ import '../../assets/img/icon-128.png';
 import axios from "axios";
 
 
-console.log("Process ENV", process.env.NODE_ENV );
+console.log("Process ENV", process.env.NODE_ENV);
 const DOMAIN = process.env.NODE_ENV === "production" ? "http://ec2-18-188-234-4.us-east-2.compute.amazonaws.com:8080/" : "http://localhost:8080/";
 console.log('DOMAIN: ', DOMAIN);
+let num_requests = 0;
+let userInfo = getStorageItem('user');
+console.log('INITIAL getStorageItem user: ', userInfo);
+chrome.browserAction.setBadgeBackgroundColor({ color: [255, 0, 0, 255] });
+
+
+if (userInfo !== null) {
+    console.log("grabbing friend requests.")
+    axios.get(DOMAIN + 'receivedfriendrequests/' + userInfo.user_id)
+        .then(res => {
+            printResponse('onLoadFriendRequestsList', res);
+            const friend_requests = res.data.received_friend_requests;
+            num_requests = friend_requests.length;
+            console.log("there are friend request:", num_requests, friend_requests);
+            if (num_requests > 0) {
+                chrome.browserAction.setBadgeText({ text: num_requests.toString() });
+            } else {
+                chrome.browserAction.setBadgeText({ text: "" });
+            }
+        })
+        .catch(err => {
+            console.error(err)
+        });
+}
+
 
 chrome.runtime.onMessage.addListener(
     function (message, sender, sendResponse) {
-        let userInfo = getStorageItem('user');
-        console.log('getStorageItem user: ', userInfo);
+        if (userInfo == null) {
+            userInfo = getStorageItem('user');
+        }
         switch (message.type) {
             case "onPopupInit":
+                console.log("onPopupInit");
                 sendResponse(userInfo);
+                console.log("grabbing friend requests.")
+                axios.get(DOMAIN + 'receivedfriendrequests/' + userInfo.user_id)
+                    .then(res => {
+                        printResponse('onLoadFriendRequestsList', res);
+                        const friend_requests = res.data.received_friend_requests;
+                        num_requests = friend_requests.length;
+                        console.log("there are friend request:", num_requests, friend_requests);
+                        if (num_requests > 0) {
+                            chrome.browserAction.setBadgeText({ text: num_requests.toString() });
+                        } else {
+                            chrome.browserAction.setBadgeText({ text: "" });
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err)
+                    });
                 return true;
 
             case "onRegister":
@@ -40,10 +83,18 @@ chrome.runtime.onMessage.addListener(
                     }
                 })
                     .then(res => {
+                        userInfo = null;
                         window.localStorage.clear();
                         printResponse('onLogin', res);
                         setStorageItem('user', res.data);
                         sendResponse(res);
+                        // upon login, check whether there are new friend requests.
+                        let friend_requests = res.data.received_friend_requests;
+                        num_requests = friend_requests.length;
+                        console.log("there are friend requests:", num_requests, friend_requests);
+                        if (num_requests > 0) {
+                            chrome.browserAction.setBadgeText({ text: num_requests.toString() });
+                        }
                     })
                     .catch(err => {
                         console.error(err);
@@ -55,11 +106,15 @@ chrome.runtime.onMessage.addListener(
                     .then(res => {
                         printResponse('onLogout', res);
                         sendResponse(res);
+                        window.localStorage.clear();
+                        userInfo = null;
+                        num_requests = 0;
+                        chrome.browserAction.setBadgeText({ text: "" });
+
                     })
                     .catch(err => {
                         console.error(err)
                     })
-                window.localStorage.clear();
                 return true;
 
             case "onLoadUserInfo":
@@ -92,7 +147,7 @@ chrome.runtime.onMessage.addListener(
                 } else {
                     console.log("current user id", userInfo.user_id);
                     let user_id = userInfo.user_id;
-                    axios.post(DOMAIN + 'userinfo/' + user_id,  message.data, {
+                    axios.post(DOMAIN + 'userinfo/' + user_id, message.data, {
                         headers: {
                             'content-type': 'application/json',
                         }
@@ -112,7 +167,7 @@ chrome.runtime.onMessage.addListener(
                     console.log("User have not logged in");
                     sendResponse("User have not logged in");
                 } else {
-                    console.log("Background about to send product data to background: ", message.data);
+                    console.log("ChoiceBox about to send product data to background: ", message.data);
                     console.log("current user id", userInfo.user_id);
                     axios.post(DOMAIN + 'add_bought_products/' + userInfo.user_id, message.data, {
                         headers: {
@@ -339,6 +394,12 @@ chrome.runtime.onMessage.addListener(
                         .then(res => {
                             printResponse('onHandleFriendRequest', res);
                             sendResponse(res);
+                            num_requests = num_requests - 1;
+                            if (num_requests > 0) {
+                                chrome.browserAction.setBadgeText({ text: num_requests.toString() });
+                            } else {
+                                chrome.browserAction.setBadgeText({ text: "" });
+                            }
                         })
                         .catch(err => {
                             console.error(err)
@@ -381,7 +442,7 @@ function printResponse(message_type, res) {
 }
 
 function setStorageItem(message_type, data) {
-    console.log("setStorage", data);
+    console.log("setStorage",message_type, ":", data);
     window.localStorage.setItem(message_type, JSON.stringify(data));
 }
 

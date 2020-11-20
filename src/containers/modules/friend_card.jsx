@@ -18,15 +18,11 @@ class FriendCard extends Component {
         console.log(this.state);
     }
 
-    onClickFriend = (friend) => {
-        console.log("friend clicked: ", friend.user_name);
-    }
-
 
     render() {
         const friend = this.state.friend;
         return (
-            <CardActionArea key={friend._id} component="a" href={"#/users/" + friend._id + "/2"} style={{ padding: 5 }}>
+            <CardActionArea key={friend._id} component="a" href={"#/users/" + friend._id} style={{ padding: 5 }}>
                 <Grid container spacing={0} style={{ display: 'flex', justifyContent: 'center', alignItems: "center" }}>
                     <Grid item xs={2}>
                         <Avatar className="avatar" alt={friend.user_name} src={friend.profile_img} />

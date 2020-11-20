@@ -10,49 +10,25 @@ import {
 import CardActionArea from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Draggable from 'react-draggable';
-import fetchLikedProductInfo from './modules/fetch_product';
 import "./sidebox.css";
 
-const icon_url = "https://lh3.googleusercontent.com/1IJ60N360-Z6JxbS77UnKYPug2JmjXd40vX0-PRkT1VbjB4GGxLF1gfXMCiPs09Hj-2Lfo8=s85";
-
+const icon_url = "https://i.ibb.co/1rgS6hX/icon-noborder.png"
 class SideBox extends Component {
     constructor(props) {
         super(props);
         this.state = {
             liked: false,
             show_product: false,
-            cursor: "default",
-            product: null,
+            product: this.props.product,
             added_product: false,
         }
     }
 
     componentDidMount = () => {
-        let product = fetchLikedProductInfo();
-        this.setState({
-            product: product,
-        });
-        document.getElementById("buy-now-button").addEventListener("click", function() {
-            console.log( 
-                "Clicked Buy Now Button. Adding products in cart to bought"
-            )
-            chrome.runtime.sendMessage({ type: "onBoughtProductsToBeAdded", data: [product] },
-                function (response) {
-                    console.log('Sidebox: is the response from the background page for the  onBoughtProductsToBeAdded  Event', response.data);
-                    if (response.status === 200) {
-                        console.log("onBoughtProductsToBeAdded", " succeeded.", response.data);
-                    } else {
-                        console.log("onBoughtProductsToBeAdded", " failed.", response.data);
-                    }
-                }
-            );
-          });
-
-
+        // TODO: check whether product has been added to like list before
     }
 
     onMouseOverIcon = () => {
-        console.log("mouse over. ")
         this.setState({
             transform: "translate(0px, 50px)",
             show_product: true,
@@ -60,14 +36,12 @@ class SideBox extends Component {
     }
 
     onMouseLeaveIcon = () => {
-        console.log("mouse leave. ")
         this.setState({
             transform: "translate(0px, 0px)",
         });
     }
 
     onMouseLeaveBlock = () => {
-        console.log("mouse leave block. ")
         this.setState({
             show_product: false,
         });
@@ -108,8 +82,8 @@ class SideBox extends Component {
                     </CardActionArea>
                     {this.state.product !== null && this.state.show_product &&
                         <Card style={{ backgroundColor: "white", width: 250, position: "absolute", right: "0px", display: "flex", flexDirection: 'column', justifyContent: "space-between", alignItems: "center" }}>
-                            <div style={{ display: "flex", flexDirection: 'row', justifyContent: "space-between" }}>
-                                <img className="productimage" alt={this.state.product.product_title} src={this.state.product.product_imgurl} />
+                            <div style={{ padding: 5, display: "flex", flexDirection: 'row', justifyContent: "space-between" }}>
+                                <img className="productimage" alt={this.state.product.product_title} src={this.state.product.product_imgurl} style={{padding: 5}} />
                                 <CardContent style={{ paddingTop: "10px", paddingRight: "5px", paddingLeft: "5px" }} >
                                     <Typography gutterBottom variant="body2" component="h5" style={{ fontSize: 12, padding: "5px" }}>
                                         {this.cropTitle(this.state.product.product_title)}
@@ -117,7 +91,7 @@ class SideBox extends Component {
                                 </CardContent>
                             </div>
                             <Divider />
-                            <CardActionArea style={{ paddingBottom: "20px"}}>
+                            <CardActionArea style={{ paddingBottom: "20px" }}>
                                 {this.state.added_product ?
                                     <Button onClick={this.onClickAddCollection} style={{ textTransform: "none", width: "180px", backgroundColor: "#E9967A", color: "#F5F5DC" }} >
                                         Added

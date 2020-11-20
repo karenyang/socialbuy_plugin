@@ -1,5 +1,5 @@
 import React, {
-    Component
+    Component,
 } from 'react';
 import './Greetings.css';
 import IconTabs from '../icontabs/iconstabs';
@@ -16,9 +16,31 @@ class Greetings extends Component {
             user_name: this.props.user_name,
             user_id: this.props.user_id,
             tab: parseInt(this.props.match.params.tab_id),
+            num_friend_requests: 0,
         }
-        window.localStorage.setItem("tab",  this.props.match.params.tab_id);
+        window.localStorage.setItem("tab", this.props.match.params.tab_id);
 
+    }
+
+    handleUpdate = (name, value) => { //[name of variable]: value of variable
+        this.setState({ [name]: value, });
+        console.log("Update state-> ", this.state);
+    }
+
+    componentDidMount = () => {
+        const handleUpdate = this.handleUpdate;
+        chrome.runtime.sendMessage({ type: "onLoadFriendRequestsList" },
+            function (res) {
+                console.log('Userinfo receives reply from background for onLoadFriendRequestsList ', res.data);
+                if (res.status === 200) {
+                    console.log("onLoadFriendRequestsList succeeded.");
+                    handleUpdate("num_friend_requests", res.data.received_friend_requests.length);
+                }
+                else {
+                    console.error(res.data + ", onLoadFriendRequestsList failed.");
+                }
+            }
+        );
     }
 
     componentDidUpdate = (prevProps) => {
@@ -49,12 +71,12 @@ class Greetings extends Component {
 
     }
 
-    handleTabChange = (value) =>{
-        console.log("Tab changed to ",  value)
+    handleTabChange = (value) => {
+        console.log("Tab changed to ", value)
         this.setState({
             tab: value
         })
-        window.localStorage.setItem("tab",  value);
+        window.localStorage.setItem("tab", value);
 
     }
 
@@ -75,13 +97,20 @@ class Greetings extends Component {
             });
     }
 
+    onUpdateNumFriendRequests = (num_friend_requests) => {
+        this.setState({
+            num_friend_requests: num_friend_requests
+        });
+        console.log("Greetings update num_friend_requests:", num_friend_requests);
+    }
+
     render() {
         return (
             <div className="container">
-                { this.state.tab === 0 &&  <RecentActivitiesPage user_id={this.state.user_id} />}
-                { this.state.tab === 1 &&  <SearchPage user_id={this.state.user_id}  /> }
-                { this.state.tab === 2 &&  <UserInfoPage onLogOut={this.onLogOut} user_id={this.state.user_id} />}
-                <IconTabs handleTabChange={this.handleTabChange} tab={this.state.tab}/>
+                { this.state.tab === 0 && <RecentActivitiesPage user_id={this.state.user_id} />}
+                { this.state.tab === 1 && <SearchPage user_id={this.state.user_id} />}
+                { this.state.tab === 2 && <UserInfoPage onLogOut={this.onLogOut} user_id={this.state.user_id} onUpdateNumFriendRequests={this.onUpdateNumFriendRequests} />}
+                <IconTabs handleTabChange={this.handleTabChange} tab={this.state.tab} num_friend_requests={this.state.num_friend_requests} />
             </div >
         );
     }

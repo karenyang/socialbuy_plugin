@@ -31,6 +31,7 @@ class UserInfoPage extends Component {
             liked_product_list: [],
             friends_list: [],
             received_friend_requests: [],
+            num_friend_requests: 0,
             show_collection_bought: false,
             show_collection_liked: false,
             show_friends: false,
@@ -85,6 +86,9 @@ class UserInfoPage extends Component {
                 if (res.status === 200) {
                     console.log("onLoadFriendsList succeeded.");
                     handleUpdate("received_friend_requests", res.data.received_friend_requests);
+                    handleUpdate("num_friend_requests", res.data.received_friend_requests.length);
+
+                    this.props.onUpdateNumFriendRequests(res.data.received_friend_requests.length);
                 }
                 else {
                     console.error(res.data + ", onLoadFriendRequestsList failed.");
@@ -165,10 +169,17 @@ class UserInfoPage extends Component {
         })
     }
 
+    onUpdateFriendRequestStatus = () => {
+        this.props.onUpdateNumFriendRequests(this.state.num_friend_requests - 1);
+        this.setState({
+            num_friend_requests: this.state.num_friend_requests - 1
+        });
+        console.log("userinfo updates friend request status: ", this.state.num_friend_requests);
+    }
 
     render() {
         return (
-            <Grid container spacing={0} alignItems="center" style={{margin:0, padding:0}}>
+            <Grid container spacing={0} alignItems="center" style={{ margin: 0, padding: 0 }}>
                 <Grid item xs={2}>
                     <img src={icon} alt="extension icon" width="25px" />
                 </Grid>
@@ -182,7 +193,7 @@ class UserInfoPage extends Component {
 
                 <Grid item xs={12}>
                     <Divider />
-                    <NameCard user_id={this.state.user_id} is_self={true}/>
+                    <NameCard user_id={this.state.user_id} is_self={true} />
                 </Grid>
 
                 <Grid item xs={12}>
@@ -198,11 +209,11 @@ class UserInfoPage extends Component {
                         <Collapse in={this.state.show_collection_bought}>
                             {
                                 this.state.bought_product_list.map((product) => (
-                                    <MyProductCard key={product._id+"_bought"} product={product}  show_details={false} delete_func={this.onDeleteBoughtProduct}/>
+                                    <MyProductCard key={product._id + "_bought"} product={product} show_details={false} delete_func={this.onDeleteBoughtProduct} />
                                 ))
                             }
                         </Collapse>
-                        
+
                         <Card style={{ width: 400, marginTop: 6, display: 'flex', justifyContent: 'center' }}>
                             <CardActions>
                                 <Button onClick={this.onShowClickCollectionLikedButton} style={{ textTransform: "none" }} >
@@ -214,13 +225,13 @@ class UserInfoPage extends Component {
                         <Collapse in={this.state.show_collection_liked}>
                             {
                                 this.state.liked_product_list.map((product) => (
-                                    <MyProductCard  key={product._id+"_liked"}  product={product} show_details={true} delete_func={this.onDeleteLikedProduct}/>
+                                    <MyProductCard key={product._id + "_liked"} product={product} show_details={true} delete_func={this.onDeleteLikedProduct} />
                                 ))
                             }
                         </Collapse>
 
                         <Card style={{ width: 400, marginTop: 6, display: 'flex', justifyContent: 'center' }}>
-                            {this.state.received_friend_requests.length > 0 ?
+                            {this.state.num_friend_requests > 0 ?
                                 <CardActions>
                                     <Badge color="secondary" variant="dot" >
                                         <Button onClick={this.onClickShowFriendsButton} style={{ textTransform: "none" }}>
@@ -239,11 +250,11 @@ class UserInfoPage extends Component {
                         <Collapse in={this.state.show_friends}>
                             <div>
                                 {this.state.received_friend_requests.map((friend) => (
-                                    <FriendRequestCard  key={friend._id} friend={friend}/>
+                                    <FriendRequestCard key={friend._id} friend={friend} onUpdateFriendRequestStatus={this.onUpdateFriendRequestStatus} />
                                 ))}
                                 <Divider variant="middle" />
                                 {this.state.friends_list.map((friend) => (
-                                   <FriendCard key={friend._id} friend={friend}/>
+                                    <FriendCard key={friend._id} friend={friend} />
                                 ))}
                             </div>
                         </Collapse>
