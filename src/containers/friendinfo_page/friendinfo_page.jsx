@@ -29,6 +29,7 @@ class FriendInfoPage extends Component {
             show_collection_liked: false,
             show_friends: false,
             user_id: this.props.match.params.user_id, // friend's id 
+            is_friends_friends: this.props.is_friends_friends,
         }
         console.log("FriendInfoPage state:", this.state);
     }
@@ -61,12 +62,30 @@ class FriendInfoPage extends Component {
                 }
             }
         );
+        chrome.runtime.sendMessage({ type: "onLoadFriendsList", data: this.state.user_id },
+            function (res) {
+                console.log('FriendInfo receives reply from background for onLoadFriendsList ', res.data);
+                if (res.status === 200) {
+                    console.log("onLoadFriendsList succeeded.");
+                    handleUpdate("friends_list", res.data.friends_list);
+                }
+                else {
+                    console.error(res.data + ", onLoadUserBoughtProductList failed.");
+                }
+            }
+        );
     }
 
     onClickBack = () => {
-        const tab = window.localStorage.getItem("tab");
-        console.log('Before go back, go the key Tab is ', tab);
-        this.props.history.push("/greetings/" + tab);
+        if (this.state.is_friends_friends){ // return to previous page of friend info
+            console.log('is_friends_friends go back to previous friend page ');
+            this.props.history.goBack();
+        } else { //return to previous tab
+            const tab = window.localStorage.getItem("tab");
+            console.log('Before go back, go the key Tab is ', tab);
+            this.props.history.push("/greetings/" + tab); 
+        }
+
     }
 
     handleUpdate = (name, value) => { //[name of variable]: value of variable
@@ -179,7 +198,7 @@ class FriendInfoPage extends Component {
                         <Collapse in={this.state.show_friends}>
 
                             {this.state.friends_list.map((friend) => (
-                                <FriendCard key={friend._id} friend={friend} />
+                                <FriendCard key={friend._id} friend={friend}/>
                             ))}
                         </Collapse>
 
@@ -191,5 +210,11 @@ class FriendInfoPage extends Component {
         );
     }
 };
+FriendInfoPage.defaultProps = {
+    is_friends_friends: false,
+};
+
+
+
 
 export default FriendInfoPage;

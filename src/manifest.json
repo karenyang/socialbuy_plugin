@@ -29,6 +29,7 @@
         "cookies",
         "*://*.google.com",
         "tabs",
+        "notifications",
         "storage"
     ]
 }

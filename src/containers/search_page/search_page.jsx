@@ -23,7 +23,7 @@ import OthersProductCard from '../modules/others_product_card';
 
 
 function setStorageItem(message_type, data) {
-    console.log("setStorage",message_type, ":", data);
+    console.log("setStorage", message_type, ":", data);
     window.localStorage.setItem(message_type, JSON.stringify(data));
 }
 
@@ -48,7 +48,7 @@ class SearchPage extends Component {
 
     componentDidMount = () => {
         const stored_search_input = getStorageItem("search_input")
-        if (stored_search_input){
+        if (stored_search_input) {
             this.setState(
                 {
                     search_input: stored_search_input
@@ -56,10 +56,18 @@ class SearchPage extends Component {
             )
         }
         const stored_search_results = getStorageItem("search_results")
-        if (stored_search_input){
+        if (stored_search_input) {
             this.setState(
                 {
                     search_results: stored_search_results
+                }
+            )
+        }
+        const stored_search_category = getStorageItem("search_category")
+        if (stored_search_category) {
+            this.setState(
+                {
+                    search_category: stored_search_category
                 }
             )
         }
@@ -80,9 +88,9 @@ class SearchPage extends Component {
             this.setState({
                 search_results: res.data.results
             });
-            setStorageItem("search_results", res.data.results)
-            setStorageItem("search_input", this.state.search_input)
-
+            setStorageItem("search_results", res.data.results);
+            setStorageItem("search_input", this.state.search_input);
+            setStorageItem("search_category", this.state.search_category);
         }
         else {
             this.setState({
@@ -91,6 +99,8 @@ class SearchPage extends Component {
             });
             setStorageItem("search_results", "")
             setStorageItem("search_input", "")
+            setStorageItem("search_category", this.state.search_category);
+
             console.log("should update with no result")
         }
     }
@@ -102,7 +112,12 @@ class SearchPage extends Component {
             this.setState({
                 is_no_result: false,
             });
-            chrome.runtime.sendMessage({ type: "onHandleSearch", data: { "search_category": this.state.search_category, "search_key": event.target.value } },
+            let query = { 
+                search_category: this.state.search_category, 
+                search_key: event.target.value,
+                is_include_self_products: true,
+            }
+            chrome.runtime.sendMessage({ type: "onHandleSearch", data: query },
                 function (res) {
                     console.log('SearchPage receives reply from background for onHandleSearch ', res.data);
                     updateSearchResult(res);
@@ -211,21 +226,19 @@ class SearchPage extends Component {
 
                                     <Card key={result.user_name} style={{ width: 400, marginTop: 5, marginBottom: 5 }}>
                                         <Grid container spacing={2} justify="center" align="center">
-                                            <CardActionArea key={result.user_name} component="a" href={"#/users/" + result._id} style={{ padding: 5 }}>
-                                                <Grid item xs={1} >
-                                                    <Avatar alt={result.user_name} src={result.profile_img} />
-                                                </Grid>
-                                                <Grid item xs={4} >
-                                                    <CardContent style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
-                                                        <Typography gutterBottom variant="body1" component="h5">
-                                                            {result.user_name}
-                                                        </Typography>
-                                                        {/* <Typography gutterBottom variant="body2" component="h5" style={{ fontSize: 10 }}>
+                                            <Grid item xs={5} ><CardActionArea key={result.user_name} component="a" href={"#/users/" + result._id} style={{ padding: 5 }}>
+                                                <Avatar alt={result.user_name} src={result.profile_img} />
+                                                <CardContent style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
+                                                    <Typography gutterBottom variant="body1" component="h5">
+                                                        {result.user_name}
+                                                    </Typography>
+                                                    {/* <Typography gutterBottom variant="body2" component="h5" style={{ fontSize: 10 }}>
                                                         {result.email}
                                                     </Typography> */}
-                                                    </CardContent>
-                                                </Grid>
+                                                </CardContent>
                                             </CardActionArea>
+                                            </Grid>
+
 
 
                                             <Grid item xs={7} >
