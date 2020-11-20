@@ -123,7 +123,7 @@ class SearchPage extends Component {
 
     handleSearch = (event) => {
         const updateSearchResult = this.updateSearchResult;
-        if (event.key === 'Enter' && event.target.value !== "") {
+        if (event.key === 'Enter') {
             console.log('Searching for: ', event.target.value);
             this.setState({
                 is_no_result: false,
@@ -140,12 +140,12 @@ class SearchPage extends Component {
                 }
             );
         }
-        else if (event.key === 'Enter' && event.target.value === "") {
-            this.setState({
-                is_no_result: false,
-                search_results: [],
-            });
-        }
+        // else if (event.key === 'Enter' && event.target.value === "") {
+        //     this.setState({
+        //         is_no_result: false,
+        //         search_results: [],
+        //     });
+        // }
     }
 
     onRequestFriend = (name) => {
@@ -165,6 +165,16 @@ class SearchPage extends Component {
 
     onHandleFriendRequest = (name, is_accept_friend) => {
         console.log("onHandleFriendRequest: ", name);
+        let friend_requests = this.state.search_results;
+        friend_requests.map(r => {
+            if (r.user_name === name) {
+                r.is_friend = is_accept_friend;
+                r.is_received_friend_reqeust = false;
+            }
+        });
+        this.setState({
+            search_results: friend_requests,
+        })
         chrome.runtime.sendMessage({ type: "onHandleFriendRequest", data: { "friend_username": name, "is_accept_friend": is_accept_friend } },
             function (res) {
                 console.log('SearchPage receives reply from background for onHandleFriendRequest ', res.data);
@@ -245,8 +255,8 @@ class SearchPage extends Component {
                                             <Grid item xs={3} >
                                                 <CardActionArea key={result.user_name} component="a" href={"#/users/" + result._id} style={{ display: "flex", alignItems: "center", justifyContent: "space-around" }}>
                                                     <CardContent style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
-                                                        <Avatar alt={result.user_name} src={result.profile_img} sytle= {{padding: 5}}/>
-                                                        <Typography gutterBottom variant="body2" component="h5" style={{ fontSize: 14}}>
+                                                        <Avatar alt={result.user_name} src={result.profile_img} sytle={{ padding: 5 }} />
+                                                        <Typography gutterBottom variant="body2" component="h5" style={{ fontSize: 14 }}>
                                                             {result.user_name}
                                                         </Typography>
                                                     </CardContent>
@@ -255,7 +265,7 @@ class SearchPage extends Component {
                                             <Grid item xs={3} >
                                                 <CardContent style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
                                                     {result.num_mutual_friends > 0 && !result.is_self &&
-                                                        <Typography gutterBottom variant="body2" component="h5" style={{ fontSize: 12}}>
+                                                        <Typography gutterBottom variant="body2" component="h5" style={{ fontSize: 12 }}>
                                                             {result.num_mutual_friends} mutual friends
                                                         </Typography>}
                                                 </CardContent>

@@ -281,7 +281,7 @@ app.post('/deletefriend/:user_id', function (request, response) {
                     const idx1 = friend.friends_list.indexOf(ObjectID(user._id));
                     if (idx1 === -1) {
                         console.error('user with id:' + user._id + " not found in the tobe deletetd friends's friend list");
-                        response.status(421).send('User not found.');
+                        // response.status(421).send('User not found.');
                         return;
                     }
                     else {
@@ -292,7 +292,7 @@ app.post('/deletefriend/:user_id', function (request, response) {
                     const idx2 = user.friends_list.indexOf(ObjectID(friend_id));
                     if (idx2 === -1) {
                         console.error('friend with id:' + friend_id + " not found in the user's friend list");
-                        response.status(421).send('User not found.');
+                        // response.status(421).send('User not found.');
                         return;
                     }
                     else {
