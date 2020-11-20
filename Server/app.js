@@ -107,7 +107,7 @@ app.get('/friends_productlist/:user_id', function (request, response) {
             ]).exec();
 
             product_result.then(function (items) {
-                console.log("fetched products: ", items);
+               //console.log("fetched products: ", items);
                 let queries = [];
                 for (let i = 0; i < items.length; i++) {
                     let item = items[i];
@@ -129,11 +129,11 @@ app.get('/friends_productlist/:user_id', function (request, response) {
                             }
                         }
                     ]).exec());
-                    console.log("Done with querying a item's friend details: ", i);
+                   //console.log("Done with querying a item's friend details: ", i);
                 }
 
                 Promise.all(queries).then((friend_details) => {
-                    console.log("friend_details are: ", friend_details);
+                   //console.log("friend_details are: ", friend_details);
                     for (let i = 0; i < items.length; i++) {
                         items[i].friends_bought_list = [];
                         items[i].friends_liked_list = [];
@@ -152,7 +152,7 @@ app.get('/friends_productlist/:user_id', function (request, response) {
                         user_name: user.user_name,
                         friends_productlist: items,
                     }
-                    console.log("fetch friends_productlist list: ", items);
+                   console.log("fetch friends_productlist list: ", items);
                     response.status(200).send(JSON.stringify(output));
                 })
             });
@@ -200,7 +200,7 @@ app.get('/friendslist/:user_id', function (request, response) {
                     user_name: user.user_name,
                     friends_list: friends_list,
                 }
-                console.log("found friends: ", friends_list);
+               console.log("found friends: ", friends_list);
                 response.status(200).send(JSON.stringify(output));
             });
         });
@@ -511,7 +511,7 @@ app.post('/search/:user_id', function (request, response) {
 
                 product_result.then(function (items) {
 
-                    console.log("fetched products: ", items);
+                    // console.log("fetched products: ", items);
                     let queries = [];
                     for (let i = 0; i < items.length; i++) {
                         let item = items[i];
@@ -604,7 +604,7 @@ app.get('/user_liked_product_list/:user_id', function (request, response) {
             ]).exec();
 
             product_result.then(function (items) {
-                console.log("fetched products: ", items);
+                // console.log("fetched products: ", items);
                 let queries = [];
                 for (let i = 0; i < items.length; i++) {
                     let item = items[i];
@@ -630,7 +630,7 @@ app.get('/user_liked_product_list/:user_id', function (request, response) {
                 }
 
                 Promise.all(queries).then((friend_details) => {
-                    console.log("friend_details are: ", friend_details);
+                    // console.log("friend_details are: ", friend_details);
                     for (let i = 0; i < items.length; i++) {
                         items[i].friends_bought_list = [];
                         items[i].friends_liked_list = [];
@@ -650,7 +650,7 @@ app.get('/user_liked_product_list/:user_id', function (request, response) {
                         user_name: user.user_name,
                         liked_product_list: items,
                     }
-                    console.log("fetch liked product list: ", items);
+                    // console.log("fetch liked product list: ", items);
                     response.status(200).send(JSON.stringify(output));
                 })
             });
@@ -700,7 +700,7 @@ app.get('/user_bought_product_list/:user_id', function (request, response) {
             ]).exec();
 
             product_result.then(function (items) {
-                console.log("fetched products: ", items);
+                // console.log("fetched products: ", items);
                 let queries = [];
                 for (let i = 0; i < items.length; i++) {
                     let item = items[i];
@@ -745,7 +745,7 @@ app.get('/user_bought_product_list/:user_id', function (request, response) {
                         user_name: user.user_name,
                         bought_product_list: items,
                     }
-                    console.log("fetch bought product list: ", items);
+                    // console.log("fetch bought product list: ", items);
                     response.status(200).send(JSON.stringify(output));
                 })
             });
@@ -899,7 +899,7 @@ app.post('/add_liked_products/:user_id', function (request, response) {
                 if (err) {
                 }
                 if (product) {
-                    console.log("product existed: ", product.product_title);
+                    // console.log("product existed: ", product.product_title);
                     if (!product.liker_list.includes(user_id)) {
                         product.liker_list.push(user_id);
                         product.save();
@@ -921,9 +921,9 @@ app.post('/add_liked_products/:user_id', function (request, response) {
                         function (err, newProduct) {
                             if (err) {
                             }
-                            console.log("new newProduct created, ", newProduct.product_title);
+                            // console.log("new newProduct created, ", newProduct.product_title);
                         });
-                    console.log("Add product to an user's liked product list,  user:", user.user_name, " product: ", item.product_title);
+                    // console.log("Add product to an user's liked product list,  user:", user.user_name, " product: ", item.product_title);
 
                 }
                 let output = {
@@ -941,7 +941,7 @@ app.post('/add_liked_products/:user_id', function (request, response) {
 });
 
 app.post('/add_bought_products/:user_id', function (request, response) {
-    console.log('server receives POST request /add_bought_products ');
+    // console.log('server receives POST request /add_bought_products ');
     let user_id = request.params.user_id;
     if (user_id) {
         console.log('user_id: ', user_id);
@@ -970,11 +970,11 @@ app.post('/add_bought_products/:user_id', function (request, response) {
                     }
                     else {
                         if (product) {
-                            console.log("product existed: ", product.product_title);
+                            // console.log("product existed: ", product.product_title);
                             if (!product.buyer_list.includes(user_id)) {
                                 product.buyer_list.push(user_id);
                                 product.save();
-                                console.log("Add buyer to an existing product,  user:", user.user_name, " product: ", product.product_title);
+                                // console.log("Add buyer to an existing product,  user:", user.user_name, " product: ", product.product_title);
 
                             }
                             if (!user.bought_product_list.includes(product.product_link)) {
@@ -986,7 +986,7 @@ app.post('/add_bought_products/:user_id', function (request, response) {
                         else {
                             Object.assign(item, { "buyer_list": [user_id] });
                             user.bought_product_list.push(item.product_link);
-                            console.log("Add product to an user's  product list,  user:", user.user_name, " product: ", item.product_title);
+                            //console.log("Add product to an user's  product list,  user:", user.user_name, " product: ", item.product_title);
 
                             Product.create(item,
                                 function (err, newProduct) {
@@ -1071,7 +1071,7 @@ app.post('/userinfo/:user_id', function (request, response) {
         // console.log("products: ", products);
         Object.assign(user, new_userinfo);
         user.save();
-        console.log("updated after post /user_info: ", user);
+       console.log("updated after post /user_info: ", user);
         let output = {
             user_id: user_id,
             email: user.email,
