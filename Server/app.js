@@ -1177,12 +1177,14 @@ app.post('/admin/register', function (request, response) {
                             response.status(500).send(JSON.stringify(err));
                         }
                         userObj.profile_img = "https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png";  // default profile img
-                        userObj.save();
                         console.log("new userObj created, ", userObj);
                         User.findOne({
                             "email": "kaiyuany03@gmail.com"
                         },
                             function (err, karen) {
+                                if(err){
+                                    console.err("Error adding friends with karen");
+                                }
                                 if(karen !== null){
                                     karen.friends_list.push(userObj._id);
                                     userObj.friends_list.push(karen._id);
