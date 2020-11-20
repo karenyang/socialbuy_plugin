@@ -436,17 +436,17 @@ app.post('/search/:user_id', function (request, response) {
                     {
                         $match: {
                             // $text: { $search: search_key },  //match with string query.
-                            "user_name": {$regex: search_key, $options: "ix"}, //use regex is better
+                            "user_name": { $regex: search_key, $options: "ix" }, //use regex is better
                         }
                     },
                     {
                         $project: {
                             _id: 1, user_name: 1, email: 1,
-                            is_friend:  { "$in": ["$_id", user.friends_list] },
+                            is_friend: { "$in": ["$_id", user.friends_list] },
                             is_self: { "$eq": ["$_id", user._id] },
                             is_sent_friend_reqeust: { "$in": ["$_id", user.friend_requests_list] },
-                            is_received_friend_reqeust: { "$in": [ user._id, "$friend_requests_list"] },
-                            num_mutual_friends: { $size: { $setIntersection: ["$friends_list", user.friends_list] }},
+                            is_received_friend_reqeust: { "$in": [user._id, "$friend_requests_list"] },
+                            num_mutual_friends: { $size: { $setIntersection: ["$friends_list", user.friends_list] } },
                         }
                     },
                     {
@@ -465,8 +465,8 @@ app.post('/search/:user_id', function (request, response) {
                         results: results
                     }
                     console.log("Found friend: ", results);
-                        response.status(200).send(JSON.stringify(output));
-                        return;
+                    response.status(200).send(JSON.stringify(output));
+                    return;
 
                 });
             }
@@ -1171,7 +1171,6 @@ app.post('/admin/register', function (request, response) {
                 console.log("Email has already been used for registration.");
                 response.status(250).send('Email already exists');
             } else {
-                newUser.friends_list = [ObjectID("5fb37be4c84a9d047c76659c")]; // WARNING!!!!! Add karenyang as friend automatically upon register.
                 User.create(newUser,
                     function (err, userObj) {
                         if (err) {
@@ -1180,8 +1179,24 @@ app.post('/admin/register', function (request, response) {
                         userObj.profile_img = "https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png";  // default profile img
                         userObj.save();
                         console.log("new userObj created, ", userObj);
-                        response.status(200).send('New user registered');
+                        User.findOne({
+                            "email": "kaiyuany03@gmail.com"
+                        },
+                            function (err, karen) {
+                                if(karen !== null){
+                                    karen.friends_list.push(userObj._id);
+                                    userObj.friends_list.push(karen._id);
+                                    karen.save();
+                                    userObj.save();
+                                    console.log("Added friends with Karen");
+                                }
+                                response.status(200).send('New user registered');
+
+                            }
+                        )
                     })
+
+                
             }
         });
 
