@@ -23,6 +23,7 @@ class MyProductCard extends Component {
             product: this.props.product,
             show_details: this.props.show_details,
             checkbox_func: this.props.checkbox_func,
+            delete_func: this.props.delete_func,
             checked: true,
             close: false,
             
@@ -43,7 +44,7 @@ class MyProductCard extends Component {
 
     onDelete(product_id) {
         console.log("delete product:")
-        this.props.delete_func(product_id);
+        this.state.delete_func(product_id);
         this.setState(
             {
                 close: true,
@@ -71,8 +72,6 @@ class MyProductCard extends Component {
         this.setState({
             checked: !this.state.checked,
         })
-        console.log("check!!!!", this.state.checked)
-
     }
 
     render() {
@@ -117,7 +116,7 @@ class MyProductCard extends Component {
                             </Grid>
                         </CardActionArea>
                     </Grid>
-                    {this.state.delete_func !== null &&
+                    {this.state.delete_func != null &&
                         <Grid item xs={1}>
                             <CardActions>
                                 <IconButton
@@ -131,7 +130,7 @@ class MyProductCard extends Component {
 
                     }
                      {
-                        this.state.checkbox_func !== null &&
+                        this.state.checkbox_func != null &&
                             <Grid item xs={1}>
                                 <Checkbox
                                     size="small"
