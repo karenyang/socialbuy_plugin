@@ -1,13 +1,18 @@
 import React from 'react';
-import {
-    Typography,
-} from '@material-ui/core';
+
 import './Login.css';
 import {
     Link
 } from 'react-router-dom';
+import {
+    Typography,
+    Card,
+} from '@material-ui/core';
 import icon from '../../assets/img/icon-34.png';
+import FacebookLogin from 'react-facebook-login';
+import FacebookLoginWithButton from 'react-facebook-login';
 
+const parseUrl = require('parseurl')
 
 
 class Login extends React.Component {
@@ -63,14 +68,71 @@ class Login extends React.Component {
             });
     }
 
+    // responseFacebook = (response) => {
+    //     console.log(response);
+    // }
+    // facebookButtonClicked = () => {
+    //     console.log("clicked");
+    // }
+
+    onClickFBLogin = () => {
+        // redirect to https://www.facebook.com/v9.0/dialog/oauth?
+        // client_id={app-id}
+        // &redirect_uri={redirect-uri}
+        // &state={state-param}
+        const app_id = "189391966126165";
+        // const redirect_uri = encodeURIComponent(chrome.identity.getRedirectURL("TasteMaker"));
+        const redirect_uri = "https://www.facebook.com/connect/login_success.html";
+        console.log("redirect_uri is: ", redirect_uri);
+        const redirectRe = new RegExp(redirect_uri + '[#\?](.*)');
+        const state_param = "state_param";
+        const url = `https://www.facebook.com/v9.0/dialog/oauth?client_id=${app_id}&redirect_uri=${redirect_uri}&state=${state_param}`;
+        console.log("url for FB login is: ", url);
+       
+
+
+        chrome.identity.launchWebAuthFlow(
+            {
+                "url": url,
+                "interactive": true,
+            },
+            function (redirectUri) {
+                if (chrome.runtime.lastError) {
+                    callback(new Error(chrome.runtime.lastError));
+                    return;
+                }
+                const response = parseUrl(redirectUri);
+                console.log("redirectUri: ", redirectUri);
+                access_token = response[`#access_token`];
+                callback(null, access_token);
+            });
+
+
+
+    }
     render() {
         return (
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+            <div className="container" style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+
                 <form onSubmit={this.handleSubmit}>
                     <div style={{ margin: "5px" }}>
                         <img src={icon} alt="icon" width="40" height="40" style={{ padding: 5 }} />
                         <h1>Login</h1>
                     </div>
+
+                    <button onClick={this.onClickFBLogin}>
+                        FB Login
+                    </button>
+                    {/* <FacebookLoginWithButton
+                        appId="189391966126165"
+                        autoLoad={true}
+                        fields="name,email,picture"
+                        scope="public_profile,user_friends"
+                        callback={this.responseFacebook}
+                        onClick={this.facebookButtonClicked}
+                        icon="fa-facebook" /> */}
+
+
                     <div style={{ margin: "5px" }}>
                         <label>Email: </label>
                         <input

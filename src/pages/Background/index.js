@@ -41,7 +41,7 @@ chrome.runtime.onMessage.addListener(
             case "onPopupInit":
                 console.log("onPopupInit");
                 sendResponse(userInfo);
-                if (userInfo.user_id !== undefiend) {
+                if (userInfo !== undefiend) {
                     axios.get(DOMAIN + 'receivedfriendrequests/' + userInfo.user_id)
                         .then(res => {
                             printResponse('onLoadFriendRequestsList', res);

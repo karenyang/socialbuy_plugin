@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
-    "name": "FrienTribe",
-    "version": "0.2",
+    "name": "TasteMaker",
+    "version": "0.0",
     "options_page": "options.html",
     "background": {
         "page": "background.html"
@@ -24,12 +24,12 @@
         "icon-34.png",
         "assets/img/*.png"
     ],
-    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+    "content_security_policy": "script-src 'self' https://connect.facebook.net/en_US/sdk.js 'unsafe-eval'; object-src 'self'",
     "permissions": [
         "cookies",
         "*://*.google.com",
         "tabs",
-        "notifications",
-        "storage"
+        "storage",
+        "identity"
     ]
 }

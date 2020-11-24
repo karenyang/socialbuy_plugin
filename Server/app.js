@@ -478,7 +478,6 @@ app.post('/search/:user_id', function (request, response) {
                 }
                 console.log("search string is: ", search_string);
                 let friends_and_self = user.friends_list.concat(ObjectID(user_id)); //include user themselves to be searchable
-                console.log("seaching among", friends_and_self);
                 let product_result = Product.aggregate([
                     {
                         $match: {
