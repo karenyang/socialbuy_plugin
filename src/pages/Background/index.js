@@ -41,23 +41,25 @@ chrome.runtime.onMessage.addListener(
             case "onPopupInit":
                 console.log("onPopupInit");
                 sendResponse(userInfo);
-                console.log("grabbing friend requests.")
-                axios.get(DOMAIN + 'receivedfriendrequests/' + userInfo.user_id)
-                    .then(res => {
-                        printResponse('onLoadFriendRequestsList', res);
-                        const friend_requests = res.data.received_friend_requests;
-                        num_requests = friend_requests.length;
-                        console.log("there are friend request:", num_requests, friend_requests);
-                        if (num_requests > 0) {
-                            chrome.browserAction.setBadgeText({ text: num_requests.toString() });
-                        } else {
-                            chrome.browserAction.setBadgeText({ text: "" });
-                        }
-                    })
-                    .catch(err => {
-                        console.error(err)
-                    });
-                return true;
+                if (userInfo.user_id !== undefiend) {
+                    axios.get(DOMAIN + 'receivedfriendrequests/' + userInfo.user_id)
+                        .then(res => {
+                            printResponse('onLoadFriendRequestsList', res);
+                            const friend_requests = res.data.received_friend_requests;
+                            num_requests = friend_requests.length;
+                            console.log("there are friend request:", num_requests, friend_requests);
+                            if (num_requests > 0) {
+                                chrome.browserAction.setBadgeText({ text: num_requests.toString() });
+                            } else {
+                                chrome.browserAction.setBadgeText({ text: "" });
+                            }
+                        })
+                        .catch(err => {
+                            console.error(err)
+                        });
+                    return true;
+                }
+
 
             case "onRegister":
                 console.log("About to register: ", message.data);
@@ -119,7 +121,7 @@ chrome.runtime.onMessage.addListener(
 
             case "onLoadUserInfo":
                 console.log("Background about to get onLoadUserInfo data from background: ");
-                if (userInfo === undefined || userInfo.user_id === undefined) {
+                if (userInfo === null || userInfo.user_id === undefined) {
                     console.log("User have not logged in");
                     sendResponse("User have not logged in");
                 } else {
@@ -141,7 +143,7 @@ chrome.runtime.onMessage.addListener(
 
             case "onUploadUserInfo":
                 console.log("Background about to get onLoadUserInfo data from background: ");
-                if (userInfo === undefined || userInfo.user_id === undefined) {
+                if (userInfo === null || userInfo.user_id === undefined) {
                     console.log("User have not logged in");
                     sendResponse("User have not logged in");
                 } else {
@@ -163,7 +165,7 @@ chrome.runtime.onMessage.addListener(
                 return true;
 
             case 'onBoughtProductsToBeAdded':
-                if (userInfo === undefined || userInfo.user_id === undefined) {
+                if (userInfo === null || userInfo.user_id === undefined) {
                     console.log("User have not logged in");
                     sendResponse("User have not logged in");
                 } else {
@@ -186,7 +188,7 @@ chrome.runtime.onMessage.addListener(
 
             case "onLikedProductsToBeAdded":
                 console.log("Background about to Handle onLikedProductsToBeAdded. ");
-                if (userInfo === undefined || userInfo.user_id === undefined) {
+                if (userInfo === null || userInfo.user_id === undefined) {
                     console.log("User have not logged in");
                     sendResponse("User have not logged in");
                 } else {
@@ -209,7 +211,7 @@ chrome.runtime.onMessage.addListener(
 
             case "onLoadUserBoughtProductList":
                 console.log("Background about to get LoadSelfProductList data from background: ");
-                if (userInfo === undefined || userInfo.user_id === undefined) {
+                if (userInfo === null || userInfo.user_id === undefined) {
                     console.log("User have not logged in");
                     sendResponse("User have not logged in");
                 } else {
@@ -231,7 +233,7 @@ chrome.runtime.onMessage.addListener(
 
             case "onLoadUserLikedProductList":
                 console.log("Background about to get onLoadUserLikedProductList data from background: ");
-                if (userInfo === undefined || userInfo.user_id === undefined) {
+                if (userInfo === null || userInfo.user_id === undefined) {
                     console.log("User have not logged in");
                     sendResponse("User have not logged in");
                 } else {
@@ -259,7 +261,7 @@ chrome.runtime.onMessage.addListener(
 
             case "onDeleteSelfBoughtProduct":
                 console.log("Background about to Delete Self Bought Product: ", message.data);
-                if (userInfo === undefined || userInfo.user_id === undefined) {
+                if (userInfo === null || userInfo.user_id === undefined) {
                     console.log("User have not logged in");
                     sendResponse("User have not logged in");
                 } else {
@@ -277,7 +279,7 @@ chrome.runtime.onMessage.addListener(
 
             case "onDeleteSelfLikedProduct":
                 console.log("Background about to Delete Self Liked Product: ", message.data);
-                if (userInfo === undefined || userInfo.user_id === undefined) {
+                if (userInfo === null || userInfo.user_id === undefined) {
                     console.log("User have not logged in");
                     sendResponse("User have not logged in");
                 } else {
@@ -295,7 +297,7 @@ chrome.runtime.onMessage.addListener(
 
             case "onHandleSearch":
                 console.log("Background about to Handle Search: ", message.data);
-                if (userInfo === undefined || userInfo.user_id === undefined) {
+                if (userInfo === null || userInfo.user_id === undefined) {
                     console.log("User have not logged in");
                     sendResponse("User have not logged in");
                 } else {
@@ -313,7 +315,7 @@ chrome.runtime.onMessage.addListener(
 
             case "onRequestFriend":
                 console.log("Background about to Handle onRequestFriend: ", message.data);
-                if (userInfo === undefined || userInfo.user_id === undefined) {
+                if (userInfo === null || userInfo.user_id === undefined) {
                     console.log("User have not logged in");
                     sendResponse("User have not logged in");
                 } else {
@@ -331,7 +333,7 @@ chrome.runtime.onMessage.addListener(
 
             case "onLoadFriendsList":
                 console.log("Background about to Handle onLoadFriendsList. ");
-                if (userInfo === undefined || userInfo.user_id === undefined) {
+                if (userInfo === null || userInfo.user_id === undefined) {
                     console.log("User have not lpogged in");
                     sendResponse("User have not logged in");
                 } else {
@@ -349,7 +351,7 @@ chrome.runtime.onMessage.addListener(
 
             case "onLoadFriendRequestsList":
                 console.log("Background about to Handle onLoadFriendRequestsList. ");
-                if (userInfo === undefined || userInfo.user_id === undefined) {
+                if (userInfo === null || userInfo.user_id === undefined) {
                     console.log("User have not lpogged in");
                     sendResponse("User have not logged in");
                 } else {
@@ -367,7 +369,7 @@ chrome.runtime.onMessage.addListener(
 
             case "onLoadFriendsProductList":
                 console.log("Background about to Handle onLoadFriendsProductList. ");
-                if (userInfo === undefined || userInfo.user_id === undefined) {
+                if (userInfo === null || userInfo.user_id === undefined) {
                     console.log("User have not lpogged in");
                     sendResponse("User have not logged in");
                 } else {
@@ -385,7 +387,7 @@ chrome.runtime.onMessage.addListener(
 
             case "onHandleFriendRequest":
                 console.log("Background about to Handle onHandleFriendRequest. ");
-                if (userInfo === undefined || userInfo.user_id === undefined) {
+                if (userInfo === null || userInfo.user_id === undefined) {
                     console.log("User have not lpogged in");
                     sendResponse("User have not logged in");
                 } else {
@@ -409,7 +411,7 @@ chrome.runtime.onMessage.addListener(
 
             case "onDeleteFriend":
                 console.log("Background about to Handle onDeleteFriend. ");
-                if (userInfo === undefined || userInfo.user_id === undefined) {
+                if (userInfo === null || userInfo.user_id === undefined) {
                     console.log("User have not lpogged in");
                     sendResponse("User have not logged in");
                 } else {
@@ -442,7 +444,7 @@ function printResponse(message_type, res) {
 }
 
 function setStorageItem(message_type, data) {
-    console.log("setStorage",message_type, ":", data);
+    console.log("setStorage", message_type, ":", data);
     window.localStorage.setItem(message_type, JSON.stringify(data));
 }
 

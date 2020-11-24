@@ -21,10 +21,11 @@ class MyProductCard extends Component {
         super(props);
         this.state = {
             product: this.props.product,
-            delete_func: this.props.delete_func,
             show_details: this.props.show_details,
             checkbox_func: this.props.checkbox_func,
             checked: true,
+            close: false,
+            
         }
     }
 
@@ -42,7 +43,12 @@ class MyProductCard extends Component {
 
     onDelete(product_id) {
         console.log("delete product:")
-        this.state.delete_func(product_id);
+        this.props.delete_func(product_id);
+        this.setState(
+            {
+                close: true,
+            }
+        )
     }
 
     cropTitle = (product_title) => {
@@ -71,6 +77,9 @@ class MyProductCard extends Component {
 
     render() {
         const product = this.state.product;
+        if (this.state.close) {
+            return null;
+        }
         return (
             <div key={product.product_link} style={{ padding: "5px", display: "flex", alignItems: "center" }}>
                 <Grid container spacing={0}  >
@@ -113,7 +122,7 @@ class MyProductCard extends Component {
                             <CardActions>
                                 <IconButton
                                     style={{ padding: 0, height: 18, width: 18 }}
-                                    onClick={() => this.onDelete(product.product_link)}
+                                    onClick={() => this.onDelete(product._id)}
                                 >
                                     <DeleteIcon style={{ fontSize: 15 }} />
                                 </IconButton>

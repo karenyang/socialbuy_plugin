@@ -11,7 +11,6 @@ import ReactDOM from "react-dom";
 
 console.log("================================================================================================");
 var url = window.location.href;
-
 console.log('Current URL: ', url);
 
 
@@ -126,8 +125,6 @@ else if (url.includes('amazon.com/') && !url.includes('amazon.com/gp/huc') && !u
         <SideBox product={product} />,
         document.body.appendChild(document.createElement("DIV"))
     )
-
-
     // if user buy now, count as buying for now
     document.getElementById("buy-now-button").addEventListener("click", function () {
         console.log(
@@ -144,8 +141,6 @@ else if (url.includes('amazon.com/') && !url.includes('amazon.com/gp/huc') && !u
         //     }
         // );
         setStorageItem("LastPurchase", [product]);
-
-
     });
     // if user add to card , add it to soonWillBuyProducts
     document.getElementById("add-to-cart-button").addEventListener("click", function () {
@@ -187,7 +182,6 @@ function searchFromUrl() {
         }
     );
 }
-
 
 function fetchMoreBoughtProductInfo(response, item) {
     let page = document.createElement('html');

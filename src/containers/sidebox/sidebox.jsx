@@ -17,15 +17,44 @@ class SideBox extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            liked: false,
             show_product: false,
             product: this.props.product,
             added_product: false,
+            liked_product_list: [],
+            logged_in: true,
         }
     }
 
+    handleUpdate = (name, value) => { //[name of variable]: value of variable
+        this.setState({ [name]: value, });
+        console.log("Update state-> ", this.state);
+    }
+
     componentDidMount = () => {
-        // TODO: check whether product has been added to like list before
+        // Check Log In
+        const handleUpdate = this.handleUpdate;
+        const curr_product = this.props.product;
+        chrome.runtime.sendMessage({ type: "onLoadUserLikedProductList" },
+            function (res) {
+                console.log('Userinfo Page receives reply from background for onLoadUserBoughtProductList ', res.data);
+                if (res === "User have not logged in") {
+                    console.log("User have not logged in");
+                    handleUpdate("logged_in", false);
+                }
+                else if (res.status === 200) {
+                    console.log("onLoadUserLikedProductList succeeded.");
+                    let match = res.data.liked_product_list.filter(p => p.product_link === curr_product.product_link)
+                    if (match.length > 0) {
+                        console.log("This product is already in user's liked product list.")
+                        handleUpdate("added_product", true);
+                    }
+                }
+                else {
+                    console.error(res.data + ", onLoadUserLikedProductList failed.");
+                }
+            }
+        );
+
     }
 
     onMouseOverIcon = () => {
@@ -49,7 +78,7 @@ class SideBox extends Component {
 
     onClickAddCollection = () => {
         console.log("mouse click. ");
-        if (!this.state.liked && this.state.product !== null) {
+        if (!this.state.added_product && this.state.product !== null) {
             chrome.runtime.sendMessage({ type: "onLikedProductsToBeAdded", data: this.state.product },
                 function (response) {
                     console.log('this is the response from the background page for onLikedProductsToBeAdded', response);
@@ -62,7 +91,6 @@ class SideBox extends Component {
             );
         }
         this.setState({
-            liked: true,
             added_product: true,
         });
 
@@ -83,7 +111,7 @@ class SideBox extends Component {
                     {this.state.product !== null && this.state.show_product &&
                         <Card style={{ backgroundColor: "white", width: 250, position: "absolute", right: "0px", display: "flex", flexDirection: 'column', justifyContent: "space-between", alignItems: "center" }}>
                             <div style={{ padding: 5, display: "flex", flexDirection: 'row', justifyContent: "space-between" }}>
-                                <img className="productimage" alt={this.state.product.product_title} src={this.state.product.product_imgurl} style={{padding: 5}} />
+                                <img className="productimage" alt={this.state.product.product_title} src={this.state.product.product_imgurl} style={{ padding: 5 }} />
                                 <CardContent style={{ paddingTop: "10px", paddingRight: "5px", paddingLeft: "5px" }} >
                                     <Typography gutterBottom variant="body2" component="h5" style={{ fontSize: 12, padding: "5px" }}>
                                         {this.cropTitle(this.state.product.product_title)}
@@ -92,10 +120,16 @@ class SideBox extends Component {
                             </div>
                             <Divider />
                             <CardActionArea style={{ paddingBottom: "20px" }}>
-                                {this.state.added_product ?
+                                {!this.state.logged_in &&
+                                    <Typography gutterBottom variant="body2" component="h5" style={{padding: "5px"}}>
+                                        Log In to Add Product
+                                    </Typography>
+                                }
+                                {this.state.added_product && this.state.logged_in &&
                                     <Button onClick={this.onClickAddCollection} style={{ textTransform: "none", width: "180px", backgroundColor: "#E9967A", color: "#F5F5DC" }} >
                                         Added
-                                    </Button> :
+                                </Button>}
+                                {!this.state.added_product && this.state.logged_in &&
                                     <Button onClick={this.onClickAddCollection} style={{ textTransform: "none", width: "180px", backgroundColor: "#FF6347", color: "white" }} >
                                         Add to Collection
                                     </Button>

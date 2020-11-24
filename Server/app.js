@@ -107,7 +107,7 @@ app.get('/friends_productlist/:user_id', function (request, response) {
             ]).exec();
 
             product_result.then(function (items) {
-               //console.log("fetched products: ", items);
+                //console.log("fetched products: ", items);
                 let queries = [];
                 for (let i = 0; i < items.length; i++) {
                     let item = items[i];
@@ -129,11 +129,11 @@ app.get('/friends_productlist/:user_id', function (request, response) {
                             }
                         }
                     ]).exec());
-                   //console.log("Done with querying a item's friend details: ", i);
+                    //console.log("Done with querying a item's friend details: ", i);
                 }
 
                 Promise.all(queries).then((friend_details) => {
-                   //console.log("friend_details are: ", friend_details);
+                    //console.log("friend_details are: ", friend_details);
                     for (let i = 0; i < items.length; i++) {
                         items[i].friends_bought_list = [];
                         items[i].friends_liked_list = [];
@@ -152,7 +152,7 @@ app.get('/friends_productlist/:user_id', function (request, response) {
                         user_name: user.user_name,
                         friends_productlist: items,
                     }
-                   console.log("fetch friends_productlist list: ", items);
+                    console.log("fetch friends_productlist list: ", items);
                     response.status(200).send(JSON.stringify(output));
                 })
             });
@@ -200,7 +200,7 @@ app.get('/friendslist/:user_id', function (request, response) {
                     user_name: user.user_name,
                     friends_list: friends_list,
                 }
-               console.log("found friends: ", friends_list);
+                console.log("found friends: ", friends_list);
                 response.status(200).send(JSON.stringify(output));
             });
         });
@@ -1071,7 +1071,7 @@ app.post('/userinfo/:user_id', function (request, response) {
         // console.log("products: ", products);
         Object.assign(user, new_userinfo);
         user.save();
-       console.log("updated after post /user_info: ", user);
+        console.log("updated after post /user_info: ", user);
         let output = {
             user_id: user_id,
             email: user.email,
@@ -1178,27 +1178,29 @@ app.post('/admin/register', function (request, response) {
                         }
                         userObj.profile_img = "https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png";  // default profile img
                         console.log("new userObj created, ", userObj);
-                        User.findOne({
-                            "email": "kaiyuany03@gmail.com"
-                        },
-                            function (err, karen) {
-                                if(err){
-                                    console.err("Error adding friends with karen");
-                                }
-                                if(karen !== null){
-                                    karen.friends_list.push(userObj._id);
-                                    userObj.friends_list.push(karen._id);
-                                    karen.save();
-                                    userObj.save();
-                                    console.log("Added friends with Karen");
-                                }
-                                response.status(200).send('New user registered');
+                        if (userObj.email !== "kaiyuany03@gmail.com") {
+                            User.findOne({
+                                "email": "kaiyuany03@gmail.com"
+                            },
+                                function (err, karen) {
+                                    if (err) {
+                                        console.err("Error adding friends with karen");
+                                    }
+                                    if (karen !== null) {
+                                        karen.friends_list.push(userObj._id);
+                                        userObj.friends_list.push(karen._id);
+                                        karen.save();
+                                        userObj.save();
+                                        console.log("Added friends with Karen");
+                                    }
+                                    response.status(200).send('New user registered');
 
-                            }
-                        )
+                                }
+                            )
+                        }
                     })
 
-                
+
             }
         });
 
