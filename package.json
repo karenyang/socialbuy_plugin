@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "build": "node Server/build.js",
-    "start": "node Server/webserver.js",
+    "start": "HTTPS=true node Server/webserver.js",
     "server": "node Server/app.js",
     "prettier": "prettier --write '**/*.{js,jsx,css,html}' --tab-width 4"
   },
@@ -26,6 +26,7 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-draggable": "^4.4.3",
+    "react-facebook-login": "^4.1.1",
     "react-hot-loader": "^4.13.0",
     "react-router-dom": "^5.2.0"
   },

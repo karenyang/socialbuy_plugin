@@ -477,6 +477,8 @@ app.post('/search/:user_id', function (request, response) {
                     search_string = search_key.concat(" " + search_category);
                 }
                 console.log("search string is: ", search_string);
+                let friends_and_self = user.friends_list.concat(ObjectID(user_id)); //include user themselves to be searchable
+                console.log("seaching among", friends_and_self);
                 let product_result = Product.aggregate([
                     {
                         $match: {
@@ -485,8 +487,8 @@ app.post('/search/:user_id', function (request, response) {
                                 $gt: [
                                     {
                                         $sum: [
-                                            { $size: { $setIntersection: ['$liker_list', user.friends_list] } }, //liker or buyer has my friends in it
-                                            { $size: { $setIntersection: ['$buyer_list', user.friends_list] } }
+                                            { $size: { $setIntersection: ['$liker_list', friends_and_self] } }, //liker or buyer has my friends in it
+                                            { $size: { $setIntersection: ['$buyer_list', friends_and_self] } }
                                         ]
                                     },
                                     0
@@ -498,8 +500,8 @@ app.post('/search/:user_id', function (request, response) {
                         $project: {
                             _id: 1, product_title: 1, product_cost: 1, product_link: 1, product_imgurl: 1,
                             score: { $meta: "textScore" },
-                            bought_friends_id_list: { $setIntersection: ['$buyer_list', user.friends_list] },
-                            liked_friends_id_list: { $setIntersection: ['$liker_list', user.friends_list] }
+                            bought_friends_id_list: { $setIntersection: ['$buyer_list', friends_and_self] },
+                            liked_friends_id_list: { $setIntersection: ['$liker_list', friends_and_self] }
                         }
                     },
                     // {
