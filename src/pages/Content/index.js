@@ -55,14 +55,14 @@ if (url.includes('amazon.com/gp/cart')) {
             }
             setStorageItem("soonWillBuyProducts", products);
 
-            // ################ use this for testing in cart w/ actually buying ###################
-            if (products.length > 0) {
-                ReactDOM.render(
-                    <ChoiceBox products={products} />,
-                    document.body.appendChild(document.createElement("DIV"))
-                )
-            }
-            // ###################################################################################
+            // // ################ use this for testing in cart w/ actually buying ###################
+            // if (products.length > 0) {
+            //     ReactDOM.render(
+            //         <ChoiceBox products={products} />,
+            //         document.body.appendChild(document.createElement("DIV"))
+            //     )
+            // }
+            // // ###################################################################################
         })
     }
 
@@ -76,10 +76,12 @@ else if (url.includes('amazon.com/s?k=')) {
 else if (url.includes('amazon.com/gp/buy/thankyou/')) {
     console.log("thank you for last purchase", getStorageItem("LastPurchase"));
     let last_purchase_products = getStorageItem("LastPurchase");
-    ReactDOM.render(
-        <ChoiceBox products={last_purchase_products} />,
-        document.body.appendChild(document.createElement("DIV"))
-    )
+    if (last_purchase_products.length > 0) {
+        ReactDOM.render(
+            <ChoiceBox products={last_purchase_products} />,
+            document.body.appendChild(document.createElement("DIV"))
+        )
+    }
 }
 
 else if (url.includes('amazon.com/gp/buy/')) {
@@ -88,94 +90,95 @@ else if (url.includes('amazon.com/gp/buy/')) {
     let soonWillBuyProducts = getStorageItem("soonWillBuyProducts")
     console.log("Before buy soonWillBuyProducts: ", soonWillBuyProducts);
 
-    let products_checkout = document.querySelectorAll("#spc-orders > div > div > div.a-row.shipment > div > div > div > div> div > div > div.a-row > div > div > div.a-fixed-left-grid-col.item-details-right-column.a-col-right > div.a-row.breakword > span")
-    let data = []
-    if (products_checkout !== null && products_checkout !== []) {
-        let product_names = [];
-        product_names = Array.from(products_checkout).map((a) => a.innerText);
-        console.log("product_names: ", product_names);
+    
+    // // ################ use this for testing in cart w/ actually buying ###################
+    // let products_checkout = document.querySelectorAll("#spc-orders > div > div > div.a-row.shipment > div > div > div > div> div > div > div.a-row > div > div > div.a-fixed-left-grid-col.item-details-right-column.a-col-right > div.a-row.breakword > span")
+    // let data = []
+    // if (products_checkout !== null && products_checkout !== []) {
+    //     let product_names = [];
+    //     product_names = Array.from(products_checkout).map((a) => a.innerText);
+    //     console.log("product_names: ", product_names);
 
-        if (product_names.length > 0) {
-            for (let i = 0; i < soonWillBuyProducts.length; i++) {
-                for (let j = 0; j < product_names.length; j++) {
-                    if (product_names[j].includes(soonWillBuyProducts[i].product_title)) {
-                        data.push(soonWillBuyProducts[i]);
-                        console.log("Data added:", soonWillBuyProducts[i].product_title)
-                    }
-                }
-            }
-            setStorageItem("LastPurchase", data);
-        }
-    }
-    setStorageItem("soonWillBuyProducts", []);
-    ReactDOM.render(
-        <ChoiceBox products={data} />,
-        document.body.appendChild(document.createElement("DIV"))
-    )
-
-    // const after_placing_order_func = function () {
-    //     console.log(
-    //         "Clicked Place Your Order Button. Adding products in page to bought List"
-    //     )
-    //     let products_checkout = document.querySelectorAll("#spc-orders > div > div > div.a-row.shipment > div > div > div > div> div > div > div.a-row > div > div > div.a-fixed-left-grid-col.item-details-right-column.a-col-right > div.a-row.breakword > span")
-    //     let data = []
-    //     if (products_checkout !== null && products_checkout !== []) {
-    //         let product_names = [];
-    //         product_names = Array.from(products_checkout).map((a) => a.innerText);
-    //         console.log("product_names: ", product_names);
-
-    //         if (product_names.length > 0) {
-    //             for (let i = 0; i < soonWillBuyProducts.length; i++) {
-    //                 for (let j = 0; j < product_names.length; j++) {
-    //                     if (product_names[j].includes(soonWillBuyProducts[i].product_title)) {
-    //                         data.push(soonWillBuyProducts[i]);
-    //                         console.log("Data added:", soonWillBuyProducts[i].product_title)
-    //                     }
+    //     if (product_names.length > 0) {
+    //         for (let i = 0; i < soonWillBuyProducts.length; i++) {
+    //             for (let j = 0; j < product_names.length; j++) {
+    //                 if (product_names[j].includes(soonWillBuyProducts[i].product_title)) {
+    //                     data.push(soonWillBuyProducts[i]);
+    //                     console.log("Data added:", soonWillBuyProducts[i].product_title)
     //                 }
     //             }
-    //             setStorageItem("LastPurchase", data);
     //         }
+    //         setStorageItem("LastPurchase", data);
     //     }
-    //     setStorageItem("soonWillBuyProducts", []);
     // }
-    // buy_button.addEventListener("click", after_placing_order_func);
-    // buy_button_bottom.addEventListener("click", after_placing_order_func);
+    // if (data.length > 0) {
+    //     ReactDOM.render(
+    //         <ChoiceBox products={data} />,
+    //         document.body.appendChild(document.createElement("DIV"))
+    //     )
+    // }
+    // // ################ use this for testing in cart w/ actually buying ###################
+
+
+    const after_placing_order_func = function () {
+        console.log(
+            "Clicked Place Your Order Button. Adding products in page to bought List"
+        )
+        let products_checkout = document.querySelectorAll("#spc-orders > div > div > div.a-row.shipment > div > div > div > div> div > div > div.a-row > div > div > div.a-fixed-left-grid-col.item-details-right-column.a-col-right > div.a-row.breakword > span")
+        let data = []
+        if (products_checkout !== null && products_checkout !== []) {
+            let product_names = [];
+            product_names = Array.from(products_checkout).map((a) => a.innerText);
+            console.log("product_names: ", product_names);
+
+            if (product_names.length > 0) {
+                for (let i = 0; i < soonWillBuyProducts.length; i++) {
+                    for (let j = 0; j < product_names.length; j++) {
+                        if (product_names[j].includes(soonWillBuyProducts[i].product_title)) {
+                            data.push(soonWillBuyProducts[i]);
+                            console.log("Data added:", soonWillBuyProducts[i].product_title)
+                        }
+                    }
+                }
+                setStorageItem("LastPurchase", data);
+            }
+        }
+        setStorageItem("soonWillBuyProducts", []);
+    }
+    buy_button.addEventListener("click", after_placing_order_func);
+    buy_button_bottom.addEventListener("click", after_placing_order_func);
 
 
 }
-else if (url.includes('amazon.com/') && !url.includes('amazon.com/gp/huc') && !url.includes('amazon.com/gp/css')) { //on a product page: Creating the side box
+else if (url.includes('amazon.com/') && !url.includes('amazon.com/gp/huc') && !url.includes('amazon.com/gp/css') && !url.includes('amazon.com/gp/yourstore')) { //on a product page: Creating the side box
     console.log("Adding side box .....");
-    let product = fetchLikedProductInfo();
-    console.log("fetched product: ", product);
+    
     ReactDOM.render(
-        <SideBox product={product} />,
+        <SideBox/>,
         document.body.appendChild(document.createElement("DIV"))
     )
     // if user buy now, count as buying for now
     document.getElementById("buy-now-button").addEventListener("click", function () {
+        let product = fetchLikedProductInfo();
         console.log(
-            "Clicked Buy Now Button. Count this as buying for now"
+            "Clicked Buy Now Button. Count this as buying for now", product
         )
-        // chrome.runtime.sendMessage({ type: "onBoughtProductsToBeAdded", data: [product] },
-        //     function (response) {
-        //         console.log('Sidebox: is the response from the background page for the onBoughtProductsToBeAdded  Event', response.data);
-        //         if (response.status === 200) {
-        //             console.log("onBoughtProductsToBeAdded", " succeeded.", response.data);
-        //         } else {
-        //             console.log("onBoughtProductsToBeAdded", " failed.", response.data);
-        //         }
-        //     }
-        // );
         setStorageItem("LastPurchase", [product]);
     });
     // if user add to card , add it to soonWillBuyProducts
+
     document.getElementById("add-to-cart-button").addEventListener("click", function () {
         console.log(
-            "Clicked Add to Cart Button."
+            "Clicked Add to Cart Button.", product
         )
-        let soonWillBuyProducts = getStorageItem("soonWillBuyProducts")
+        let product = fetchLikedProductInfo();
+
+        let soonWillBuyProducts = getStorageItem("soonWillBuyProducts");
+        console.log("soonWillBuyProducts from storage", soonWillBuyProducts)
         soonWillBuyProducts.push(product);
         setStorageItem("soonWillBuyProducts", soonWillBuyProducts);
+        console.log("soonWillBuyProducts from storage AFTER", getStorageItem("soonWillBuyProducts"));
+
     });
 }
 
@@ -244,5 +247,12 @@ function setStorageItem(message_type, data) {
 }
 
 function getStorageItem(message_type) {
+    if (message_type == "soonWillBuyProducts"){
+        let soonWillBuyProducts = JSON.parse(window.localStorage.getItem(message_type));
+        if (soonWillBuyProducts === "" || soonWillBuyProducts === "[]" || soonWillBuyProducts === null){
+            soonWillBuyProducts = [];
+        }
+        return soonWillBuyProducts;
+    }
     return JSON.parse(window.localStorage.getItem(message_type));
 }

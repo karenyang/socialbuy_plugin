@@ -11,6 +11,8 @@ import CardActionArea from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Draggable from 'react-draggable';
 import "./sidebox.css";
+import fetchLikedProductInfo from '../../pages/Content/modules/fetch_product';
+
 
 const icon_url = "https://i.ibb.co/1rgS6hX/icon-noborder.png"
 class SideBox extends Component {
@@ -18,7 +20,7 @@ class SideBox extends Component {
         super(props);
         this.state = {
             show_product: false,
-            product: this.props.product,
+            product: "",
             added_product: false,
             liked_product_list: [],
             logged_in: true,
@@ -58,9 +60,11 @@ class SideBox extends Component {
     }
 
     onMouseOverIcon = () => {
+        let product = fetchLikedProductInfo();
         this.setState({
             transform: "translate(0px, 50px)",
             show_product: true,
+            product: product,
         });
     }
 
