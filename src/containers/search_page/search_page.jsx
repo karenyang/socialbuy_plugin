@@ -274,17 +274,17 @@ class SearchPage extends Component {
                                             <Grid item xs={6} >
                                                 {!result.is_friend && !result.is_self && !result.is_received_friend_reqeust && !result.is_sent_friend_reqeust &&
                                                     <CardActions style={{ justifyContent: "center" }}>
-                                                        <Button style={{ textTransform: "none" }}
+                                                        <Button variant="contained" color="primary" style={{ textTransform: "none" }}
                                                             onClick={() => this.onRequestFriend(result.user_name)}
                                                         >
-                                                            Add Friend
+                                                            Follow
                                                     </Button>
                                                     </CardActions>
                                                 }
                                                 {result.is_friend && !result.is_self && !result.is_sent_friend_reqeust && !result.is_received_friend_reqeust &&
                                                     <CardContent >
                                                         <Typography variant="body2" component="h5" style={{ 'color': 'grey' }}>
-                                                            Your friend
+                                                            Mutually followed
                                                     </Typography>
                                                     </CardContent>
                                                 }
@@ -298,20 +298,20 @@ class SearchPage extends Component {
                                                 {result.is_sent_friend_reqeust &&
                                                     <CardContent >
                                                         <Typography variant="body2" component="h5" style={{ 'color': 'grey' }}>
-                                                            Friend request sent
+                                                            Followed
                                                     </Typography>
                                                     </CardContent>
                                                 }
                                                 {result.is_received_friend_reqeust &&
                                                     <CardActions>
                                                         <Typography variant="body2" component="h5" style={{ 'color': 'grey' }}>
-                                                            Friend request received
+                                                            Follows you
                                                     </Typography>
                                                         <div style={{ display: 'flex' }}>
                                                             <Button style={{ textTransform: "none" }}
                                                                 onClick={() => this.onHandleFriendRequest(result.user_name, true)}
                                                             >
-                                                                Accept
+                                                                Follow back
                                                     </Button>
                                                             <Button style={{ textTransform: "none" }}
                                                                 onClick={() => this.onHandleFriendRequest(result.user_name, false)}

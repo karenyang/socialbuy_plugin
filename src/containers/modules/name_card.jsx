@@ -18,6 +18,8 @@ class NameCard extends Component {
             profile_img: "",
             is_self: this.props.is_self,
             ready_for_upload: false,
+            is_follows_me: false,
+            is_followed_by_me: false,
         }
         // this.uploadImage = null;
         console.log(this.state);
@@ -28,6 +30,8 @@ class NameCard extends Component {
         this.setState({
             user_name: data.user_name,
             profile_img: data.profile_img,
+            is_followed_by_me: data.is_followed_by_me,
+            is_follows_me: data.is_followes_me,
         })
         console.log("updated self: ", this.state);
     }
@@ -123,9 +127,14 @@ class NameCard extends Component {
                 <Typography variant="body1" component="h5" style={{ width: 200 }}>
                     {this.state.user_name}
                 </Typography>
-                { !this.state.is_self &&
+                { !this.state.is_self && this.state.is_followed_by_me && 
+                    <Button onClick={this.props.onClickUnfollow} style={{ textTransform: "none", fontSize: 13, backgroundColor: "#EBEBEB", right: 10, position: "absolute" }} >
+                        Unfollow
+                    </Button>
+                }
+                { !this.state.is_self && this.state.is_follows_me && 
                     <Button onClick={this.props.onClickDeleteFriend} style={{ textTransform: "none", fontSize: 13, backgroundColor: "#EBEBEB", right: 10, position: "absolute" }} >
-                        Unfriend
+                        Block
                     </Button>
                 }
 

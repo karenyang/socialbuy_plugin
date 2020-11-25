@@ -289,6 +289,7 @@ app.post('/deletefriend/:user_id', function (request, response) {
                         friend.save();
                     }
 
+
                     const idx2 = user.friends_list.indexOf(ObjectID(friend_id));
                     if (idx2 === -1) {
                         console.error('friend with id:' + friend_id + " not found in the user's friend list");
@@ -301,7 +302,87 @@ app.post('/deletefriend/:user_id', function (request, response) {
                     }
 
 
+                    const idx3 = friend.friend_requests_list.indexOf(ObjectID(user._id));
+                    if (idx3 === -1) {
+                        console.error('user with id:' + user._id + " not found in the tobe deletetd friends's friend_requests_list");
+
+                    }
+                    else {
+                        friend.friend_requests_list.splice(idx3, 1);
+                        friend.save();
+                    }
+
+                    const idx4 = user.friend_requests_list.indexOf(ObjectID(friend_id));
+                    if (idx4 === -1) {
+                        console.error('friend with id:' + user._id + " not found in the to user's friend_requests_list");
+                        
+                    }
+                    else {
+                        user.friend_requests_list.splice(idx4, 1);
+                        user.save();
+                    }
+
                     console.log("Delete friendship reqeust between ", user.user_name, " and ", friend.user_name);
+                    response.status(200).send("success");
+                    return;
+                }
+
+            });
+
+        });
+    }
+});
+
+app.post('/unfollowfriend/:user_id', function (request, response) {
+    console.log('server receives POST request /unfollowfriend ', request.body, request.params);
+    const friend_id = request.body.friend_id;
+    let user_id = request.params.user_id;
+    if (user_id) {
+        console.log('request.session.user_id: ', user_id);
+        User.findOne({
+            _id: user_id,
+        }, function (err, user) {
+            if (err) {
+                console.error(err);
+            }
+            if (user === null) {
+                console.log("could not find user", user_id)
+                response.status(421).send('User with id:' + user_id + ' not found.');
+                return;
+            }
+            User.findOne({
+                _id: friend_id,
+            }, function (err, friend) {
+                if (friend === null) {
+                    console.log("could not find friend_id", friend_id)
+
+                    response.status(421).send('Friend with id:' + friend_id + ' not found.');
+                    return;
+                }
+                else {
+                   
+                    const idx2 = user.friends_list.indexOf(ObjectID(friend_id));
+                    if (idx2 === -1) {
+                        console.error('friend with id:' + friend_id + " not found in the user's friend list");
+                        // response.status(421).send('User not found.');
+                        // return;
+                    }
+                    else {
+                        user.friends_list.splice(idx2, 1);
+                        user.save();
+                    }
+
+                    const idx4 = user.friend_requests_list.indexOf(ObjectID(friend_id));
+                    if (idx4 === -1) {
+                        console.error('friend with id:' + user._id + " not found in the user's friend_requests_list");
+                        
+                    }
+                    else {
+                        user.friend_requests_list.splice(idx4, 1);
+                        user.save();
+                    }
+
+                    console.log( user.user_name + "Unfollowed friend ", friend.user_name);
                     response.status(200).send("success");
                     return;
                 }
@@ -344,14 +425,23 @@ app.post('/respondfriendrequest/:user_id', function (request, response) {
                     console.log("Will respondfriendrequest a friend: ", friend_username, is_accept_friend);
                     if (is_accept_friend) { //both add
                         user.friends_list.push(ObjectID(friend._id));
-                        friend.friends_list.push(ObjectID(user._id));
+                        // friend.friends_list.push(ObjectID(user._id)); //in follower mode, this should already be added.
+                    }
+                    else{
+                        // if i do not accept, blocks this person from following me
+                        const idx1 = friend.friends_list.indexOf(user._id);
+                        if (idx1 === -1) {
+                            console.error('user with id:' + user._id + "not found in the sender's friend list");
+                        }
+                        else {
+                            friend.friends_list.splice(idx1, 1);
+                        }
+
                     }
                     // remove from friend's friend_requests_list no matter whether accepts or not 
                     const idx = friend.friend_requests_list.indexOf(user._id);
                     if (idx === -1) {
                         console.error('user with id:' + user._id + "not found in the sender's friend request list");
-                        response.status(421).send('User not found.');
-                        return;
                     }
                     else {
                         friend.friend_requests_list.splice(idx, 1);
@@ -398,7 +488,7 @@ app.post('/requestfriend/:user_id', function (request, response) {
                 }
                 else {
                     console.log("Will send a request for friend: ", friend_username);
-                    user.friends_list.push(ObjectID(friend._id)); // One line change from frind -> Follower model!!! 
+                    user.friends_list.push(ObjectID(friend._id)); // One line change from friend -> Follower model!!! 
                     user.friend_requests_list.push(ObjectID(friend._id));
                     user.save();
                     console.log("requested a friend: ", user.friends_list);
@@ -1024,32 +1114,45 @@ app.post('/add_bought_products/:user_id', function (request, response) {
 });
 
 
-app.get('/userinfo/:user_id', function (request, response) {
-    console.log('server receives GET request /user_info ');
+app.get('/userinfo/:user_id/:friend_id', function (request, response) {
+    console.log('server receives GET request /user_info ', request.params);
     let user_id = request.params.user_id;
+    let friend_id = request.params.friend_id;
+
     User.findOne({
         _id: user_id,
     }, function (err, user) {
         if (err) {
             console.error(err);
             response.status(422).send(err);
+        }
+        User.findOne({
+            _id: friend_id,
+        }, function (err, friend) {
+            if (err) {
+                console.error(err);
+                response.status(422).send(err);
+            }
+            if (user === null) {
+                console.error('User with id:' + user_id + ' not found.');
+                response.status(421).send('User not found.');
+                return;
+            }
+            // console.log("products: ", products);
+            let output = {
+                user_id: friend_id,
+                email: friend.email,
+                user_name: friend.user_name,
+                profile_img: friend.profile_img,
+                is_follows_me: friend.friends_list.includes(user_id),
+                is_followed_by_me: user.friends_list.includes(friend_id),
+            };
+            console.log("get /user_info: ", output);
+            response.status(200).send(JSON.stringify(output));
+        });
+    }
+    )
 
-        }
-        if (user === null) {
-            console.error('User with id:' + user_id + ' not found.');
-            response.status(421).send('User not found.');
-            return;
-        }
-        // console.log("products: ", products);
-        let output = {
-            user_id: user_id,
-            email: user.email,
-            user_name: user.user_name,
-            profile_img: user.profile_img,
-        };
-        console.log("get /user_info: ", output);
-        response.status(200).send(JSON.stringify(output));
-    });
 });
 
 app.post('/userinfo/:user_id', function (request, response) {
@@ -1192,9 +1295,7 @@ app.post('/admin/fblogin', function (request, response) {
 
     });
     return;
-
 });
-
 
 
 // logout

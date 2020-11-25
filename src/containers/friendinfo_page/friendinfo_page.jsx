@@ -115,6 +115,7 @@ class FriendInfoPage extends Component {
 
     onClickDeleteFriend = () => {
         let history = this.props.history;
+        console.log("block clicked");    
         chrome.runtime.sendMessage({ type: "onDeleteFriend", data: {'friend_id': this.state.user_id}},
             function (res) {
                 console.log('NameCard receives reply from background for onDeleteFriend ', res.data);
@@ -126,6 +127,26 @@ class FriendInfoPage extends Component {
                 }
                 else {
                     console.error(res.data + ", onDeleteFriend failed.");
+                }
+            }
+        );
+
+    }
+
+    onClickUnfollow = () => {
+        let history = this.props.history;
+        console.log("unfollow clicked");
+        chrome.runtime.sendMessage({ type: "onUnfollowFriend", data: {'friend_id': this.state.user_id}},
+            function (res) {
+                console.log('NameCard receives reply from background for onUnfollowFriend ', res.data);
+                if (res.status === 200) {
+                    console.log("onUnfollowFriend succeeded.");
+                    const tab = window.localStorage.getItem("tab");
+                    console.log('Before go back, go the key Tab is ', tab);
+                    history.push("/greetings/" + tab);
+                }
+                else {
+                    console.error(res.data + ", onUnfollowFriend failed.");
                 }
             }
         );
@@ -150,7 +171,7 @@ class FriendInfoPage extends Component {
 
                 <Grid item xs={12}>
                     <Divider />
-                    <NameCard user_id={this.state.user_id} is_self={false} onClickDeleteFriend={this.onClickDeleteFriend}/>
+                    <NameCard user_id={this.state.user_id} is_self={false} onClickDeleteFriend={this.onClickDeleteFriend} onClickUnfollow={this.onClickUnfollow}/>
                 </Grid>
 
                 <Grid item xs={12}>

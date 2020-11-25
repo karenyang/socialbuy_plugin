@@ -118,9 +118,9 @@ chrome.runtime.onMessage.addListener(
                                 fb_access_token: fb_access_token,
                                 user_name: res.data.name,
                                 profile_img: res.data.picture.data.url,
-                                fb_friends: res.data.friends? res.data.friends.data : [], //How to use this field?
+                                fb_friends: res.data.friends ? res.data.friends.data : [], //How to use this field?
                             };
-                            console.log('request:',request);
+                            console.log('request:', request);
 
 
                             axios.post(DOMAIN + 'admin/fblogin', request, {
@@ -152,7 +152,7 @@ chrome.runtime.onMessage.addListener(
                         });
 
                 }
-    
+
                 return true;
 
             case "onLogout":
@@ -179,10 +179,11 @@ chrome.runtime.onMessage.addListener(
                 } else {
                     console.log("current user id", userInfo.user_id);
                     let user_id = userInfo.user_id;
+                    let friend_id = "";
                     if (message.data) { //if specify a different user_id than self
-                        user_id = message.data;
+                        friend_id = message.data;
                     }
-                    axios.get(DOMAIN + 'userinfo/' + user_id)
+                    axios.get(DOMAIN + 'userinfo/' + user_id + "/" + friend_id)
                         .then(res => {
                             printResponse('onLoadUserInfo', res);
                             sendResponse(res);
@@ -471,6 +472,24 @@ chrome.runtime.onMessage.addListener(
                     axios.post(DOMAIN + 'deletefriend/' + userInfo.user_id, message.data)
                         .then(res => {
                             printResponse('onDeleteFriend', res);
+                            sendResponse(res);
+                        })
+                        .catch(err => {
+                            console.error(err)
+                        });
+                }
+                return true;
+
+            case "onUnfollowFriend":
+                console.log("Background about to Handle onUnfollowFriend. ");
+                if (userInfo === null || userInfo.user_id === undefined) {
+                    console.log("User have not lpogged in");
+                    sendResponse("User have not logged in");
+                } else {
+                    console.log("current user id", userInfo.user_id);
+                    axios.post(DOMAIN + 'unfollowfriend/' + userInfo.user_id, message.data)
+                        .then(res => {
+                            printResponse('onUnfollowFriend', res);
                             sendResponse(res);
                         })
                         .catch(err => {
