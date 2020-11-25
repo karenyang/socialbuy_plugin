@@ -1121,6 +1121,81 @@ app.post('/admin/login', function (request, response) {
 
 });
 
+app.post('/admin/fblogin', function (request, response) {
+    console.log('server receives POST request /admin/fblogin : ', request.body);
+    const fb_id = request.body.fb_id; //unique id form Facebook 
+
+    User.findOne({
+        fb_id: fb_id
+    }, function (err, user) {
+        if (err) {
+            response.status(500).send(JSON.stringify(err));
+            return;
+        }
+        if (user === null) {
+            // create an account in database
+            const newUser = request.body; //email, name, fb_id, fb_access_token, friends
+            console.log("about to create new user: ", newUser);
+            User.create(newUser,
+                function (err, userObj) {
+                    if (err) {
+                        response.status(500).send(JSON.stringify(err));
+                        return;
+                    }
+                    console.log("new userObj created, ", userObj);
+                    if (userObj.email !== "kaiyuany03@gmail.com") {
+                        User.findOne({
+                            "email": "kaiyuany03@gmail.com"
+                        },
+                            function (err, karen) {
+                                if (err) {
+                                    console.err("Error adding friends with karen");
+                                }
+                                if (karen !== null) {
+                                    karen.friends_list.push(userObj._id);
+                                    userObj.friends_list.push(karen._id);
+                                    karen.save();
+                                    userObj.save();
+                                    console.log("Added friends with Karen");
+                                }
+                                request.session.user_id = userObj._id;
+                                request.session.user_name = userObj.user_name;
+                                request.session.email = userObj.email;
+
+                                let output = {
+                                    user_id: userObj._id,
+                                    user_name: userObj.user_name,
+                                    email: userObj.email,
+                                    received_friend_requests: [],
+                                };
+                                response.status(200).send(JSON.stringify(output));
+                                return;
+                            }
+                        )
+                    }
+                })
+        }
+        else {
+            console.log("found user: ", user);
+            request.session.user_id = user._id;
+            request.session.user_name = user.user_name;
+            request.session.email = user.email;
+
+            let output = {
+                user_id: user._id,
+                user_name: user.user_name,
+                email: user.email,
+                received_friend_requests: user.received_friend_requests,
+            };
+            response.status(200).send(JSON.stringify(output));
+        }
+
+    });
+    return;
+
+});
+
+
 
 // logout
 app.post('/admin/logout', function (request, response) {

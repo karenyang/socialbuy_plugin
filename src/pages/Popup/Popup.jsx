@@ -79,7 +79,7 @@ class Popup extends React.Component {
                                 render={(props) => <Greetings {...props} email={this.state.email} user_name={this.state.user_name} user_id={this.state.user_id} />}
                             />
                             <Route path="/admin/register"
-                                render={(props) => <Register {...props} />}
+                                render={(props) => <Register {...props} onLoggedIn={this.onLoggedIn}/>}
                             />
                             <Route path="/admin/login"
                                 render={(props) => <Login {...props} onLoggedIn={this.onLoggedIn} />}

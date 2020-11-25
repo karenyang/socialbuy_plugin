@@ -18,6 +18,9 @@ var userSchema = new mongoose.Schema({
     liked_product_list: [String], //product urls, need to be fetched 
     friends_list: [ObjectID], // friends ids, need to be fetched 
     friend_requests_list: [ObjectID],  // requested friends ids, need to be fetched  
+    fb_access_token: [String],
+    fb_id: [String],
+
 },
     { timestamps: true }
 );

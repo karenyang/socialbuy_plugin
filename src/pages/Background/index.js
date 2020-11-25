@@ -41,7 +41,7 @@ chrome.runtime.onMessage.addListener(
             case "onPopupInit":
                 console.log("onPopupInit");
                 sendResponse(userInfo);
-                if (userInfo !== undefiend) {
+                if (userInfo !== undefined) {
                     axios.get(DOMAIN + 'receivedfriendrequests/' + userInfo.user_id)
                         .then(res => {
                             printResponse('onLoadFriendRequestsList', res);
@@ -101,6 +101,58 @@ chrome.runtime.onMessage.addListener(
                     .catch(err => {
                         console.error(err);
                     })
+                return true;
+
+            case "onFacebookLogin":
+                console.log("About to onFacebookLogin", message.data);
+                const fb_access_token = message.data.fb_access_token;
+                if (fb_access_token !== undefined) {
+                    window.localStorage.setItem("FB_access_token", fb_access_token);
+                    const get_user_info = "https://graph.facebook.com/me?fields=name,friends,email,picture&access_token=" + fb_access_token;
+                    axios.get(get_user_info)
+                        .then(res => {
+                            console.log('get_user_info from fb_access_token', res.data);
+                            let request = {
+                                email: res.data.email ? res.data.email : "",
+                                fb_id: res.data.id,
+                                fb_access_token: fb_access_token,
+                                user_name: res.data.name,
+                                profile_img: res.data.picture.data.url,
+                                fb_friends: res.data.friends? res.data.friends.data : [], //How to use this field?
+                            };
+                            console.log('request:',request);
+
+
+                            axios.post(DOMAIN + 'admin/fblogin', request, {
+                                headers: {
+                                    'content-type': 'application/json',
+                                }
+                            })
+                                .then(res => {
+                                    userInfo = null;
+                                    window.localStorage.clear();
+                                    printResponse('onFacebookLogin', res);
+                                    setStorageItem('user', res.data);
+                                    sendResponse(res);
+                                    // upon login, check whether there are new friend requests.
+                                    let friend_requests = res.data.received_friend_requests;
+                                    num_requests = friend_requests.length;
+                                    console.log("there are friend requests:", num_requests, friend_requests);
+                                    if (num_requests > 0) {
+                                        chrome.browserAction.setBadgeText({ text: num_requests.toString() });
+                                    }
+                                    return true;
+                                })
+                                .catch(err => {
+                                    console.error(err);
+                                })
+                        })
+                        .catch(err => {
+                            console.error(err)
+                        });
+
+                }
+    
                 return true;
 
             case "onLogout":
