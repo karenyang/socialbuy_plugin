@@ -30,6 +30,8 @@
         "*://*.google.com",
         "tabs",
         "storage",
-        "identity"
+        "identity",
+        "https://www.facebook.com/",
+        "https://graph.facebook.com/"
     ]
 }
