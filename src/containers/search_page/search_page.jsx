@@ -72,7 +72,7 @@ class SearchPage extends Component {
             )
         }
 
-        if (stored_search_category && stored_search_input && stored_search_input !== "") {
+        if (stored_search_category && stored_search_input) {
             console.log('Searching for: ', stored_search_input);
             const updateSearchResult = this.updateSearchResult;
             let query = {
@@ -123,7 +123,7 @@ class SearchPage extends Component {
 
     handleSearch = (event) => {
         const updateSearchResult = this.updateSearchResult;
-        if (event.key === 'Enter') {
+        if (event.key === 'Enter' && this.state.search_input.length > 0) {
             console.log('Searching for: ', event.target.value);
             this.setState({
                 is_no_result: false,
@@ -140,18 +140,29 @@ class SearchPage extends Component {
                 }
             );
         }
-        // else if (event.key === 'Enter' && event.target.value === "") {
-        //     this.setState({
-        //         is_no_result: false,
-        //         search_results: [],
-        //     });
-        // }
+        else if (event.key !== 'Enter' && this.state.search_input === ""){
+            console.log('Discover friends');
+            this.setState({
+                is_no_result: false,
+            });
+            let query = {
+                search_category: this.state.search_category,
+                search_key: "",
+            }
+            chrome.runtime.sendMessage({ type: "onHandleSearch", data: query },
+                function (res) {
+                    console.log('SearchPage receives reply from background for onHandleSearch ', res.data);
+                    updateSearchResult(res);
+                }
+            );
+
+        }
     }
 
     onRequestFriend = (name) => {
         console.log("onRequestFriend: ", name);
         let friend_requests = this.state.search_results;
-        friend_requests.map(r => { if (r.user_name === name) { r.is_sent_friend_reqeust = true } });
+        friend_requests.map(r => { if (r.user_name === name) { r.is_followed_by_me = true } });
         this.setState({
             search_results: friend_requests,
         })
@@ -168,8 +179,8 @@ class SearchPage extends Component {
         let friend_requests = this.state.search_results;
         friend_requests.map(r => {
             if (r.user_name === name) {
-                r.is_friend = is_accept_friend;
-                r.is_received_friend_reqeust = false;
+                r.is_follows_me = is_accept_friend;
+                r.is_followed_by_me = is_accept_friend;
             }
         });
         this.setState({
@@ -186,6 +197,7 @@ class SearchPage extends Component {
         this.setState({
             search_results: [],
             search_category: value,
+            is_no_result: false,
         })
     };
 
@@ -227,7 +239,12 @@ class SearchPage extends Component {
                         <Tab label="User" aria-label="user" value="user" style={{ textTransform: "none", fontSize: 12 }} />
                         <Tab label="Product" aria-label="product" value="product" style={{ textTransform: "none", fontSize: 12 }} />
                     </Tabs>
-
+                    {this.state.search_input === "" && this.state.search_results.length == 0 && this.state.search_category === "user" &&
+                        <Button  style={{textTransform: "none", padding: 8, fontSize: 16, color: "#3366FF", marginTop: 50, padding: 10 }}
+                        onClick={this.handleSearch}>
+                            Discover Users
+                        </Button>
+                    }
                     {this.state.is_no_result &&
                         (
                             <Typography gutterBottom variant="body2" component="h5">
@@ -248,6 +265,7 @@ class SearchPage extends Component {
                     {this.state.search_results !== [] && this.state.search_category === "user" &&
                         <Paper style={{ maxHeight: 450, width: 400, marginTop: 5, overflow: 'auto' }}>
                             {
+
                                 this.state.search_results.map((result) => (
 
                                     <Card key={result.user_name} style={{ width: 400, marginTop: 5 }}>
@@ -272,7 +290,7 @@ class SearchPage extends Component {
                                             </Grid>
 
                                             <Grid item xs={6} >
-                                                {!result.is_friend && !result.is_self && !result.is_received_friend_reqeust && !result.is_sent_friend_reqeust &&
+                                                {!result.is_self && !result.is_followed_by_me && !result.is_follows_me &&
                                                     <CardActions style={{ justifyContent: "center" }}>
                                                         <Button variant="contained" color="primary" style={{ textTransform: "none" }}
                                                             onClick={() => this.onRequestFriend(result.user_name)}
@@ -281,43 +299,44 @@ class SearchPage extends Component {
                                                     </Button>
                                                     </CardActions>
                                                 }
-                                                {result.is_friend && !result.is_self && !result.is_sent_friend_reqeust && !result.is_received_friend_reqeust &&
+                                                {!result.is_self && result.is_followed_by_me && result.is_follows_me &&
                                                     <CardContent >
                                                         <Typography variant="body2" component="h5" style={{ 'color': 'grey' }}>
                                                             Mutually followed
                                                     </Typography>
                                                     </CardContent>
                                                 }
-                                                {result.is_self && !result.is_friend &&
+                                                {result.is_self &&
                                                     <CardContent >
                                                         <Typography variant="body2" component="h5" style={{ 'color': 'grey' }}>
                                                             Me
                                                     </Typography>
                                                     </CardContent>
                                                 }
-                                                {result.is_sent_friend_reqeust &&
+                                                {!result.is_self && result.is_followed_by_me && !result.is_follows_me &&
                                                     <CardContent >
                                                         <Typography variant="body2" component="h5" style={{ 'color': 'grey' }}>
                                                             Followed
                                                     </Typography>
                                                     </CardContent>
                                                 }
-                                                {result.is_received_friend_reqeust &&
+                                                {!result.is_self && !result.is_followed_by_me && result.is_follows_me &&
                                                     <CardActions>
-                                                        <Typography variant="body2" component="h5" style={{ 'color': 'grey' }}>
-                                                            Follows you
+                                                        <div style={{ display: 'flex', flexDirection: "column" }}>
+
+                                                            <Typography variant="body2" component="h5" style={{ 'color': 'grey' }}>
+                                                                Follows you
                                                     </Typography>
-                                                        <div style={{ display: 'flex' }}>
-                                                            <Button style={{ textTransform: "none" }}
-                                                                onClick={() => this.onHandleFriendRequest(result.user_name, true)}
-                                                            >
-                                                                Follow back
+                                                            <div style={{ display: 'flex' }}>
+                                                                <Button variant="contained" style={{ textTransform: "none", backgroundColor: "#3366FF", color: "white", padding: 8, margin: 3 }}
+                                                                    onClick={() => this.onHandleFriendRequest(result.user_name, true)} >
+                                                                    Follow back
+                                                                </Button>
+                                                                <Button variant="contained" style={{ textTransform: "none", backgroundColor: "#D3D3D3", padding: 2, margin: 3 }}
+                                                                    onClick={() => this.onHandleFriendRequest(result.user_name, false)} >
+                                                                    Deny
                                                     </Button>
-                                                            <Button style={{ textTransform: "none" }}
-                                                                onClick={() => this.onHandleFriendRequest(result.user_name, false)}
-                                                            >
-                                                                Deny
-                                                    </Button>
+                                                            </div>
                                                         </div>
                                                     </CardActions>
                                                 }

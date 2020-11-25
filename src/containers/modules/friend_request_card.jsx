@@ -53,7 +53,7 @@ class FriendRequestCard extends Component {
             <div key={friend._id}>
                 <Grid container spacing={0} style={{ display: 'flex', justifyContent: 'center', alignItems: "center" }}>
                     <Grid item xs={6}>
-                        <CardActionArea key={friend._id} component="a" href={"#/users/" + friend._id + "/2"} style={{ padding: 0, display:"flex", justifyContent:"space-around"}}>
+                        <CardActionArea key={friend._id} component="a" href={"#/users/" + friend._id + "/2"} style={{ padding: 0, display: "flex", justifyContent: "space-around" }}>
                             <Avatar className="avatar" alt={friend.user_name} src={friend.profile_img} onClick={() => this.onClickFriend(friend)} />
                             <Typography gutterBottom variant="body2" component="h5">
                                 {friend.user_name}
@@ -72,12 +72,12 @@ class FriendRequestCard extends Component {
                                     Just follows you
                                 </Typography>
 
-                                <div style={{ display: 'flex', flexDirection: "row", justifyContent: "space-around" , padding: 0}}>
-                                    <Button style={{ textTransform: "none", backgroundColor: "#3366FF", color: "white" }}
+                                <div style={{ display: 'flex', flexDirection: "row", justifyContent: "space-around", padding: 0 }}>
+                                    <Button variant="contained" style={{ textTransform: "none", backgroundColor: "#3366FF", color: "white", padding: 8, margin: 3 }}
                                         onClick={() => this.onHandleFriendRequest(friend.user_name, true)} >
                                         Follow back
                                     </Button>
-                                    <Button style={{ textTransform: "none", backgroundColor: "#D3D3D3" }}
+                                    <Button variant="contained" style={{ textTransform: "none", backgroundColor: "#D3D3D3", padding: 2, margin: 3 }}
                                         onClick={() => this.onHandleFriendRequest(friend.user_name, false)}>
                                         Deny
                                     </Button>
