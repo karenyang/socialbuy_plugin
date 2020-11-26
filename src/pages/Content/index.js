@@ -92,25 +92,25 @@ else if (url.includes('www.amazon.com/gp/buy/')) {
 
     
     // // ################ use this for testing in cart w/ actually buying ###################
-    // let products_checkout = document.querySelectorAll("#spc-orders > div > div > div.a-row.shipment > div > div > div > div> div > div > div.a-row > div > div > div.a-fixed-left-grid-col.item-details-right-column.a-col-right > div.a-row.breakword > span")
-    // let data = []
-    // if (products_checkout !== null && products_checkout !== []) {
-    //     let product_names = [];
-    //     product_names = Array.from(products_checkout).map((a) => a.innerText);
-    //     console.log("product_names: ", product_names);
+    let products_checkout = document.querySelectorAll("#spc-orders > div > div > div.a-row.shipment > div > div > div > div> div > div > div.a-row > div > div > div.a-fixed-left-grid-col.item-details-right-column.a-col-right > div.a-row.breakword > span")
+    let data = []
+    if (products_checkout !== null && products_checkout !== []) {
+        let product_names = [];
+        product_names = Array.from(products_checkout).map((a) => a.innerText);
+        console.log("product_names: ", product_names);
 
-    //     if (product_names.length > 0) {
-    //         for (let i = 0; i < soonWillBuyProducts.length; i++) {
-    //             for (let j = 0; j < product_names.length; j++) {
-    //                 if (product_names[j].includes(soonWillBuyProducts[i].product_title)) {
-    //                     data.push(soonWillBuyProducts[i]);
-    //                     console.log("Data added:", soonWillBuyProducts[i].product_title)
-    //                 }
-    //             }
-    //         }
-    //         setStorageItem("LastPurchase", data);
-    //     }
-    // }
+        if (product_names.length > 0) {
+            for (let i = 0; i < soonWillBuyProducts.length; i++) {
+                for (let j = 0; j < product_names.length; j++) {
+                    if (product_names[j].includes(soonWillBuyProducts[i].product_title)) {
+                        data.push(soonWillBuyProducts[i]);
+                        console.log("Data added:", soonWillBuyProducts[i].product_title)
+                    }
+                }
+            }
+            setStorageItem("LastPurchase", data);
+        }
+    }
     // if (data.length > 0) {
     //     ReactDOM.render(
     //         <ChoiceBox products={data} />,
@@ -193,6 +193,7 @@ function searchFromUrl() {
     let query = {
         search_key: key,
         search_category: category,
+        is_recommendation: true,
     }
     chrome.runtime.sendMessage({ type: "onHandleSearch", data: query },
         function (response) {

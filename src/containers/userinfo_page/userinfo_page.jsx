@@ -276,6 +276,17 @@ class UserInfoPage extends Component {
 
                         <Card style={{ width: 400, marginTop: 6, display: 'flex', justifyContent: 'center' }}>
                             <CardActions>
+                                <Button component="a" 
+                                href={"mailto:tastemaker.hi@gmail.com?subject=Report Bug in TasteMaker&body=" + 
+                                    encodeURIComponent("TasteMaker team: Thanks for telling us your exprience. Feel free to tell us the issues your found (with screenshots if applicable) or any suggestions. \n")}
+                                    style={{ textTransform: "none" }} >
+                                    Report Bug
+                                </Button>
+                            </CardActions>
+                        </Card>
+
+                        <Card style={{ width: 400, marginTop: 6, display: 'flex', justifyContent: 'center' }}>
+                            <CardActions>
                                 <Button onClick={this.props.onLogOut} style={{ textTransform: "none" }} >
                                     Log Out
                                 </Button>

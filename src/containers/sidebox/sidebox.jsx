@@ -66,6 +66,29 @@ class SideBox extends Component {
             show_product: true,
             product: product,
         });
+        const handleUpdate = this.handleUpdate;
+        chrome.runtime.sendMessage({ type: "onLoadUserLikedProductList" },
+            function (res) {
+                console.log('Userinfo Page receives reply from background for onLoadUserBoughtProductList ', res.data);
+                if (res === "User have not logged in") {
+                    console.log("User have not logged in");
+                    handleUpdate("logged_in", false);
+                }
+                else if (res.status === 200) {
+                    console.log("onLoadUserLikedProductList succeeded.");
+                    let match = res.data.liked_product_list.filter(p => p.product_link === product.product_link)
+                    if (match.length > 0) {
+                        console.log("This product is already in user's liked product list.")
+                        handleUpdate("added_product", true);
+                    }
+                    handleUpdate("logged_in", true);
+
+                }
+                else {
+                    console.error(res.data + ", onLoadUserLikedProductList failed.");
+                }
+            }
+        );
     }
 
     onMouseLeaveIcon = () => {

@@ -35,6 +35,9 @@ function fetchLikedProductInfo() {
         } else if (document.querySelector("#imgBlkFront") != null){
             img_element = document.querySelector("#imgBlkFront");
             item.product_imgurl = img_element.src;
+        } else{
+            img_element = document.getElementsByClassName('a-dynamic-image')[0];
+            item.product_imgurl = img_element.src;
         }
         
         console.log("product_imgurl:  ", item.product_imgurl);
