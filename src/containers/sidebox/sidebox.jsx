@@ -33,7 +33,17 @@ class SideBox extends Component {
     }
 
     componentDidMount = () => {
-        // Check Log In
+        // (function (i, s, o, g, r, a, m) {
+        //     i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+        //         (i[r].q = i[r].q || []).push(arguments)
+        //     }, i[r].l = 1 * new Date(); a = s.createElement(o),
+        //         m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+        // })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+        // ga('create', 'UA-184044017-1', 'auto');
+        // ga('set', 'checkProtocolTask', null);
+        // ga('send', 'pageview', "sidebox");
+        // console.log("sidebox tracked")
+
         const handleUpdate = this.handleUpdate;
         const curr_product = this.props.product;
         chrome.runtime.sendMessage({ type: "onLoadUserLikedProductList" },
@@ -60,12 +70,15 @@ class SideBox extends Component {
     }
 
     onMouseOverIcon = () => {
+
         let product = fetchLikedProductInfo();
         this.setState({
             transform: "translate(0px, 50px)",
             show_product: true,
             product: product,
         });
+        // ga('send', 'event', "SideBox", "Hover");
+        
         const handleUpdate = this.handleUpdate;
         chrome.runtime.sendMessage({ type: "onLoadUserLikedProductList" },
             function (res) {
@@ -104,6 +117,12 @@ class SideBox extends Component {
     }
 
     onClickAddCollection = () => {
+        if(this.state.added_product){
+            ga('send', 'event', "SideBox", "UnAddCollection", this.state.product.product_link);
+        }else{
+            ga('send', 'event', "SideBox", "AddCollection", this.state.product.product_link);
+        }
+
         console.log("mouse click. ");
         if (!this.state.added_product && this.state.product !== null) {
             chrome.runtime.sendMessage({ type: "onLikedProductsToBeAdded", data: this.state.product },

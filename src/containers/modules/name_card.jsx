@@ -62,6 +62,9 @@ class NameCard extends Component {
     }
 
     onUploadPhoto = async (e) => {
+        ga('send', 'event', "UserProfile", 'Photo', this.state.user_name);
+
+        
         if (this.state.is_self) {
             console.log("can update profile image --- TODO");
             e.preventDefault();

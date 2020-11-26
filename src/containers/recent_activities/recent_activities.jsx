@@ -79,7 +79,7 @@ class RecentActivitiesPage extends Component {
                     <Typography variant="h4" color="inherit" style={{ "fontSize": 16, "paddingTop": 5, "paddingBottom": 5 }}>
                         What's popular
                         </Typography>
-                    <Paper style={{ maxHeight: 450, width: 400, overflow: 'auto' }}>
+                    <Paper style={{ maxHeight: 420, width: 400, overflow: 'auto' }}>
                         {
                             this.state.friends_product_list.map((product) => (
                                 <OthersProductCard key={product._id} product={product}/>

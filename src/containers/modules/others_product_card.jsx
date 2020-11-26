@@ -27,6 +27,7 @@ class OthersProductCard extends Component {
     }
 
     onClickProduct(product) {
+        ga('send', 'event', "OthersProduct", "Click", product.product_link);
         console.log("product clicked.", product.product_title);
         chrome.runtime.sendMessage({ type: "onClickProduct", data: product.product_link },
             function (res) {

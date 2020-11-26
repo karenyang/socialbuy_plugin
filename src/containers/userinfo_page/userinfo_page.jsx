@@ -161,29 +161,29 @@ class UserInfoPage extends Component {
         );
     }
 
-    onClickCollectionShowBoughtButton = () => {
-        ga('send', 'event', "UIButton", 'Click', "CollectionShowBoughtButton");
+    onClickCollectionShowBought = () => {
+        ga('send', 'event', "Userinfo_UIButton", 'Click', "CollectionShowBought");
         this.setState({
             show_collection_bought: !this.state.show_collection_bought
         })
     }
 
     onShowClickCollectionLikedButton = () => {
-        ga('send', 'event', "UIButton", 'Click', "CollectionShowLiked");
+        ga('send', 'event', "Userinfo_UIButton", 'Click', "CollectionShowLiked");
         this.setState({
             show_collection_liked: !this.state.show_collection_liked
         })
     }
 
     onClickShowFriendsButton = () => {
-        ga('send', 'event', "UIButton", 'Click', "ShowFriends");
+        ga('send', 'event', "Userinfo_UIButton", 'Click', "ShowFriends");
         this.setState({
             show_friends: !this.state.show_friends
         })
     }
 
     onUpdateFriendRequestStatus = () => {
-        ga('send', 'event', "UIButton", 'Click', "FriendRequest");
+        ga('send', 'event', "Userinfo_UIButton", 'Click', "FriendRequest");
 
         this.props.onUpdateNumFriendRequests(this.state.num_friend_requests - 1);
         this.setState({
@@ -193,7 +193,7 @@ class UserInfoPage extends Component {
     }
 
     onClickApp() {
-        ga('send', 'event', "UIButton", 'Click', "AppHomePage");
+        ga('send', 'event', "Userinfo_UIButton", 'Click', "AppHomePage");
         console.log("onClickApp");
         chrome.runtime.sendMessage({ type: "onClickApp" },
             function (res) {
@@ -231,7 +231,7 @@ class UserInfoPage extends Component {
                     <Paper style={{ maxHeight: 420, width: 400, marginTop: 5, marginBottom: 5, overflowY: 'auto' }}>
                         <Card style={{ width: 400, display: 'flex', justifyContent: 'center' }}>
                             <CardActions>
-                                <Button onClick={this.onClickCollectionShowBoughtButton} style={{ textTransform: "none" }} >
+                                <Button onClick={this.onClickCollectionShowBought} style={{ textTransform: "none" }} >
                                     Your Collection - purchased
                                 </Button>
                             </CardActions>
@@ -240,7 +240,7 @@ class UserInfoPage extends Component {
                         <Collapse in={this.state.show_collection_bought}>
                             {
                                 this.state.bought_product_list.map((product) => (
-                                    <MyProductCard key={product._id + "_bought"} product={product} show_details={false} delete_func={this.onDeleteBoughtProduct} />
+                                    <MyProductCard key={product._id + "_bought"} product={product} is_bought={true} show_details={false} delete_func={this.onDeleteBoughtProduct} />
                                 ))
                             }
                         </Collapse>
@@ -256,7 +256,7 @@ class UserInfoPage extends Component {
                         <Collapse in={this.state.show_collection_liked}>
                             {
                                 this.state.liked_product_list.map((product) => (
-                                    <MyProductCard key={product._id + "_liked"} product={product} show_details={true} delete_func={this.onDeleteLikedProduct} />
+                                    <MyProductCard key={product._id + "_liked"} product={product} is_liked={true} show_details={true} delete_func={this.onDeleteLikedProduct} />
                                 ))
                             }
                         </Collapse>

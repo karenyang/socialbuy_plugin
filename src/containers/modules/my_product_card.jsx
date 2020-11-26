@@ -26,7 +26,6 @@ class MyProductCard extends Component {
             delete_func: this.props.delete_func,
             checked: true,
             close: false,
-            
         }
     }
 
@@ -43,7 +42,14 @@ class MyProductCard extends Component {
     }
 
     onDelete(product) {
-        ga('send', 'event', "ProductDelete", 'Click', product.product_link);
+        let category = "MyProductDelete";
+        if (this.props.is_liked) {
+            category = "MyLikedProductDelete";
+        } else if (this.props.is_bought) {
+            category = "MyBoughtProductDelete";
+        }
+        ga('send', 'event', category, 'Click', product.product_link);
+        
         console.log("delete product:")
         this.state.delete_func(product._id);
         this.setState(
@@ -59,7 +65,14 @@ class MyProductCard extends Component {
     }
 
     onClickProduct(product) {
-        ga('send', 'event', "Product", 'Click', product.product_link);
+        let category = "MyProduct";
+        if (this.props.is_liked) {
+            category = "MyLikedProduct";
+        } else if (this.props.is_bought) {
+            category = "MyBoughtProduct";
+        }
+        ga('send', 'event', category, 'Click', product.product_link);
+
         console.log("product clicked.", product.product_title);
         chrome.runtime.sendMessage({ type: "onClickProduct", data: product.product_link },
             function (res) {
@@ -160,6 +173,8 @@ MyProductCard.defaultProps = {
     show_details: false,
     delete_func: null,
     checkbox_func: null,
+    is_liked: false,
+    is_bought:false
 };
 
 

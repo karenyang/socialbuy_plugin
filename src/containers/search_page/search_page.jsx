@@ -148,7 +148,7 @@ class SearchPage extends Component {
             );
         }
         else if (event.key !== 'Enter' && this.state.search_input === ""){
-            ga('send', 'event', "UIButton", "Click", "DiscoverUsers");
+            ga('send', 'event', "Search_UIButton", "Click", "DiscoverUsers");
 
             console.log('Discover friends');
             this.setState({
@@ -195,7 +195,7 @@ class SearchPage extends Component {
     }
 
     onDiscoverProducts = () => {
-        ga('send', 'event', "UIButton", 'Click', "DiscoverProducts");
+        ga('send', 'event', "Search_UIButton", 'Click', "DiscoverProducts");
         const updateFriendsProductList = this.updateFriendsProductList;
         if (this.state.friends_product_list == 0){
             chrome.runtime.sendMessage({ type: "onLoadFriendsProductList" },
@@ -244,7 +244,7 @@ class SearchPage extends Component {
     }
 
     handleTabChange = (event, value) => {
-        ga('send', 'event', "UIButton", "Click", "SearchCatagoryChange");
+        ga('send', 'event', "Search_UIButton", "Click", "SearchCatagoryChange");
         this.setState({
             search_results: [],
             search_category: value,
@@ -311,7 +311,7 @@ class SearchPage extends Component {
                     }
 
                     {this.state.search_results !== [] && this.state.search_category === "product" &&
-                        <Paper style={{ maxHeight: 450, width: 400, margin: 0, marginTop: 5, overflow: 'auto' }}>
+                        <Paper style={{ maxHeight: 420, width: 400, margin: 0, marginTop: 5, overflow: 'auto' }}>
                             {
                                 this.state.search_results.map((product) => (
                                     <OthersProductCard key={product._id} product={product} />
@@ -320,7 +320,7 @@ class SearchPage extends Component {
                         </Paper>}
 
                     {this.state.search_results !== [] && this.state.search_category === "user" &&
-                        <Paper style={{ maxHeight: 450, width: 400, marginTop: 5, overflow: 'auto' }}>
+                        <Paper style={{ maxHeight: 420, width: 400, marginTop: 5, overflow: 'auto' }}>
                             {
 
                                 this.state.search_results.map((result) => (

@@ -36,6 +36,16 @@ class FriendInfoPage extends Component {
 
 
     componentDidMount = () => {
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date(); a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+        ga('create', 'UA-184044017-1', 'auto');
+        ga('set', 'checkProtocolTask', null);
+        ga('send', 'pageview', "friendinfo_page");
+
         const handleUpdate = this.handleUpdate;
 
         chrome.runtime.sendMessage({ type: "onLoadUserLikedProductList", data: this.state.user_id },
@@ -94,26 +104,32 @@ class FriendInfoPage extends Component {
     }
 
 
-    onClickCollectionShowBoughtButton = () => {
+    onClickCollectionShowBought = () => {
+        ga('send', 'event', "Friendinfo_UIButton", "Click", "CollectionShowBought");
         this.setState({
             show_collection_bought: !this.state.show_collection_bought
         })
     }
 
     onShowClickCollectionLikedButton = () => {
+        ga('send', 'event', "Friendinfo_UIButton", "Click", "CollectionShowLiked");
         this.setState({
             show_collection_liked: !this.state.show_collection_liked
         })
     }
 
-    onClickShowFriendsButton = () => {
-        this.setState({
-            show_friends: !this.state.show_friends
-        })
-    }
+    // onClickShowFriendsButton = () => {
+    //     ga('send', 'event', "Friendinfo_UIButton", 'Click', "ShowFriendsButton");
+    //     this.setState({
+    //         show_friends: !this.state.show_friends
+    //     })
+    // }
 
 
     onClickDeleteFriend = () => {
+        
+        ga('send', 'event', "Friend", "DeleteFriend", this.state.user_name);
+        
         let history = this.props.history;
         console.log("block clicked");    
         chrome.runtime.sendMessage({ type: "onDeleteFriend", data: {'friend_id': this.state.user_id}},
@@ -134,6 +150,8 @@ class FriendInfoPage extends Component {
     }
 
     onClickUnfollow = () => {
+        ga('send', 'event', "Friend", "Unfollow", this.state.user_name);
+
         let history = this.props.history;
         console.log("unfollow clicked");
         chrome.runtime.sendMessage({ type: "onUnfollowFriend", data: {'friend_id': this.state.user_id}},
@@ -175,10 +193,10 @@ class FriendInfoPage extends Component {
                 </Grid>
 
                 <Grid item xs={12}>
-                    <Paper style={{ maxHeight: 450, width: 400, marginLeft:10, overflowY: 'auto' }}>
+                    <Paper style={{ maxHeight: 420, width: 400, marginLeft:10, overflowY: 'auto' }}>
                         <Card style={{ width: 400, marginTop: 6, display: 'flex', justifyContent: 'center' }}>
                             <CardActions>
-                                <Button onClick={this.onClickCollectionShowBoughtButton} style={{ textTransform: "none" }} >
+                                <Button onClick={this.onClickCollectionShowBought} style={{ textTransform: "none" }} >
                                     Collection - purchased
                             </Button>
                             </CardActions>

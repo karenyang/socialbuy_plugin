@@ -120,7 +120,7 @@ class ChoiceBox extends Component {
                         <Paper style={{ maxHeight: 400, width: 380, overflowY: 'auto', overflowX: "hidden", margin: 0 }}>
                             {
                                 this.state.products.map((product) => (
-                                    <MyProductCard key={product.product_link} product={product} show_checkbox={true} checkbox_func={this.handleCheckBox} />
+                                    <MyProductCard key={product.product_link} product={product} is_bought={true} show_checkbox={true} checkbox_func={this.handleCheckBox} />
                                 ))
                             }
                         </Paper>
