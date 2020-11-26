@@ -5,6 +5,7 @@ import axios from "axios";
 
 console.log("Process ENV", process.env.NODE_ENV);
 const DOMAIN = process.env.NODE_ENV === "production" ? "http://ec2-54-153-92-137.us-west-1.compute.amazonaws.com:8080/" : "http://localhost:8080/";
+const TASTEMAKER_URL = "https://tastemaker.mailchimpsites.com/";
 console.log('DOMAIN: ', DOMAIN);
 let num_requests = 0;
 let userInfo = getStorageItem('user');
@@ -309,6 +310,11 @@ chrome.runtime.onMessage.addListener(
             case "onClickProduct":
                 console.log("Background about to open a new tab: ", message.data);
                 chrome.tabs.create({ url: message.data });
+                return true;
+            
+            case "onClickApp":
+                console.log("Background about to open app in a tab: ", TASTEMAKER_URL);
+                chrome.tabs.create({ url: TASTEMAKER_URL });
                 return true;
 
             case "onDeleteSelfBoughtProduct":

@@ -177,14 +177,29 @@ class UserInfoPage extends Component {
         console.log("userinfo updates friend request status: ", this.state.num_friend_requests);
     }
 
+    onClickApp(product) {
+        console.log("onClickApp");
+        chrome.runtime.sendMessage({ type: "onClickApp" },
+            function (res) {
+                console.log("Page opened for tastemaker app: ");
+            }
+        );
+    }
+
     render() {
         return (
             <Grid container spacing={0} alignItems="center" style={{ margin: 0, padding: 0 }}>
                 <Grid item xs={2}>
                     <img src={icon} alt="extension icon" width="25px" />
                 </Grid>
-                <Grid item xs={8}>
+                <Grid item xs={4}>
+                <Button onClick={this.onClickApp} style={{ textTransform: "none", textDecoration: "underline", fontSize:12 }} >
+                        About TasteMaker
+                </Button>
                 </Grid>
+                <Grid item xs={4}>
+                </Grid>
+
                 <Grid item xs={2}>
                     <IconButton onClick={() => { window.close(); }} >
                         <CloseIcon style={{ fontSize: 15 }} />
@@ -202,7 +217,7 @@ class UserInfoPage extends Component {
                             <CardActions>
                                 <Button onClick={this.onClickCollectionShowBoughtButton} style={{ textTransform: "none" }} >
                                     Your Collection - purchased
-                            </Button>
+                                </Button>
                             </CardActions>
                         </Card>
 
@@ -259,14 +274,15 @@ class UserInfoPage extends Component {
                             </div>
                         </Collapse>
 
-
                         <Card style={{ width: 400, marginTop: 6, display: 'flex', justifyContent: 'center' }}>
                             <CardActions>
                                 <Button onClick={this.props.onLogOut} style={{ textTransform: "none" }} >
                                     Log Out
-                            </Button>
+                                </Button>
                             </CardActions>
                         </Card>
+
+
                     </Paper>
 
                 </Grid>

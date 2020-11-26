@@ -87,7 +87,7 @@ class Register extends React.Component {
         const url = 'https://www.facebook.com/v9.0/dialog/oauth?' +
             'client_id=' + app_id +
             '&redirect_uri=' + redirect_uri +
-            '&scope=email,user_friends' +
+            '&scope=email' +
             '&response_type=token';
         console.log("url for FB login is: ", url);
         let history = this.props.history;
@@ -134,10 +134,10 @@ class Register extends React.Component {
             <div className="container" style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
                 <img src={icon} alt="icon" width="40" height="40" style={{ padding: 5, marginBottom: 60 }} />
 
-                <Button variant="contained" color="primary" onClick={this.onClickFBLogin} style={{ textTransform: "none", fontSize: 18, marginTop: 20, marginBottom: 30 }}>
+                {/* <Button variant="contained" color="primary" onClick={this.onClickFBLogin} style={{ textTransform: "none", fontSize: 18, marginTop: 20, marginBottom: 30 }}>
                     <FacebookIcon style={{ padding: 5 }} />
                             Continue with Facebook
-                </Button>
+                </Button> */}
 
                 <form onSubmit={this.handleRegister}>
                     <div style={{ margin: "10px" }}>

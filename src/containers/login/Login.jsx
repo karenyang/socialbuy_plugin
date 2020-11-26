@@ -67,12 +67,14 @@ class Login extends React.Component {
 
     onClickFBLogin = () => {
         const app_id = "189391966126165";
-        const redirect_uri = encodeURIComponent(chrome.identity.getRedirectURL("TasteMaker") + "/greetings");
+        // const redirect_uri = encodeURIComponent(chrome.identity.getRedirectURL("TasteMaker") + "/greetings");
+        const redirect_uri = encodeURIComponent("https://www.facebook.com/connect/login_success.html");
+
         console.log("redirect_uri is: ", redirect_uri);
         const url = 'https://www.facebook.com/v9.0/dialog/oauth?' +
             'client_id=' + app_id +
             '&redirect_uri=' + redirect_uri +
-            '&scope=email,user_friends' +
+            '&scope=email' +
             '&response_type=token';
         console.log("url for FB login is: ", url);
         let history = this.props.history;
@@ -119,10 +121,10 @@ class Login extends React.Component {
             <div className="container" style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
                 <img src={icon} alt="icon" width="40" height="40" style={{ padding: 5, marginBottom: 60 }} />
 
-                <Button variant="contained" color="primary" onClick={this.onClickFBLogin} style={{ textTransform: "none", fontSize: 18, marginTop: 20, marginBottom: 30}}>
+                {/* <Button variant="contained" color="primary" onClick={this.onClickFBLogin} style={{ textTransform: "none", fontSize: 18, marginTop: 20, marginBottom: 30}}>
                     <FacebookIcon style={{ padding: 5 }} />
                         Log in with Facebook
-                </Button>
+                </Button> */}
 
 
                 <form onSubmit={this.handleSubmit}>

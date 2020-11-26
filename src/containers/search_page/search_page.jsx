@@ -42,6 +42,7 @@ class SearchPage extends Component {
             search_results: [],
             search_category: "user",
             is_no_result: false,
+            friends_product_list: [],
         }
         console.log(this.state);
     }
@@ -174,6 +175,37 @@ class SearchPage extends Component {
         );
     }
 
+    updateFriendsProductList = (friends_product_list) => {
+        this.setState({
+            friends_product_list: friends_product_list,
+            search_results: friends_product_list,
+        });
+        console.log("State product list updated: ", this.state);
+
+    }
+
+    onDiscoverProducts = () => {
+        const updateFriendsProductList = this.updateFriendsProductList;
+        if (this.state.friends_product_list == 0){
+            chrome.runtime.sendMessage({ type: "onLoadFriendsProductList" },
+            function (res) {
+                console.log('Greetings receives reply from background for onLoadFriendsProductList ', res.data);
+                if (res.status === 200) {
+                    console.log("onLoadFriendsProductList succeeded.");
+                    updateFriendsProductList(res.data.friends_productlist);
+                }
+                else {
+                    console.error(res.data + ", onLoadFriendsProductList failed.");
+                }
+            });
+        }
+        else {
+            this.setState({
+                search_results: this.state.friends_product_list,
+            });
+        }
+    }
+
     onHandleFriendRequest = (name, is_accept_friend) => {
         console.log("onHandleFriendRequest: ", name);
         let friend_requests = this.state.search_results;
@@ -245,6 +277,12 @@ class SearchPage extends Component {
                             Discover Users
                         </Button>
                     }
+                    {this.state.search_input === "" && this.state.search_results.length == 0 && this.state.search_category === "product" &&
+                        <Button  style={{textTransform: "none", padding: 8, fontSize: 16, color: "#3366FF", marginTop: 50, padding: 10 }}
+                        onClick={this.onDiscoverProducts}>
+                            Discover Products
+                        </Button>
+                    }
                     {this.state.is_no_result &&
                         (
                             <Typography gutterBottom variant="body2" component="h5">
@@ -254,7 +292,7 @@ class SearchPage extends Component {
                     }
 
                     {this.state.search_results !== [] && this.state.search_category === "product" &&
-                        <Paper style={{ maxHeight: 540, width: 400, margin: 0, marginTop: 5, marginoverflow: 'auto' }}>
+                        <Paper style={{ maxHeight: 450, width: 400, margin: 0, marginTop: 5, overflow: 'auto' }}>
                             {
                                 this.state.search_results.map((product) => (
                                     <OthersProductCard key={product._id} product={product} />
