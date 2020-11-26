@@ -311,7 +311,7 @@ chrome.runtime.onMessage.addListener(
                 console.log("Background about to open a new tab: ", message.data);
                 chrome.tabs.create({ url: message.data });
                 return true;
-            
+
             case "onClickApp":
                 console.log("Background about to open app in a tab: ", TASTEMAKER_URL);
                 chrome.tabs.create({ url: TASTEMAKER_URL });
@@ -337,12 +337,16 @@ chrome.runtime.onMessage.addListener(
 
             case "onDeleteSelfLikedProduct":
                 console.log("Background about to Delete Self Liked Product: ", message.data);
+                let request = { "product_id": message.data };
+                if (message.data.includes("https://wwww")) {
+                    request = { "product_link": message.data };
+                }
                 if (userInfo === null || userInfo.user_id === undefined) {
                     console.log("User have not logged in");
                     sendResponse("User have not logged in");
                 } else {
                     console.log("current user id", userInfo.user_id);
-                    axios.post(DOMAIN + 'delete_liked_product/' + userInfo.user_id, { "product_id": message.data })
+                    axios.post(DOMAIN + 'delete_liked_product/' + userInfo.user_id, request)
                         .then(res => {
                             printResponse('onDeleteSelfLikedProduct', res);
                             sendResponse(res);

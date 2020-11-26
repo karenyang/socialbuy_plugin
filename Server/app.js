@@ -858,8 +858,6 @@ app.post('/delete_bought_product/:user_id', function (request, response) {
     if (user_id) {
         console.log('user_id: ', user_id);
         let product_id = request.body["product_id"];
-        console.log('product_id: ', request.body);
-
         User.findOne({
             _id: user_id,
         }, function (err, user) {
@@ -911,13 +909,10 @@ app.post('/delete_bought_product/:user_id', function (request, response) {
 });
 
 app.post('/delete_liked_product/:user_id', function (request, response) {
-    console.log('server receives POST request /delete_liked_product ');
+    console.log('server receives POST request /delete_liked_product '. request.body);
     let user_id = request.params.user_id;
     if (user_id) {
         console.log('user_id: ', user_id);
-        let product_id = request.body["product_id"];
-        console.log('product_id: ', request.body);
-
         User.findOne({
             _id: user_id,
         }, function (err, user) {
@@ -930,37 +925,77 @@ app.post('/delete_liked_product/:user_id', function (request, response) {
                 response.status(421).send('User not found.');
                 return;
             }
-            Product.findOne({
-                _id: product_id,
-            }, function (err, product) {
-                if (err) {
-                    console.error(err);
-                    response.status(422).send(err);
-                    return;
-                }
-                if (product === null) {
-                    console.error('Product with id:' + product_id + ' not found.');
-                    response.status(421).send('Product not found.');
-                    return;
-                }
-                const idx1 = user.liked_product_list.indexOf(product.product_link);
-                if (idx1 === -1) {
-                    console.error('Product with id:' + product_id + ' not found in user liked product list');
-                    response.status(421).send('Product not found in user liked product list');
-                    return;
-                }
-                user.liked_product_list.splice(idx1, 1);
-                user.save()
-                const idx2 = product.liker_list.indexOf(user._id);
-                if (idx2 === -1) {
-                    console.error('user with id:' + user._id + ' not found in  product liker list');
-                    response.status(421).send('User not found in product liker list');
-                    return;
-                }
-                product.liker_list.splice(idx2, 1);
-                product.save();
-                response.status(200).send('Success in deleting the liked product');
-            });
+            
+            if("product_id" in request.body){
+                let product_id = request.body["product_id"];
+                Product.findOne({
+                    _id: product_id,
+                }, function (err, product) {
+                    if (err) {
+                        console.error(err);
+                        response.status(422).send(err);
+                        return;
+                    }
+                    if (product === null) {
+                        console.error('Product with id:' + product_id + ' not found.');
+                        response.status(421).send('Product not found.');
+                        return;
+                    }
+                    const idx1 = user.liked_product_list.indexOf(product.product_link);
+                    if (idx1 === -1) {
+                        console.error('Product with id:' + product_id + ' not found in user liked product list');
+                        response.status(421).send('Product not found in user liked product list');
+                        return;
+                    }
+                    user.liked_product_list.splice(idx1, 1);
+                    user.save()
+                    const idx2 = product.liker_list.indexOf(user._id);
+                    if (idx2 === -1) {
+                        console.error('user with id:' + user._id + ' not found in  product liker list');
+                        response.status(421).send('User not found in product liker list');
+                        return;
+                    }
+                    product.liker_list.splice(idx2, 1);
+                    product.save();
+                    response.status(200).send('Success in deleting the liked product');
+                });
+            }
+            else if ("product_link" in request.body){
+                let product_link = request.body["product_link"];
+
+                Product.findOne({
+                    product_link: product_link,
+                }, function (err, product) {
+                    if (err) {
+                        console.error(err);
+                        response.status(422).send(err);
+                        return;
+                    }
+                    if (product === null) {
+                        console.error('Product with id:' + product_id + ' not found.');
+                        response.status(421).send('Product not found.');
+                        return;
+                    }
+                    const idx1 = user.liked_product_list.indexOf(product.product_link);
+                    if (idx1 === -1) {
+                        console.error('Product with id:' + product_id + ' not found in user liked product list');
+                        response.status(421).send('Product not found in user liked product list');
+                        return;
+                    }
+                    user.liked_product_list.splice(idx1, 1);
+                    user.save()
+                    const idx2 = product.liker_list.indexOf(user._id);
+                    if (idx2 === -1) {
+                        console.error('user with id:' + user._id + ' not found in  product liker list');
+                        response.status(421).send('User not found in product liker list');
+                        return;
+                    }
+                    product.liker_list.splice(idx2, 1);
+                    product.save();
+                    response.status(200).send('Success in deleting the liked product');
+                });
+            }
+            
         });
     } else {
         response.status(400).send('Not logged in yet.');

@@ -117,8 +117,21 @@ class SideBox extends Component {
                 }
             );
         }
+        else if (this.state.added_product && this.state.product !== null) {
+            chrome.runtime.sendMessage({ type: "onDeleteSelfLikedProduct", data: this.state.product.product_link },
+            function (res) {
+                console.log('this is the response from the background page for onDeleteSelfLikedProduct', res.data);
+                if (res.status === 200) {
+                    console.log("onDeleteSelfLikedProduct succeeded.");
+                }
+                else {
+                    console.error(res.data + ", onDeleteSelfLikedProduct failed.");
+                }
+            }
+        );
+        }
         this.setState({
-            added_product: true,
+            added_product: !this.state.added_product,
         });
 
     }
