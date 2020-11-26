@@ -599,9 +599,9 @@ app.post('/search/:user_id', function (request, response) {
                             liked_friends_id_list: { $setIntersection: ['$liker_list', user_list] }
                         }
                     },
-                    // {
-                    //     $match: { score: { $gt: 6.0 } }
-                    // },
+                    {
+                        $match: { score: { $gt: 6.3 } }
+                    },
                     { $sort: { score: { $meta: "textScore" } } },
 
                 ]).exec();
