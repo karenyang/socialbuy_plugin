@@ -14,7 +14,7 @@ var url = window.location.href;
 console.log('Current URL: ', url);
 
 
-if (url.includes('amazon.com/gp/cart')) {
+if (url.includes('www.amazon.com/gp/cart')) {
     if (document.getElementsByName("proceedToRetailCheckout") !== null) {
         console.log("Grabbing all products in cart...");
         let domain = "www.amazon.com";
@@ -68,12 +68,12 @@ if (url.includes('amazon.com/gp/cart')) {
 
 }
 
-else if (url.includes('amazon.com/s?k=')) {
+else if (url.includes('www.amazon.com/s?k=')) {
     console.log("Searching from URL  .....");
     searchFromUrl();
 }
 
-else if (url.includes('amazon.com/gp/buy/thankyou/')) {
+else if (url.includes('www.amazon.com/gp/buy/thankyou/')) {
     console.log("thank you for last purchase", getStorageItem("LastPurchase"));
     let last_purchase_products = getStorageItem("LastPurchase");
     if (last_purchase_products.length > 0) {
@@ -84,7 +84,7 @@ else if (url.includes('amazon.com/gp/buy/thankyou/')) {
     }
 }
 
-else if (url.includes('amazon.com/gp/buy/')) {
+else if (url.includes('www.amazon.com/gp/buy/')) {
     let buy_button = document.querySelector("#submitOrderButtonId > span > input");
     let buy_button_bottom = document.querySelector("#bottomSubmitOrderButtonId > span > input");
     let soonWillBuyProducts = getStorageItem("soonWillBuyProducts")
@@ -150,7 +150,7 @@ else if (url.includes('amazon.com/gp/buy/')) {
 
 
 }
-else if (url.includes('amazon.com/') && !url.includes('amazon.com/gp/huc') && !url.includes('amazon.com/gp/css') && !url.includes('amazon.com/gp/yourstore')) { //on a product page: Creating the side box
+else if (url.includes('www.amazon.com/') && !url.includes('amazon.com/gp/huc') && !url.includes('amazon.com/gp/css') && !url.includes('amazon.com/gp/yourstore')) { //on a product page: Creating the side box
     console.log("Adding side box .....");
     
     ReactDOM.render(

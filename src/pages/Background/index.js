@@ -108,7 +108,7 @@ chrome.runtime.onMessage.addListener(
                 const fb_access_token = message.data.fb_access_token;
                 if (fb_access_token !== undefined) {
                     window.localStorage.setItem("FB_access_token", fb_access_token);
-                    const get_user_info = "https://graph.facebook.com/me?fields=name,friends,email,picture&access_token=" + fb_access_token;
+                    const get_user_info = "https://graph.facebook.com/me?fields=name,email,picture&access_token=" + fb_access_token;
                     axios.get(get_user_info)
                         .then(res => {
                             console.log('get_user_info from fb_access_token', res.data);
@@ -118,7 +118,6 @@ chrome.runtime.onMessage.addListener(
                                 fb_access_token: fb_access_token,
                                 user_name: res.data.name,
                                 profile_img: res.data.picture.data.url,
-                                fb_friends: res.data.friends ? res.data.friends.data : [], //How to use this field?
                             };
                             console.log('request:', request);
 
