@@ -22,6 +22,7 @@ class RecommendationBox extends Component {
         }
     }
 
+
     onClickProduct(product) {
         console.log("product clicked.", product.product_title);
         chrome.runtime.sendMessage({ type: "onClickProduct", data: product.product_link },

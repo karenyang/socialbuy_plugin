@@ -42,9 +42,10 @@ class MyProductCard extends Component {
         }
     }
 
-    onDelete(product_id) {
+    onDelete(product) {
+        ga('send', 'event', "ProductDelete", 'Click', product.product_link);
         console.log("delete product:")
-        this.state.delete_func(product_id);
+        this.state.delete_func(product._id);
         this.setState(
             {
                 close: true,
@@ -58,6 +59,7 @@ class MyProductCard extends Component {
     }
 
     onClickProduct(product) {
+        ga('send', 'event', "Product", 'Click', product.product_link);
         console.log("product clicked.", product.product_title);
         chrome.runtime.sendMessage({ type: "onClickProduct", data: product.product_link },
             function (res) {
@@ -121,7 +123,7 @@ class MyProductCard extends Component {
                             <CardActions>
                                 <IconButton
                                     style={{ padding: 0, height: 18, width: 18 }}
-                                    onClick={() => this.onDelete(product._id)}
+                                    onClick={() => this.onDelete(product)}
                                 >
                                     <DeleteIcon style={{ fontSize: 15 }} />
                                 </IconButton>

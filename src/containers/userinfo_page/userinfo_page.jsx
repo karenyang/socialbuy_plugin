@@ -54,6 +54,16 @@ class UserInfoPage extends Component {
 
 
     componentDidMount = () => {
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date(); a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+        ga('create', 'UA-184044017-1', 'auto');
+        ga('set', 'checkProtocolTask', null);
+        ga('send', 'pageview', "userinfo_page");
+
         const handleUpdate = this.handleUpdate;
         chrome.runtime.sendMessage({ type: "onLoadUserBoughtProductList" },
             function (res) {
@@ -138,7 +148,7 @@ class UserInfoPage extends Component {
         this.setState({
             liked_product_list: new_liked_product_list,
         });
-        chrome.runtime.sendMessage({ type: "onDeleteSelfLikedProduct", data: {"product_id": product_id} },
+        chrome.runtime.sendMessage({ type: "onDeleteSelfLikedProduct", data: { "product_id": product_id } },
             function (res) {
                 console.log('Userinfo     receives reply from background for onDeleteSelfLikedProduct', res.data);
                 if (res.status === 200) {
@@ -152,24 +162,29 @@ class UserInfoPage extends Component {
     }
 
     onClickCollectionShowBoughtButton = () => {
+        ga('send', 'event', "UIButton", 'Click', "CollectionShowBoughtButton");
         this.setState({
             show_collection_bought: !this.state.show_collection_bought
         })
     }
 
     onShowClickCollectionLikedButton = () => {
+        ga('send', 'event', "UIButton", 'Click', "CollectionShowLiked");
         this.setState({
             show_collection_liked: !this.state.show_collection_liked
         })
     }
 
     onClickShowFriendsButton = () => {
+        ga('send', 'event', "UIButton", 'Click', "ShowFriends");
         this.setState({
             show_friends: !this.state.show_friends
         })
     }
 
     onUpdateFriendRequestStatus = () => {
+        ga('send', 'event', "UIButton", 'Click', "FriendRequest");
+
         this.props.onUpdateNumFriendRequests(this.state.num_friend_requests - 1);
         this.setState({
             num_friend_requests: this.state.num_friend_requests - 1
@@ -177,11 +192,12 @@ class UserInfoPage extends Component {
         console.log("userinfo updates friend request status: ", this.state.num_friend_requests);
     }
 
-    onClickApp(product) {
+    onClickApp() {
+        ga('send', 'event', "UIButton", 'Click', "AppHomePage");
         console.log("onClickApp");
         chrome.runtime.sendMessage({ type: "onClickApp" },
             function (res) {
-                console.log("Page opened for tastemaker app: ");
+                console.log("Page opened for tastemaker app: ", res);
             }
         );
     }
@@ -193,7 +209,7 @@ class UserInfoPage extends Component {
                     <img src={icon} alt="extension icon" width="25px" />
                 </Grid>
                 <Grid item xs={4}>
-                <Button onClick={this.onClickApp} style={{ textTransform: "none", textDecoration: "underline", fontSize:12 }} >
+                    <Button onClick={this.onClickApp} style={{ textTransform: "none", textDecoration: "underline", fontSize: 12 }} >
                         About TasteMaker
                 </Button>
                 </Grid>
@@ -276,9 +292,9 @@ class UserInfoPage extends Component {
 
                         <Card style={{ width: 400, marginTop: 6, display: 'flex', justifyContent: 'center' }}>
                             <CardActions>
-                                <Button component="a" 
-                                href={"mailto:tastemaker.hi@gmail.com?subject=Report Bug in TasteMaker&body=" + 
-                                    encodeURIComponent("TasteMaker team: Thanks for telling us your exprience. Feel free to tell us the issues your found (with screenshots if applicable) or any suggestions. \n")}
+                                <Button component="a"
+                                    href={"mailto:tastemaker.hi@gmail.com?subject=Report Bug in TasteMaker&body=" +
+                                        encodeURIComponent("TasteMaker team: Thanks for telling us your exprience. Feel free to tell us the issues your found (with screenshots if applicable) or any suggestions. \n")}
                                     style={{ textTransform: "none" }} >
                                     Report Bug
                                 </Button>

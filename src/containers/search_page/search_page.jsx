@@ -48,6 +48,16 @@ class SearchPage extends Component {
     }
 
     componentDidMount = () => {
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date(); a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+        ga('create', 'UA-184044017-1', 'auto');
+        ga('set', 'checkProtocolTask', null);
+        ga('send', 'pageview', "search_page");
+
         const stored_search_input = getStorageItem("search_input")
         if (stored_search_input) {
             this.setState(
@@ -56,14 +66,6 @@ class SearchPage extends Component {
                 }
             )
         }
-        // const stored_search_results = getStorageItem("search_results")
-        // if (stored_search_input) {
-        //     this.setState(
-        //         {
-        //             search_results: stored_search_results
-        //         }
-        //     )
-        // }
         const stored_search_category = getStorageItem("search_category")
         if (stored_search_category) {
             this.setState(
@@ -123,9 +125,13 @@ class SearchPage extends Component {
     }
 
     handleSearch = (event) => {
+
         const updateSearchResult = this.updateSearchResult;
         if (event.key === 'Enter' && this.state.search_input.length > 0) {
+            ga('send', 'event', "Search", this.state.search_category, this.state.search_input);
+
             console.log('Searching for: ', event.target.value);
+            
             this.setState({
                 is_no_result: false,
             });
@@ -142,6 +148,8 @@ class SearchPage extends Component {
             );
         }
         else if (event.key !== 'Enter' && this.state.search_input === ""){
+            ga('send', 'event', "UIButton", "Click", "DiscoverUsers");
+
             console.log('Discover friends');
             this.setState({
                 is_no_result: false,
@@ -161,6 +169,8 @@ class SearchPage extends Component {
     }
 
     onRequestFriend = (name) => {
+        ga('send', 'event', "Friend", 'SendRequest', name);
+
         console.log("onRequestFriend: ", name);
         let friend_requests = this.state.search_results;
         friend_requests.map(r => { if (r.user_name === name) { r.is_followed_by_me = true } });
@@ -185,6 +195,7 @@ class SearchPage extends Component {
     }
 
     onDiscoverProducts = () => {
+        ga('send', 'event', "UIButton", 'Click', "DiscoverProducts");
         const updateFriendsProductList = this.updateFriendsProductList;
         if (this.state.friends_product_list == 0){
             chrome.runtime.sendMessage({ type: "onLoadFriendsProductList" },
@@ -207,6 +218,13 @@ class SearchPage extends Component {
     }
 
     onHandleFriendRequest = (name, is_accept_friend) => {
+        if (is_accept_friend){
+            ga('send', 'event', "Friend", "AcceptRequest", name);
+        }
+        else{
+            ga('send', 'event', "Friend", "DenyRequest", name);
+        }
+
         console.log("onHandleFriendRequest: ", name);
         let friend_requests = this.state.search_results;
         friend_requests.map(r => {
@@ -226,6 +244,7 @@ class SearchPage extends Component {
     }
 
     handleTabChange = (event, value) => {
+        ga('send', 'event', "UIButton", "Click", "SearchCatagoryChange");
         this.setState({
             search_results: [],
             search_category: value,
