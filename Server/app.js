@@ -503,7 +503,7 @@ app.post('/requestfriend/:user_id', function (request, response) {
 });
 
 app.post('/search/:user_id', function (request, response) {
-    console.log('server receives Get request /search ');
+    console.log('server receives Get request /search ',request.body );
     const search_category = request.body.search_category;
     const search_key = request.body.search_key;
     console.log('search_category: ', search_category, "search_key: ", search_key);

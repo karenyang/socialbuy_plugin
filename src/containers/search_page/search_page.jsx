@@ -79,7 +79,7 @@ class SearchPage extends Component {
             let query = {
                 search_category: this.state.search_category,
                 search_key: stored_search_input,
-                is_include_self_products: true,
+                is_recommendation: false,
             }
             chrome.runtime.sendMessage({ type: "onHandleSearch", data: query },
                 function (res) {
