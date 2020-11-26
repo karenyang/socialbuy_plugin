@@ -21,7 +21,7 @@ if (userInfo !== null) {
         .then(res => {
             printResponse('onLoadFriendRequestsList', res);
             const friend_requests = res.data.received_friend_requests;
-            num_requests = friend_requests.length;
+            num_requests = friend_requests!== undefined? friend_requests.length: num_requests;
             console.log("there are friend request:", num_requests, friend_requests);
             if (num_requests > 0) {
                 chrome.browserAction.setBadgeText({ text: num_requests.toString() });
@@ -34,6 +34,15 @@ if (userInfo !== null) {
         });
 }
 
+(function (i, s, o, g, r, a, m) {
+    i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+        (i[r].q = i[r].q || []).push(arguments)
+    }, i[r].l = 1 * new Date(); a = s.createElement(o),
+        m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+})(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+ga('create', 'UA-184044017-1', 'auto');
+ga('set', 'checkProtocolTask', null);
+// ga('send', 'pageview', "userinfo_page");
 
 chrome.runtime.onMessage.addListener(
     function (message, sender, sendResponse) {
@@ -41,6 +50,11 @@ chrome.runtime.onMessage.addListener(
             userInfo = getStorageItem('user');
         }
         switch (message.type) {
+            case "onGAEvent":
+                // console.log("onGAEvent", message.data);
+                ga("send", "event", message.data.category, message.data.action, message.data.tag);
+                return true;
+
             case "onPopupInit":
                 console.log("onPopupInit");
                 sendResponse(userInfo);
@@ -49,7 +63,7 @@ chrome.runtime.onMessage.addListener(
                         .then(res => {
                             printResponse('onLoadFriendRequestsList', res);
                             const friend_requests = res.data.received_friend_requests;
-                            num_requests = friend_requests.length;
+                            num_requests = friend_requests!== undefined? friend_requests.length: num_requests;
                             console.log("there are friend request:", num_requests, friend_requests);
                             if (num_requests > 0) {
                                 chrome.browserAction.setBadgeText({ text: num_requests.toString() });
@@ -95,7 +109,7 @@ chrome.runtime.onMessage.addListener(
                         sendResponse(res);
                         // upon login, check whether there are new friend requests.
                         let friend_requests = res.data.received_friend_requests;
-                        num_requests = friend_requests.length;
+                        num_requests = friend_requests!== undefined? friend_requests.length: num_requests;
                         console.log("there are friend requests:", num_requests, friend_requests);
                         if (num_requests > 0) {
                             chrome.browserAction.setBadgeText({ text: num_requests.toString() });
@@ -138,7 +152,7 @@ chrome.runtime.onMessage.addListener(
                                     sendResponse(res);
                                     // upon login, check whether there are new friend requests.
                                     let friend_requests = res.data.received_friend_requests;
-                                    num_requests = friend_requests.length;
+                                    num_requests = friend_requests!== undefined? friend_requests.length: num_requests;
                                     console.log("there are friend requests:", num_requests, friend_requests);
                                     if (num_requests > 0) {
                                         chrome.browserAction.setBadgeText({ text: num_requests.toString() });
@@ -319,6 +333,7 @@ chrome.runtime.onMessage.addListener(
                 return true;
 
             case "onDeleteSelfBoughtProduct":
+
                 console.log("Background about to Delete Self Bought Product: ", message.data);
                 if (userInfo === null || userInfo.user_id === undefined) {
                     console.log("User have not logged in");

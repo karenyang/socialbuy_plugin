@@ -19,12 +19,27 @@ class RecommendationBox extends Component {
         this.state = {
             products: this.props.recommendated_products,
             close: false,
+            search_key: this.props.search_key,
         }
     }
 
-
-    onClickProduct(product) {
-        console.log("product clicked.", product.product_title);
+    componentDidMount = () => {
+        chrome.runtime.sendMessage({ type: "onGAEvent", data: { "category": "RecommendationBox", "action": "Activated", "tag": this.state.search_key } },
+            function (res) {
+                if (res.status !== 200) {
+                    console.error("onGAEvent failed.");
+                }
+            }
+        );
+    }
+    onClickProduct = (product) => {
+        chrome.runtime.sendMessage({ type: "onGAEvent", data: { "category": "RecommendationBox", "action": "ClickProduct", "tag": product.product_link } },
+            function (res) {
+                if (res.status !== 200) {
+                    console.error("onGAEvent failed.");
+                }
+            }
+        );
         chrome.runtime.sendMessage({ type: "onClickProduct", data: product.product_link },
             function (res) {
                 console.log("Page opened for product: ", product.product_title);
@@ -61,7 +76,7 @@ class RecommendationBox extends Component {
                         <Paper style={{ maxHeight: 400, width: 400, overflowY: 'auto', overflowX: "hidden", margin: 0 }}>
                             {
                                 this.state.products.map((product) => (
-                                    <OthersProductCard key={product._id} product={product} />
+                                    <OthersProductCard key={product._id} product={product} onClickProduct={this.onClickProduct}/>
                                 ))
                             }
                         </Paper>

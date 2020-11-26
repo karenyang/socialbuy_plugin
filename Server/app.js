@@ -978,17 +978,14 @@ app.post('/delete_liked_product/:user_id', function (request, response) {
                     }
                     const idx1 = user.liked_product_list.indexOf(product.product_link);
                     if (idx1 === -1) {
-                        console.error('Product with id:' + product_id + ' not found in user liked product list');
-                        response.status(421).send('Product not found in user liked product list');
-                        return;
+                        console.error('Product with id:' + product._id + ' not found in user liked product list');
+
                     }
                     user.liked_product_list.splice(idx1, 1);
                     user.save()
                     const idx2 = product.liker_list.indexOf(user._id);
                     if (idx2 === -1) {
                         console.error('user with id:' + user._id + ' not found in  product liker list');
-                        response.status(421).send('User not found in product liker list');
-                        return;
                     }
                     product.liker_list.splice(idx2, 1);
                     product.save();

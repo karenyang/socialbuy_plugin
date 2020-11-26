@@ -92,6 +92,13 @@ class SideBox extends Component {
                 }
             }
         );
+        chrome.runtime.sendMessage({ type: "onGAEvent", data: { "category": "SideBox", "action": "Hover", "tag": product.product_link } },
+            function (res) {
+                if (res.status !== 200) {
+                    console.error("onGAEvent failed.");
+                }
+            }
+        );
     }
 
     onMouseLeaveIcon = () => {
@@ -120,6 +127,13 @@ class SideBox extends Component {
                     }
                 }
             );
+            chrome.runtime.sendMessage({ type: "onGAEvent", data: { "category": "SideBox", "action": "AddLikedProduct", "tag": this.state.product.product_link } },
+                function (res) {
+                    if (res.status !== 200) {
+                        console.error("onGAEvent failed.");
+                    }
+                }
+            );
         }
         else if (this.state.added_product && this.state.product !== null) {
             chrome.runtime.sendMessage({ type: "onDeleteSelfLikedProduct", data: { "product_link": this.state.product.product_link } },
@@ -130,6 +144,13 @@ class SideBox extends Component {
                     }
                     else {
                         console.error(res.data + ", onDeleteSelfLikedProduct failed.");
+                    }
+                }
+            );
+            chrome.runtime.sendMessage({ type: "onGAEvent", data: { "category": "SideBox", "action": "RemoveLikedProduct", "tag": this.state.product.product_link } },
+                function (res) {
+                    if (res.status !== 200) {
+                        console.error("onGAEvent failed.");
                     }
                 }
             );

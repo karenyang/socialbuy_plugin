@@ -27,13 +27,19 @@ class OthersProductCard extends Component {
     }
 
     onClickProduct(product) {
-        ga('send', 'event', "OthersProduct", "Click", product.product_link);
-        console.log("product clicked.", product.product_title);
-        chrome.runtime.sendMessage({ type: "onClickProduct", data: product.product_link },
-            function (res) {
-                console.log("Page opened for product: ", product.product_title);
-            }
-        );
+        if (this.props.onClickProduct !== undefined) {
+            console.log("HIIIIIIII")
+            this.props.onClickProduct(product);
+        }
+        else {
+            console.log("product clicked.", product.product_title);
+            chrome.runtime.sendMessage({ type: "onClickProduct", data: product.product_link },
+                function (res) {
+                    console.log("Page opened for product: ", product.product_title);
+                }
+            );
+        }
+
     }
 
     render() {

@@ -202,7 +202,7 @@ function searchFromUrl() {
                 console.log("onHandleSearch succeeded.", response.data);
                 if (response.data.results.length > 0) {
                     ReactDOM.render(
-                        <RecommendationBox recommendated_products={response.data.results} />,
+                        <RecommendationBox recommendated_products={response.data.results} search_key={key}/>,
                         document.body.appendChild(document.createElement("DIV"))
                     )
                 }
