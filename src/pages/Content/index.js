@@ -150,7 +150,7 @@ else if (url.includes('www.amazon.com/gp/buy/')) {
 
 
 }
-else if (url.includes('www.amazon.com/') && !url.includes('amazon.com/gp/huc') && !url.includes('amazon.com/gp/css') && !url.includes('amazon.com/gp/yourstore')) { //on a product page: Creating the side box
+else if (url.includes('www.amazon.com/') && url.includes("ref=") && !url.includes('amazon.com/gp/huc') && !url.includes('amazon.com/gp/css') && !url.includes('amazon.com/gp/yourstore')) { //on a product page: Creating the side box
     console.log("Adding side box .....");
     
     ReactDOM.render(

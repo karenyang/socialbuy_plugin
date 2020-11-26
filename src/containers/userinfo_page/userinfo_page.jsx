@@ -229,7 +229,7 @@ class UserInfoPage extends Component {
                             }
                         </Collapse>
 
-                        <Card style={{ width: 400, marginTop: 6, display: 'flex', justifyContent: 'center' }}>
+                        <Card style={{ maxHeight: 400, marginTop: 6, display: 'flex', justifyContent: 'center' }}>
                             <CardActions>
                                 <Button onClick={this.onShowClickCollectionLikedButton} style={{ textTransform: "none" }} >
                                     Your Collection - liked
@@ -245,7 +245,7 @@ class UserInfoPage extends Component {
                             }
                         </Collapse>
 
-                        <Card style={{ width: 380, marginTop: 6, display: 'flex', justifyContent: 'center' }}>
+                        <Card style={{ maxHeight: 380, marginTop: 6, display: 'flex', justifyContent: 'center' }}>
                             {this.state.num_friend_requests > 0 ?
                                 <CardActions>
                                     <Badge color="secondary" variant="dot" >
