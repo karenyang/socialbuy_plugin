@@ -39,13 +39,14 @@ const IconTabs = ({ handleTabChange, tab, num_friend_requests }) => {
                 indicatorColor="primary"
                 textColor="primary"
                 aria-label="icon tabs"
+                style={{height: 60, padding: 0}}
             >
-                <Tab icon={<WhatshotIcon />} aria-label="popular" />
-                <Tab icon={<SearchIcon />} aria-label="search" />
+                <Tab icon={<WhatshotIcon />} aria-label="popular" label="Popular"  style={{padding: 0,fontSize: 12, textTransform: "none"}} />
+                <Tab icon={<SearchIcon />} aria-label="search" label="Discover"  style={{padding: 0,fontSize: 12, textTransform: "none"}} />
                 {num_friend_requests > 0 ? 
-                    <Tab icon={<Badge badgeContent={num_friend_requests} color="secondary"><GroupIcon /></Badge>} aria-label="admin" />
+                    <Tab icon={<Badge badgeContent={num_friend_requests} color="secondary"><GroupIcon /></Badge>} aria-label="admin" label="My Products"  style={{padding: 0,fontSize: 12, textTransform: "none"}} />
                     :
-                    <Tab icon={<GroupIcon />} aria-label="admin" />
+                    <Tab icon={<GroupIcon />} aria-label="admin" label="My Products"  style={{padding: 0,fontSize: 12, textTransform: "none"}} />
                 }
 
             </Tabs>

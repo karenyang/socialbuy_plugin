@@ -535,16 +535,12 @@ app.post('/search/:user_id', function (request, response) {
                             is_followed_by_me: { "$in": ["$_id", user.friends_list] },
                             is_follows_me: { "$in": [ user._id, "$friends_list"] },
                             is_self: { "$eq": ["$_id", user._id] },
-                            // is_sent_friend_reqeust: { "$in": ["$_id", user.friend_requests_list] },
-                            // is_received_friend_reqeust: { "$in": [user._id, "$friend_requests_list"] },
                             num_mutual_friends: { $size: { $setIntersection: ["$friends_list", user.friends_list] } },
                         }
                     },
                     {
                         $sort: {
                             mutual_friends: -1,
-                            // is_received_friend_reqeust: -1,
-                            // is_sent_friend_reqeust: -1,
                             is_followed_by_me: -1,
                             is_follows_me: -1,
                             is_self: -1,
