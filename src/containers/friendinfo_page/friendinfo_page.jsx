@@ -72,28 +72,28 @@ class FriendInfoPage extends Component {
                 }
             }
         );
-        // chrome.runtime.sendMessage({ type: "onLoadFriendsList", data: this.state.user_id },
-        //     function (res) {
-        //         console.log('FriendInfo receives reply from background for onLoadFriendsList ', res.data);
-        //         if (res.status === 200) {
-        //             console.log("onLoadFriendsList succeeded.");
-        //             handleUpdate("friends_list", res.data.friends_list);
-        //         }
-        //         else {
-        //             console.error(res.data + ", onLoadUserBoughtProductList failed.");
-        //         }
-        //     }
-        // );
+        chrome.runtime.sendMessage({ type: "onLoadFriendsList", data: this.state.user_id },
+            function (res) {
+                console.log('FriendInfo receives reply from background for onLoadFriendsList ', res.data);
+                if (res.status === 200) {
+                    console.log("onLoadFriendsList succeeded.");
+                    handleUpdate("friends_list", res.data.friends_list);
+                }
+                else {
+                    console.error(res.data + ", onLoadUserBoughtProductList failed.");
+                }
+            }
+        );
     }
 
     onClickBack = () => {
-        if (this.state.is_friends_friends){ // return to previous page of friend info
+        if (this.state.is_friends_friends) { // return to previous page of friend info
             console.log('is_friends_friends go back to previous friend page ');
             this.props.history.goBack();
         } else { //return to previous tab
             const tab = window.localStorage.getItem("tab");
             console.log('Before go back, go the key Tab is ', tab);
-            this.props.history.push("/greetings/" + tab); 
+            this.props.history.push("/greetings/" + tab);
         }
 
     }
@@ -118,21 +118,21 @@ class FriendInfoPage extends Component {
         })
     }
 
-    // onClickShowFriendsButton = () => {
-    //     ga('send', 'event', "Friendinfo_UIButton", 'Click', "ShowFriendsButton");
-    //     this.setState({
-    //         show_friends: !this.state.show_friends
-    //     })
-    // }
+    onClickShowFriendsButton = () => {
+        ga('send', 'event', "Friendinfo_UIButton", 'Click', "ShowFriendsButton");
+        this.setState({
+            show_friends: !this.state.show_friends
+        })
+    }
 
 
     onClickDeleteFriend = () => {
-        
+
         ga('send', 'event', "Friend", "DeleteFriend", this.state.user_name);
-        
+
         let history = this.props.history;
-        console.log("block clicked");    
-        chrome.runtime.sendMessage({ type: "onDeleteFriend", data: {'friend_id': this.state.user_id}},
+        console.log("block clicked");
+        chrome.runtime.sendMessage({ type: "onDeleteFriend", data: { 'friend_id': this.state.user_id } },
             function (res) {
                 console.log('NameCard receives reply from background for onDeleteFriend ', res.data);
                 if (res.status === 200) {
@@ -154,7 +154,7 @@ class FriendInfoPage extends Component {
 
         let history = this.props.history;
         console.log("unfollow clicked");
-        chrome.runtime.sendMessage({ type: "onUnfollowFriend", data: {'friend_id': this.state.user_id}},
+        chrome.runtime.sendMessage({ type: "onUnfollowFriend", data: { 'friend_id': this.state.user_id } },
             function (res) {
                 console.log('NameCard receives reply from background for onUnfollowFriend ', res.data);
                 if (res.status === 200) {
@@ -189,11 +189,11 @@ class FriendInfoPage extends Component {
 
                 <Grid item xs={12}>
                     <Divider />
-                    <NameCard user_id={this.state.user_id} is_self={false} onClickDeleteFriend={this.onClickDeleteFriend} onClickUnfollow={this.onClickUnfollow}/>
+                    <NameCard user_id={this.state.user_id} is_self={false} onClickDeleteFriend={this.onClickDeleteFriend} onClickUnfollow={this.onClickUnfollow} />
                 </Grid>
 
                 <Grid item xs={12}>
-                    <Paper style={{ maxHeight: 420, width: 400, marginLeft:10, overflowY: 'auto' }}>
+                    <Paper style={{ maxHeight: 420, width: 400, marginLeft: 10, overflowY: 'auto' }}>
                         <Card style={{ width: 400, marginTop: 6, display: 'flex', justifyContent: 'center' }}>
                             <CardActions>
                                 <Button onClick={this.onClickCollectionShowBought} style={{ textTransform: "none" }} >
@@ -221,12 +221,12 @@ class FriendInfoPage extends Component {
                         <Collapse in={this.state.show_collection_liked}>
                             {
                                 this.state.liked_product_list.map((product) => (
-                                    <OthersProductCard  key={product._id + "_liked"}  product={product} />
+                                    <OthersProductCard key={product._id + "_liked"} product={product} />
                                 ))
                             }
                         </Collapse>
 
-                        {/* <Card style={{ width: 400, marginTop: 6, display: 'flex', justifyContent: 'center' }}>
+                        <Card style={{ width: 400, marginTop: 6, display: 'flex', justifyContent: 'center' }}>
 
                             <CardActions>
                                 <Button onClick={this.onClickShowFriendsButton} style={{ textTransform: "none" }} >
@@ -237,9 +237,9 @@ class FriendInfoPage extends Component {
                         <Collapse in={this.state.show_friends}>
 
                             {this.state.friends_list.map((friend) => (
-                                <FriendCard key={friend._id} friend={friend}/>
+                                <FriendCard key={friend._id} friend={friend} show_mutual_friends={false}/>
                             ))}
-                        </Collapse> */}
+                        </Collapse>
 
                     </Paper>
 
@@ -249,7 +249,8 @@ class FriendInfoPage extends Component {
         );
     }
 };
-FriendInfoPage.defaultProps = {
+
+FriendCard.defaultProps = {
     is_friends_friends: false,
 };
 

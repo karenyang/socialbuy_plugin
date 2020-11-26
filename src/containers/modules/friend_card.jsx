@@ -34,7 +34,7 @@ class FriendCard extends Component {
 
                     </Grid>
                     <Grid item xs={5}>
-                        {friend.mutual_friends.length > 0 &&
+                        {this.props.show_mutual_friends && friend.mutual_friends.length > 0 &&
                             <Typography variant="body2" component="h5" style={{ 'color': 'grey' }}>
                                 {friend.mutual_friends.length} mutual friends
                             </Typography>
@@ -46,5 +46,10 @@ class FriendCard extends Component {
         )
     }
 }
+
+FriendCard.defaultProps = {
+    show_mutual_friends: false,
+};
+
 
 export default FriendCard;

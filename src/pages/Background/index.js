@@ -293,7 +293,6 @@ chrome.runtime.onMessage.addListener(
                     sendResponse("User have not logged in");
                 } else {
                     console.log("current user id", userInfo.user_id);
-                    console.log("current user id", userInfo.user_id);
                     let user_id = userInfo.user_id;
                     if (message.data) { //if specify a different user_id than self
                         user_id = message.data;
@@ -400,7 +399,11 @@ chrome.runtime.onMessage.addListener(
                     sendResponse("User have not logged in");
                 } else {
                     console.log("current user id", userInfo.user_id);
-                    axios.get(DOMAIN + 'friendslist/' + userInfo.user_id)
+                    let user_id = userInfo.user_id;
+                    if (message.data) { //if specify a different user_id than self
+                        user_id = message.data;
+                    }
+                    axios.get(DOMAIN + 'friendslist/' + user_id)
                         .then(res => {
                             printResponse('onLoadFriendsList', res);
                             sendResponse(res);

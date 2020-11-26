@@ -131,7 +131,7 @@ class SearchPage extends Component {
             ga('send', 'event', "Search", this.state.search_category, this.state.search_input);
 
             console.log('Searching for: ', event.target.value);
-            
+
             this.setState({
                 is_no_result: false,
             });
@@ -147,7 +147,7 @@ class SearchPage extends Component {
                 }
             );
         }
-        else if (event.key !== 'Enter' && this.state.search_input === ""){
+        else if (event.key !== 'Enter' && this.state.search_input === "") {
             ga('send', 'event', "Search_UIButton", "Click", "DiscoverUsers");
 
             console.log('Discover friends');
@@ -197,18 +197,18 @@ class SearchPage extends Component {
     onDiscoverProducts = () => {
         ga('send', 'event', "Search_UIButton", 'Click', "DiscoverProducts");
         const updateFriendsProductList = this.updateFriendsProductList;
-        if (this.state.friends_product_list == 0){
+        if (this.state.friends_product_list == 0) {
             chrome.runtime.sendMessage({ type: "onLoadFriendsProductList" },
-            function (res) {
-                console.log('Greetings receives reply from background for onLoadFriendsProductList ', res.data);
-                if (res.status === 200) {
-                    console.log("onLoadFriendsProductList succeeded.");
-                    updateFriendsProductList(res.data.friends_productlist);
-                }
-                else {
-                    console.error(res.data + ", onLoadFriendsProductList failed.");
-                }
-            });
+                function (res) {
+                    console.log('Greetings receives reply from background for onLoadFriendsProductList ', res.data);
+                    if (res.status === 200) {
+                        console.log("onLoadFriendsProductList succeeded.");
+                        updateFriendsProductList(res.data.friends_productlist);
+                    }
+                    else {
+                        console.error(res.data + ", onLoadFriendsProductList failed.");
+                    }
+                });
         }
         else {
             this.setState({
@@ -218,10 +218,10 @@ class SearchPage extends Component {
     }
 
     onHandleFriendRequest = (name, is_accept_friend) => {
-        if (is_accept_friend){
+        if (is_accept_friend) {
             ga('send', 'event', "Friend", "AcceptRequest", name);
         }
-        else{
+        else {
             ga('send', 'event', "Friend", "DenyRequest", name);
         }
 
@@ -291,14 +291,14 @@ class SearchPage extends Component {
                         <Tab label="Product" aria-label="product" value="product" style={{ textTransform: "none", fontSize: 12 }} />
                     </Tabs>
                     {this.state.search_input === "" && this.state.search_results.length == 0 && this.state.search_category === "user" &&
-                        <Button  style={{textTransform: "none", padding: 8, fontSize: 16, color: "#3366FF", marginTop: 50, padding: 10 }}
-                        onClick={this.handleSearch}>
+                        <Button style={{ textTransform: "none", padding: 8, fontSize: 16, color: "#3366FF", marginTop: 50, padding: 10 }}
+                            onClick={this.handleSearch}>
                             Discover Users
                         </Button>
                     }
                     {this.state.search_input === "" && this.state.search_results.length == 0 && this.state.search_category === "product" &&
-                        <Button  style={{textTransform: "none", padding: 8, fontSize: 16, color: "#3366FF", marginTop: 50, padding: 10 }}
-                        onClick={this.onDiscoverProducts}>
+                        <Button style={{ textTransform: "none", padding: 8, fontSize: 16, color: "#3366FF", marginTop: 50, padding: 10 }}
+                            onClick={this.onDiscoverProducts}>
                             Discover Products
                         </Button>
                     }
