@@ -909,7 +909,7 @@ app.post('/delete_bought_product/:user_id', function (request, response) {
 });
 
 app.post('/delete_liked_product/:user_id', function (request, response) {
-    console.log('server receives POST request /delete_liked_product '. request.body);
+    console.log('server receives POST request /delete_liked_product ', request.body);
     let user_id = request.params.user_id;
     if (user_id) {
         console.log('user_id: ', user_id);
