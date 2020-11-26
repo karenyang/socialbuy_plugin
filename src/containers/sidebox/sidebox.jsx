@@ -33,8 +33,6 @@ class SideBox extends Component {
     }
 
     componentDidMount = () => {
-
-
         const handleUpdate = this.handleUpdate;
         const curr_product = this.props.product;
         chrome.runtime.sendMessage({ type: "onLoadUserLikedProductList" },

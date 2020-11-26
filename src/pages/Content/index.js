@@ -147,8 +147,6 @@ else if (url.includes('www.amazon.com/gp/buy/')) {
     }
     buy_button.addEventListener("click", after_placing_order_func);
     buy_button_bottom.addEventListener("click", after_placing_order_func);
-
-
 }
 else if (url.includes('www.amazon.com/') && (url.includes("ref=")|| url.includes("/gp/product") || url.includes("/dp/")  )&& !url.includes('amazon.com/gp/huc') && !url.includes('amazon.com/gp/css') && !url.includes('amazon.com/gp/yourstore')) { //on a product page: Creating the side box
     console.log("Adding side box .....");
@@ -165,7 +163,7 @@ else if (url.includes('www.amazon.com/') && (url.includes("ref=")|| url.includes
         )
         setStorageItem("LastPurchase", [product]);
     });
-    // if user add to card , add it to soonWillBuyProducts
+    // if user add to cart, add it to soonWillBuyProducts
 
     document.getElementById("add-to-cart-button").addEventListener("click", function () {
         console.log(

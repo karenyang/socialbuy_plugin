@@ -25,18 +25,13 @@ class ChoiceBox extends Component {
     }
 
     componentDidMount = () => {
-        (function (i, s, o, g, r, a, m) {
-            i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
-                (i[r].q = i[r].q || []).push(arguments)
-            }, i[r].l = 1 * new Date(); a = s.createElement(o),
-                m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
-        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
-        ga('create', 'UA-184044017-1', 'auto');
-        ga('set', 'checkProtocolTask', null);
-        ga('send', 'pageview', "choice_box");
-        this.setState({
-            shared_products: this.props.products.map(p => p.product_link),
-        })
+        chrome.runtime.sendMessage({ type: "onGAEvent", data: { "category": "ChoiceBox", "action": "Activated", "tag": "none" } },
+            function (res) {
+                if (res.status !== 200) {
+                    console.error("onGAEvent failed.");
+                }
+            }
+        );
     }
 
     cropTitle = (product_title) => {
@@ -45,12 +40,15 @@ class ChoiceBox extends Component {
     }
 
     handleCheckBox = (product_link, checked) => {
-        if (checked){
-            ga('send', 'event', "ProductUnCheck", 'Click', product_link);
-        }
-        else{
-            ga('send', 'event', "ProductCheck", 'Click', product_link);
-        }
+        let action = checked? "ProductUnCheck" : "ProductCheck"
+        chrome.runtime.sendMessage({ type: "onGAEvent", data: { "category": "ChoiceBox", "action":  action, "tag": product_link } },
+            function (res) {
+                if (res.status !== 200) {
+                    console.error("onGAEvent failed.");
+                }
+            }
+        )
+
         let new_shared_products = this.state.shared_products;
         if (checked && !this.state.shared_products.includes(product_link)) {
             new_shared_products.push(product_link)
@@ -74,6 +72,14 @@ class ChoiceBox extends Component {
         })
     }
     onClickShareButton = () => {
+        chrome.runtime.sendMessage({ type: "onGAEvent", data: { "category": "ChoiceBox", "action":  "SharePurchase", "tag": this.state.products.length.toString() } },
+            function (res) {
+                if (res.status !== 200) {
+                    console.error("onGAEvent failed.");
+                }
+            }
+        )
+
         let data = this.state.products.filter(p => this.state.shared_products.includes(p.product_link));
         const updateState = this.updateState;
         chrome.runtime.sendMessage({ type: "onBoughtProductsToBeAdded", data: data },
@@ -93,7 +99,7 @@ class ChoiceBox extends Component {
     render() {
         if (this.state.close) {
             return null;
-        } 
+        }
 
         return (
             <Paper style={{
