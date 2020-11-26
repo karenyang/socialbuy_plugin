@@ -13,6 +13,8 @@ console.log('INITIAL getStorageItem user: ', userInfo);
 chrome.browserAction.setBadgeBackgroundColor({ color: [255, 0, 0, 255] });
 
 
+// console.log("Done Creating Google Analytics .... ");
+
 if (userInfo !== null) {
     console.log("grabbing friend requests.")
     axios.get(DOMAIN + 'receivedfriendrequests/' + userInfo.user_id)
@@ -337,7 +339,7 @@ chrome.runtime.onMessage.addListener(
 
             case "onDeleteSelfLikedProduct":
                 console.log("Background about to Delete Self Liked Product: with message data", message.data);
-                
+
                 if (userInfo === null || userInfo.user_id === undefined) {
                     console.log("User have not logged in");
                     sendResponse("User have not logged in");

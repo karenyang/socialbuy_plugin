@@ -3,15 +3,13 @@ import logo from '../../assets/img/logo.svg';
 import {
     HashRouter, Route, Switch, Redirect, withRouter,
 } from 'react-router-dom';
-// import {
-//   Grid, Paper
-// } from '@material-ui/core';
 
 import Greetings from '../../containers/greetings/Greetings';
 import Register from '../../containers/register/Register';
 import Login from '../../containers/login/Login';
 import FriendInfoPage from '../../containers/friendinfo_page/friendinfo_page';
 import './Popup.css';
+
 
 
 class Popup extends React.Component {
@@ -73,7 +71,7 @@ class Popup extends React.Component {
         return (
             this.state.done_fetch === true ?
                 (<HashRouter>
-                    <div className="App">
+                    <div className="App">                        
                         <Switch>
                             <Route path="/greetings/:tab_id/"
                                 render={(props) => <Greetings {...props} email={this.state.email} user_name={this.state.user_name} user_id={this.state.user_id} />}

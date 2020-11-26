@@ -24,7 +24,7 @@
         "icon-34.png",
         "assets/img/*.png"
     ],
-    "content_security_policy": "script-src 'self' https://connect.facebook.net/en_US/sdk.js 'unsafe-eval'; object-src 'self'",
+    "content_security_policy": "script-src 'self' https://www.google-analytics.com/analytics.js 'sha256-tqBkxcARnGE+nMHDdA6LouxcAYCpa9mPuMHntrOa6o0=' 'unsafe-inline' 'unsafe-eval' ; object-src 'self'",
     "permissions": [
         "cookies",
         "*://*.google.com",
