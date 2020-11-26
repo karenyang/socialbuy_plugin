@@ -571,7 +571,7 @@ app.post('/search/:user_id', function (request, response) {
                 }
                 console.log("search string is: ", search_string);
                 let user_list = user.friends_list;
-                if(request.body.is_recommendation === true){
+                if(request.body.is_recommendation === false){
                     user_list = user.friends_list.concat(ObjectID(user_id)); //include user themselves to be searchable
                 }
                 let product_result = Product.aggregate([
