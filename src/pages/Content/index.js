@@ -16,56 +16,12 @@ console.log('Current URL: ', url);
 
 if (url.includes('www.amazon.com/gp/cart')) {
     if (document.getElementsByName("proceedToRetailCheckout") !== null) {
-        console.log("Grabbing all products in cart...");
-        let domain = "www.amazon.com";
-        let img_query_string = " > div.sc-list-item-content > div > div.a-column.a-span10 > div > div > div.a-fixed-left-grid-col.a-float-left.sc-product-image-desktop.a-col-left > a";
-        let content = document.querySelectorAll("#activeCartViewForm > div.a-row.a-spacing-mini.sc-list-body.sc-java-remote-feature >  div.a-row.sc-list-item.sc-list-item-border.sc-java-remote-feature");
-        let scrap_product_pages_promises = [];
-        let products = [];
-        let items = [];
-        for (let i = 0; i < content.length - 1; i++) { //content.length - 1 because last block is alexa ads
-            let product = content[i];
-            // console.log('product ', i);
-            // console.log(product.innerText.split("\n"));
-            let cleanedUpValues = product.innerText.split("\n");
-            let item = {};
-            item.product_title = cleanedUpValues[0];
-            // console.log("product_title: ", item.product_title)
-            let cost_str = cleanedUpValues.filter(value => value.startsWith("$"))[0];
-            cost_str = cost_str.substring(1);
-            item.product_cost = parseFloat(cost_str);
-            console.log("product_cost: ", item.product_cost);
-
-            let img = document.querySelector("#" + product.id + img_query_string);
-            item.product_link = "https://" + domain + img.getAttribute("href");
-            if (item.product_link.includes("ref=")) {
-                item.product_link = item.product_link.split('ref=')[0];
+        chrome.runtime.sendMessage({ type: "onHandleProductsInCart", data: document.URL },
+            function (response) {
+                console.log('this is the response from the background page for onHandleProductsInCart: ', response);
             }
-            console.log("product_link:  ", item.product_link);
-            item.product_imgurl = img.firstElementChild.getAttribute("src");
-            // console.log("product_imgurl:  ", item.product_imgurl);
-            item.product_by = "Amazon";
-            items.push(item);
-            scrap_product_pages_promises.push(axios.get(item.product_link.split('amazon.com')[1]));
-        }
-        Promise.all(scrap_product_pages_promises).then((responses) => {
-            console.log("responses: ", responses.length);
-            for (let i = 0; i < responses.length; i++) {
-                products.push(fetchMoreBoughtProductInfo(responses[i], items[i]));
-            }
-            setStorageItem("soonWillBuyProducts", products);
-
-            // // ################ use this for testing in cart w/ actually buying ###################
-            // if (products.length > 0) {
-            //     ReactDOM.render(
-            //         <ChoiceBox products={products} />,
-            //         document.body.appendChild(document.createElement("DIV"))
-            //     )
-            // }
-            // // ###################################################################################
-        })
+        );
     }
-
 }
 
 else if (url.includes('www.amazon.com/s?k=')) {
@@ -90,7 +46,7 @@ else if (url.includes('www.amazon.com/gp/buy/')) {
     let soonWillBuyProducts = getStorageItem("soonWillBuyProducts")
     console.log("Before buy soonWillBuyProducts: ", soonWillBuyProducts);
 
-    
+
     // // ################ use this for testing in cart w/ actually buying ###################
     let products_checkout = document.querySelectorAll("#spc-orders > div > div > div.a-row.shipment > div > div > div > div> div > div > div.a-row > div > div > div.a-fixed-left-grid-col.item-details-right-column.a-col-right > div.a-row.breakword > span")
     let data = []
@@ -148,11 +104,11 @@ else if (url.includes('www.amazon.com/gp/buy/')) {
     buy_button.addEventListener("click", after_placing_order_func);
     buy_button_bottom.addEventListener("click", after_placing_order_func);
 }
-else if (url.includes('www.amazon.com/') && (url.includes("ref=")|| url.includes("/gp/product") || url.includes("/dp/")  )&& !url.includes('amazon.com/gp/huc') && !url.includes('amazon.com/gp/css') && !url.includes('amazon.com/gp/yourstore')) { //on a product page: Creating the side box
+else if (url.includes('www.amazon.com/') && (url.includes("ref=") || url.includes("/gp/product") || url.includes("/dp/")) && !url.includes('amazon.com/gp/huc') && !url.includes('amazon.com/gp/css') && !url.includes('amazon.com/gp/yourstore')) { //on a product page: Creating the side box
     console.log("Adding side box .....");
 
     ReactDOM.render(
-        <SideBox/>,
+        <SideBox />,
         document.body.appendChild(document.createElement("DIV"))
     )
     // if user buy now, count as buying for now
@@ -200,7 +156,7 @@ function searchFromUrl() {
                 console.log("onHandleSearch succeeded.", response.data);
                 if (response.data.results.length > 0) {
                     ReactDOM.render(
-                        <RecommendationBox recommendated_products={response.data.results} search_key={key}/>,
+                        <RecommendationBox recommendated_products={response.data.results} search_key={key} />,
                         document.body.appendChild(document.createElement("DIV"))
                     )
                 }
@@ -246,9 +202,9 @@ function setStorageItem(message_type, data) {
 }
 
 function getStorageItem(message_type) {
-    if (message_type == "soonWillBuyProducts"){
+    if (message_type == "soonWillBuyProducts") {
         let soonWillBuyProducts = JSON.parse(window.localStorage.getItem(message_type));
-        if (soonWillBuyProducts === "" || soonWillBuyProducts === "[]" || soonWillBuyProducts === null){
+        if (soonWillBuyProducts === "" || soonWillBuyProducts === "[]" || soonWillBuyProducts === null) {
             soonWillBuyProducts = [];
         }
         return soonWillBuyProducts;

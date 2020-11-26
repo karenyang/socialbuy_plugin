@@ -21,7 +21,7 @@ if (userInfo !== null) {
         .then(res => {
             printResponse('onLoadFriendRequestsList', res);
             const friend_requests = res.data.received_friend_requests;
-            num_requests = friend_requests!== undefined? friend_requests.length: num_requests;
+            num_requests = friend_requests !== undefined ? friend_requests.length : num_requests;
             console.log("there are friend request:", num_requests, friend_requests);
             if (num_requests > 0) {
                 chrome.browserAction.setBadgeText({ text: num_requests.toString() });
@@ -63,7 +63,7 @@ chrome.runtime.onMessage.addListener(
                         .then(res => {
                             printResponse('onLoadFriendRequestsList', res);
                             const friend_requests = res.data.received_friend_requests;
-                            num_requests = friend_requests!== undefined? friend_requests.length: num_requests;
+                            num_requests = friend_requests !== undefined ? friend_requests.length : num_requests;
                             console.log("there are friend request:", num_requests, friend_requests);
                             if (num_requests > 0) {
                                 chrome.browserAction.setBadgeText({ text: num_requests.toString() });
@@ -109,7 +109,7 @@ chrome.runtime.onMessage.addListener(
                         sendResponse(res);
                         // upon login, check whether there are new friend requests.
                         let friend_requests = res.data.received_friend_requests;
-                        num_requests = friend_requests!== undefined? friend_requests.length: num_requests;
+                        num_requests = friend_requests !== undefined ? friend_requests.length : num_requests;
                         console.log("there are friend requests:", num_requests, friend_requests);
                         if (num_requests > 0) {
                             chrome.browserAction.setBadgeText({ text: num_requests.toString() });
@@ -152,7 +152,7 @@ chrome.runtime.onMessage.addListener(
                                     sendResponse(res);
                                     // upon login, check whether there are new friend requests.
                                     let friend_requests = res.data.received_friend_requests;
-                                    num_requests = friend_requests!== undefined? friend_requests.length: num_requests;
+                                    num_requests = friend_requests !== undefined ? friend_requests.length : num_requests;
                                     console.log("there are friend requests:", num_requests, friend_requests);
                                     if (num_requests > 0) {
                                         chrome.browserAction.setBadgeText({ text: num_requests.toString() });
@@ -525,6 +525,57 @@ chrome.runtime.onMessage.addListener(
                 }
                 return true;
 
+            case "onHandleProductsInCart":
+                axios.get(message.data)
+                    .then(res => {
+                        let page = document.createElement('html');
+                        page.innerHTML = res.data;
+                        console.log("Grabbing all products in cart...");
+                        let domain = "www.amazon.com";
+                        let img_query_string = " > div.sc-list-item-content > div > div.a-column.a-span10 > div > div > div.a-fixed-left-grid-col.a-float-left.sc-product-image-desktop.a-col-left > a";
+                        let content = page.querySelectorAll("#activeCartViewForm > div.a-row.a-spacing-mini.sc-list-body.sc-java-remote-feature >  div.a-row.sc-list-item.sc-list-item-border.sc-java-remote-feature");
+                        console.log('content ', content);
+
+                        let scrap_product_pages_promises = [];
+                        let products = [];
+                        let items = [];
+                        for (let i = 0; i < content.length - 1; i++) { //content.length - 1 because last block is alexa ads
+                            let product = content[i];
+                            // console.log('product ', i);
+                            let cleanedUpValues = product.innerText.split(/\n+/).map(p => p.trim()).filter(Boolean);
+                            // cleanedUpValues = cleanedUpValues.filter(p => p.trim().length !== 0).map;
+                            console.log("cleanedUpValues", cleanedUpValues);
+
+                            let item = {};
+                            item.product_title = cleanedUpValues[0];
+                            // console.log("product_title: ", item.product_title)
+                            let cost_str = cleanedUpValues.filter(value => value.startsWith("$"))[0];
+                            cost_str = cost_str.substring(1);
+                            item.product_cost = parseFloat(cost_str);
+                            console.log("product_cost: ", item.product_cost);
+
+                            let img = page.querySelector("#" + product.id + img_query_string);
+                            item.product_link = "https://" + domain + img.getAttribute("href");
+                            if (item.product_link.includes("ref=")) {
+                                item.product_link = item.product_link.split('ref=')[0];
+                            }
+                            console.log("product_link:  ", item.product_link);
+                            item.product_imgurl = img.firstElementChild.getAttribute("src");
+                            // console.log("product_imgurl:  ", item.product_imgurl);
+                            item.product_by = "Amazon";
+                            items.push(item);
+                            scrap_product_pages_promises.push(axios.get(item.product_link));
+                        }
+                        Promise.all(scrap_product_pages_promises).then((responses) => {
+                            console.log("responses: ", responses.length);
+                            for (let i = 0; i < responses.length; i++) {
+                                products.push(fetchMoreBoughtProductInfo(responses[i], items[i]));
+                            }
+                            setStorageItem("soonWillBuyProducts", products);
+                            sendResponse("success");
+                        });
+                    });
+                    return true;
             default:
                 console.log('couldnt find matching case for ', message.type);
         }
@@ -548,4 +599,34 @@ function setStorageItem(message_type, data) {
 
 function getStorageItem(message_type) {
     return JSON.parse(window.localStorage.getItem(message_type));
+}
+
+
+function fetchMoreBoughtProductInfo(response, item) {
+    let page = document.createElement('html');
+    page.innerHTML = response.data;
+    let summary_list = page.querySelectorAll("#feature-bullets > ul > li > span");
+    let product_summary = "";
+    for (let i = 0; i < summary_list.length; i++) {
+        if (!summary_list[i].innerHTML.includes("</")) {
+            product_summary = product_summary.concat(summary_list[i].innerHTML);
+        }
+    }
+    console.log("item", item);
+    item.product_summary = product_summary;
+    // console.log("product_summary: ", product_summary);
+    let variation_imgs = page.querySelectorAll("button > div > div > img");
+    let product_variation_names = [];
+    let product_variation_imgurls = [];
+    for (let i = 0; i < variation_imgs.length; i++) {
+        let imgurl = variation_imgs[i].getAttribute('src');
+        let name = variation_imgs[i].getAttribute('alt');
+        product_variation_names.push(name);
+        product_variation_imgurls.push(imgurl);
+    }
+    // console.log('product_variations: ', product_variation_names);
+    item.product_variation_names = product_variation_names;
+    item.product_variation_imgurls = product_variation_imgurls;
+    return item;
+
 }
