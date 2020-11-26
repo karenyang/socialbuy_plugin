@@ -4,7 +4,7 @@ import axios from "axios";
 
 
 console.log("Process ENV", process.env.NODE_ENV);
-const DOMAIN = process.env.NODE_ENV === "production" ? "http://ec2-18-188-234-4.us-east-2.compute.amazonaws.com:8080/" : "http://localhost:8080/";
+const DOMAIN = process.env.NODE_ENV === "production" ? "http://ec2-54-153-92-137.us-west-1.compute.amazonaws.com:8080/" : "http://localhost:8080/";
 console.log('DOMAIN: ', DOMAIN);
 let num_requests = 0;
 let userInfo = getStorageItem('user');
