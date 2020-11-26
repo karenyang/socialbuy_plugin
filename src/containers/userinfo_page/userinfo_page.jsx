@@ -138,7 +138,7 @@ class UserInfoPage extends Component {
         this.setState({
             liked_product_list: new_liked_product_list,
         });
-        chrome.runtime.sendMessage({ type: "onDeleteSelfLikedProduct", data: product_id },
+        chrome.runtime.sendMessage({ type: "onDeleteSelfLikedProduct", data: {"product_id": product_id} },
             function (res) {
                 console.log('Userinfo     receives reply from background for onDeleteSelfLikedProduct', res.data);
                 if (res.status === 200) {

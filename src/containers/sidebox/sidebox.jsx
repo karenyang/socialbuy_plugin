@@ -118,7 +118,7 @@ class SideBox extends Component {
             );
         }
         else if (this.state.added_product && this.state.product !== null) {
-            chrome.runtime.sendMessage({ type: "onDeleteSelfLikedProduct", data: this.state.product.product_link },
+            chrome.runtime.sendMessage({ type: "onDeleteSelfLikedProduct", data: {"product_link":  this.state.product.product_link }},
             function (res) {
                 console.log('this is the response from the background page for onDeleteSelfLikedProduct', res.data);
                 if (res.status === 200) {

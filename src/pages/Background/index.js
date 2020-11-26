@@ -336,17 +336,15 @@ chrome.runtime.onMessage.addListener(
                 return true;
 
             case "onDeleteSelfLikedProduct":
-                console.log("Background about to Delete Self Liked Product: ", message.data);
-                let request = { "product_id": message.data };
-                if (message.data.includes("https://wwww")) {
-                    request = { "product_link": message.data };
-                }
+                console.log("Background about to Delete Self Liked Product: with message data", message.data);
+                
                 if (userInfo === null || userInfo.user_id === undefined) {
                     console.log("User have not logged in");
                     sendResponse("User have not logged in");
                 } else {
                     console.log("current user id", userInfo.user_id);
-                    axios.post(DOMAIN + 'delete_liked_product/' + userInfo.user_id, request)
+                    console.log("delete_liked_product with reqeust", message.data);
+                    axios.post(DOMAIN + 'delete_liked_product/' + userInfo.user_id, message.data)
                         .then(res => {
                             printResponse('onDeleteSelfLikedProduct', res);
                             sendResponse(res);
