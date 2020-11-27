@@ -61,7 +61,7 @@ chrome.runtime.onMessage.addListener(
         }
         switch (message.type) {
             case "onGAEvent":
-                  console.log("onGAEvent", message.data);
+                console.log("onGAEvent", message.data);
                 ga("send", "event", message.data.category, message.data.action, message.data.tag);
                 return true;
 
@@ -130,56 +130,56 @@ chrome.runtime.onMessage.addListener(
                     })
                 return true;
 
-            case "onFacebookLogin":
-                console.log("About to onFacebookLogin", message.data);
-                const fb_access_token = message.data.fb_access_token;
-                if (fb_access_token !== undefined) {
-                    window.localStorage.setItem("FB_access_token", fb_access_token);
-                    const get_user_info = "https://graph.facebook.com/me?fields=name,email,picture&access_token=" + fb_access_token;
-                    axios.get(get_user_info)
-                        .then(res => {
-                            console.log('get_user_info from fb_access_token', res.data);
-                            let request = {
-                                email: res.data.email ? res.data.email : "",
-                                fb_id: res.data.id,
-                                fb_access_token: fb_access_token,
-                                user_name: res.data.name,
-                                profile_img: res.data.picture.data.url,
-                            };
-                            console.log('request:', request);
+            // case "onFacebookLogin":
+            //     console.log("About to onFacebookLogin", message.data);
+            //     const fb_access_token = message.data.fb_access_token;
+            //     if (fb_access_token !== undefined) {
+            //         window.localStorage.setItem("FB_access_token", fb_access_token);
+            //         const get_user_info = "https://graph.facebook.com/me?fields=name,email,picture&access_token=" + fb_access_token;
+            //         axios.get(get_user_info)
+            //             .then(res => {
+            //                 console.log('get_user_info from fb_access_token', res.data);
+            //                 let request = {
+            //                     email: res.data.email ? res.data.email : "",
+            //                     fb_id: res.data.id,
+            //                     fb_access_token: fb_access_token,
+            //                     user_name: res.data.name,
+            //                     profile_img: res.data.picture.data.url,
+            //                 };
+            //                 console.log('request:', request);
 
 
-                            axios.post(DOMAIN + 'admin/fblogin', request, {
-                                headers: {
-                                    'content-type': 'application/json',
-                                }
-                            })
-                                .then(res => {
-                                    userInfo = null;
-                                    window.localStorage.clear();
-                                    printResponse('onFacebookLogin', res);
-                                    setStorageItem('user', res.data);
-                                    sendResponse(res);
-                                    // upon login, check whether there are new friend requests.
-                                    let friend_requests = res.data.received_friend_requests;
-                                    num_requests = friend_requests !== undefined ? friend_requests.length : num_requests;
-                                    console.log("there are friend requests:", num_requests, friend_requests);
-                                    if (num_requests > 0) {
-                                        chrome.browserAction.setBadgeText({ text: num_requests.toString() });
-                                    }
-                                    return true;
-                                })
-                                .catch(err => {
-                                    console.error(err);
-                                })
-                        })
-                        .catch(err => {
-                            console.error(err)
-                        });
+            //                 axios.post(DOMAIN + 'admin/fblogin', request, {
+            //                     headers: {
+            //                         'content-type': 'application/json',
+            //                     }
+            //                 })
+            //                     .then(res => {
+            //                         userInfo = null;
+            //                         window.localStorage.clear();
+            //                         printResponse('onFacebookLogin', res);
+            //                         setStorageItem('user', res.data);
+            //                         sendResponse(res);
+            //                         // upon login, check whether there are new friend requests.
+            //                         let friend_requests = res.data.received_friend_requests;
+            //                         num_requests = friend_requests !== undefined ? friend_requests.length : num_requests;
+            //                         console.log("there are friend requests:", num_requests, friend_requests);
+            //                         if (num_requests > 0) {
+            //                             chrome.browserAction.setBadgeText({ text: num_requests.toString() });
+            //                         }
+            //                         return true;
+            //                     })
+            //                     .catch(err => {
+            //                         console.error(err);
+            //                     })
+            //             })
+            //             .catch(err => {
+            //                 console.error(err)
+            //             });
 
-                }
+            //     }
 
-                return true;
+            //     return true;
 
             case "onLogout":
                 axios.post(DOMAIN + 'admin/logout')
@@ -556,9 +556,9 @@ chrome.runtime.onMessage.addListener(
                             console.log("cleanedUpValues", cleanedUpValues);
 
                             let item = {};
-                            item.product_title = cleanedUpValues[0].split('...')[0];
+                            item.product_title = cleanedUpValues[0];
 
-                              console.log("product_title: ", item.product_title)
+                            //console.log("product_title: ", item.product_title)
                             let cost_str = cleanedUpValues.filter(value => value.startsWith("$"))[0];
                             cost_str = cost_str.substring(1);
                             item.product_cost = parseFloat(cost_str);
@@ -571,7 +571,7 @@ chrome.runtime.onMessage.addListener(
                             }
                             console.log("product_link:  ", item.product_link);
                             item.product_imgurl = img.firstElementChild.getAttribute("src");
-                              console.log("product_imgurl:  ", item.product_imgurl);
+                            console.log("product_imgurl:  ", item.product_imgurl);
                             item.product_by = "Amazon";
                             items.push(item);
                             scrap_product_pages_promises.push(axios.get(item.product_link));
@@ -591,7 +591,7 @@ chrome.runtime.onMessage.addListener(
                 axios.get(message.data)
                     .then(res => {
                         let item = fetchProductInfoFromPage(res);
-                        if(!getStorageItem("LastPurchase").includes(item)){
+                        if (!getStorageItem("LastPurchase").includes(item)) {
                             setStorageItem("LastPurchase", [item]);
                         }
                         sendResponse(item);
@@ -602,7 +602,7 @@ chrome.runtime.onMessage.addListener(
                 axios.get(message.data)
                     .then(res => {
                         let item = fetchProductInfoFromPage(res);
-                        if(!getStorageItem("soonWillBuyProducts").includes(item)){
+                        if (!getStorageItem("soonWillBuyProducts").includes(item)) {
                             appendStorageItem("soonWillBuyProducts", [item]);
                         }
                         sendResponse(getStorageItem("soonWillBuyProducts"));
@@ -619,10 +619,15 @@ chrome.runtime.onMessage.addListener(
                 return true;
 
             case "onPurchaseDone":
+                if (userInfo === null || userInfo.user_id === undefined) {
+                    console.log("User have not logged in");
+                    sendResponse("User have not logged in");
+                }
                 console.log("onPurchaseDone received");
                 let items = getStorageItem("LastPurchase");
-                sendResponse(items); 
+                sendResponse(items);
                 return true;
+
             default:
                 console.log('couldnt find matching case for ', message.type);
         }
@@ -645,14 +650,19 @@ function setStorageItem(message_type, data) {
 }
 function appendStorageItem(message_type, data) {
     console.log("appendStorageItem", message_type, " + ", data);
-    let list = JSON.parse(window.localStorage.getItem(message_type));
+    let list = getStorageItem(message_type);
     list = list.concat(data);
-    window.localStorage.setItem(message_type, JSON.stringify(list));
+    setStorageItem(message_type, list);
     console.log("appendStorageItem", message_type, " -> ", list);
 }
 
 
 function getStorageItem(message_type) {
+    if (message_type == "LastPurchase" || message_type === "soonWillBuyProducts") {
+        if (window.localStorage.getItem(message_type) === null || window.localStorage.getItem(message_type) === undefined) {
+            return [];
+        }
+    }
     return JSON.parse(window.localStorage.getItem(message_type));
 }
 
@@ -671,9 +681,9 @@ function fetchPreCheckoutProducts(res) {
         if (product_names.length > 0) {
             for (let i = 0; i < soonWillBuyProducts.length; i++) {
                 for (let j = 0; j < product_names.length; j++) {
-                    if (product_names[j].includes(soonWillBuyProducts[i].product_title)) {
+                    if (product_names[j].includes(soonWillBuyProducts[i].product_title.substring(0, 40))) {
                         items.push(soonWillBuyProducts[i]);
-                          console.log("Data added:", soonWillBuyProducts[i].product_title)
+                        console.log("Data added:", soonWillBuyProducts[i].product_title)
                     }
                 }
             }
@@ -752,9 +762,6 @@ function fetchProductInfoFromPage(res) {
 function fetchMoreBoughtProductInfoFromCart(response, item) {
     let page = document.createElement('html');
     page.innerHTML = response.data;
-
-
-
     let summary_list = page.querySelectorAll("#feature-bullets > ul > li > span");
     let product_summary = "";
     for (let i = 0; i < summary_list.length; i++) {

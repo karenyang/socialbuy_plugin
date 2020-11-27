@@ -40,8 +40,8 @@ class ChoiceBox extends Component {
     }
 
     handleCheckBox = (product_link, checked) => {
-        let action = checked? "ProductUnCheck" : "ProductCheck"
-        chrome.runtime.sendMessage({ type: "onGAEvent", data: { "category": "ChoiceBox", "action":  action, "tag": product_link } },
+        let action = checked ? "ProductUnCheck" : "ProductCheck"
+        chrome.runtime.sendMessage({ type: "onGAEvent", data: { "category": "ChoiceBox", "action": action, "tag": product_link } },
             function (res) {
                 if (res.status !== 200) {
                     console.error("onGAEvent failed.");
@@ -72,7 +72,7 @@ class ChoiceBox extends Component {
         })
     }
     onClickShareButton = () => {
-        chrome.runtime.sendMessage({ type: "onGAEvent", data: { "category": "ChoiceBox", "action":  "SharePurchase", "tag": this.state.products.length.toString() } },
+        chrome.runtime.sendMessage({ type: "onGAEvent", data: { "category": "ChoiceBox", "action": "SharePurchase", "tag": this.state.products.length.toString() } },
             function (res) {
                 if (res.status !== 200) {
                     console.error("onGAEvent failed.");
@@ -132,9 +132,16 @@ class ChoiceBox extends Component {
                         </Paper>
                     </Grid>
                     <Grid item xs={12} align="center">
-                        <Button variant="contained" color="primary" onClick={this.onClickShareButton} style={{ paddingLeft: 100, paddingRight: 100, margin: 20, textTransform: "none" }} >
-                            Share
-                        </Button>
+                        {!this.props.logged_in ?
+                            <Typography gutterBottom variant="body2" component="h5" style={{marginTop: "10px", padding: "5px" }}>
+                                To share your purchase, log into TasteMaker.
+                            </Typography>
+                            :
+                            <Button variant="contained" color="primary" onClick={this.onClickShareButton} style={{ paddingLeft: 100, paddingRight: 100, margin: 20, textTransform: "none" }} >
+                                Share
+                            </Button>
+                        }
+
                     </Grid>
 
 
@@ -143,5 +150,10 @@ class ChoiceBox extends Component {
         );
     }
 }
+
+ChoiceBox.defaultProps = {
+    logged_in: true,
+    products: [],
+};
 
 export default ChoiceBox;

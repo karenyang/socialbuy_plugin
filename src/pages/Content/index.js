@@ -33,15 +33,22 @@ else if (url.includes('www.amazon.com/gp/buy/thankyou/')) {
     chrome.runtime.sendMessage({ type: "onPurchaseDone" },
         function (response) {
             console.log('this is the response from the background page for onPurchaseDone: ', response);
-            const last_purchase_products = response;
-            console.log("onPurchaseDone succeeded.", last_purchase_products);
-            if (last_purchase_products.length > 0) {
+            
+            if (response === "User have not logged in"){
                 ReactDOM.render(
-                    <ChoiceBox products={last_purchase_products} />,
+                    <ChoiceBox logged_in={false} />,
                     document.body.appendChild(document.createElement("DIV"))
                 )
             }
-
+            else{
+                if (response.length > 0) {
+                    ReactDOM.render(
+                        <ChoiceBox products={response} />,
+                        document.body.appendChild(document.createElement("DIV"))
+                    )
+                }
+            }
+            
         }
     );
 }
