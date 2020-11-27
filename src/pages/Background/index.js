@@ -13,7 +13,7 @@ console.log('INITIAL getStorageItem user: ', userInfo);
 chrome.browserAction.setBadgeBackgroundColor({ color: [255, 0, 0, 255] });
 
 
-// console.log("Done Creating Google Analytics .... ");
+console.log("Done Creating Google Analytics .... ");
 
 if (userInfo !== null) {
     console.log("grabbing friend requests.")
@@ -61,7 +61,7 @@ chrome.runtime.onMessage.addListener(
         }
         switch (message.type) {
             case "onGAEvent":
-                // console.log("onGAEvent", message.data);
+                  console.log("onGAEvent", message.data);
                 ga("send", "event", message.data.category, message.data.action, message.data.tag);
                 return true;
 
@@ -558,7 +558,7 @@ chrome.runtime.onMessage.addListener(
                             let item = {};
                             item.product_title = cleanedUpValues[0].split('...')[0];
 
-                            // console.log("product_title: ", item.product_title)
+                              console.log("product_title: ", item.product_title)
                             let cost_str = cleanedUpValues.filter(value => value.startsWith("$"))[0];
                             cost_str = cost_str.substring(1);
                             item.product_cost = parseFloat(cost_str);
@@ -571,7 +571,7 @@ chrome.runtime.onMessage.addListener(
                             }
                             console.log("product_link:  ", item.product_link);
                             item.product_imgurl = img.firstElementChild.getAttribute("src");
-                            // console.log("product_imgurl:  ", item.product_imgurl);
+                              console.log("product_imgurl:  ", item.product_imgurl);
                             item.product_by = "Amazon";
                             items.push(item);
                             scrap_product_pages_promises.push(axios.get(item.product_link));
@@ -661,19 +661,19 @@ function fetchPreCheckoutProducts(res) {
     let page = document.createElement('html');
     page.innerHTML = res.data;
     const soonWillBuyProducts = getStorageItem("soonWillBuyProducts");
-    console.log("soonWillBuyProducts BEFORE", soonWillBuyProducts);
+    //console.log("soonWillBuyProducts BEFORE", soonWillBuyProducts);
     let products_checkout = page.querySelectorAll("#spc-orders > div > div > div.a-row.shipment > div > div > div > div> div > div > div.a-row > div > div > div.a-fixed-left-grid-col.item-details-right-column.a-col-right > div.a-row.breakword > span");
     let items = [];
     if (products_checkout !== null && products_checkout !== []) {
         let product_names = [];
         product_names = Array.from(products_checkout).map((a) => a.innerText.trim());
-        console.log("product_names: ", product_names);
+        //console.log("product_names: ", product_names);
         if (product_names.length > 0) {
             for (let i = 0; i < soonWillBuyProducts.length; i++) {
                 for (let j = 0; j < product_names.length; j++) {
                     if (product_names[j].includes(soonWillBuyProducts[i].product_title)) {
                         items.push(soonWillBuyProducts[i]);
-                        console.log("Data added:", soonWillBuyProducts[i].product_title)
+                          console.log("Data added:", soonWillBuyProducts[i].product_title)
                     }
                 }
             }
@@ -689,7 +689,7 @@ function fetchProductInfoFromPage(res) {
     let page = document.createElement('html');
     page.innerHTML = res.data;
     item.product_title = page.querySelector("#productTitle").innerText.trim();
-    console.log("product_title: ", item.product_title)
+    //console.log("product_title: ", item.product_title)
     let cost_str = "";
     if (page.querySelector("#priceblock_dealprice") !== null) {
         cost_str = page.querySelector("#priceblock_dealprice").innerText;
@@ -703,12 +703,12 @@ function fetchProductInfoFromPage(res) {
 
     cost_str = cost_str.substring(1);
     item.product_cost = parseFloat(cost_str);
-    console.log("product_cost: ", item.product_cost);
+    //console.log("product_cost: ", item.product_cost);
     item.product_link = res.config.url;
     if (item.product_link.includes("ref=")) {
         item.product_link = item.product_link.split('ref=')[0];
     }
-    console.log("product_link:  ", item.product_link);
+    //console.log("product_link:  ", item.product_link);
 
     let img_element = page.querySelector("#main-image-container > ul > li.image.item.itemNo0.maintain-height.selected > span > span > div > img");
     if (img_element != null) {
@@ -721,7 +721,7 @@ function fetchProductInfoFromPage(res) {
         item.product_imgurl = img_element.src;
     }
 
-    console.log("product_imgurl:  ", item.product_imgurl);
+    //console.log("product_imgurl:  ", item.product_imgurl);
     item.product_by = "Amazon";
 
     let summary_list = page.querySelectorAll("#feature-bullets > ul > li > span");
@@ -732,7 +732,7 @@ function fetchProductInfoFromPage(res) {
         }
     }
     item.product_summary = product_summary;
-    // console.log("product_summary: ", product_summary);
+    //console.log("product_summary: ", product_summary);
     let variation_imgs = page.querySelectorAll("button > div > div > img");
     let product_variation_names = [];
     let product_variation_imgurls = [];
@@ -742,10 +742,10 @@ function fetchProductInfoFromPage(res) {
         product_variation_names.push(name);
         product_variation_imgurls.push(imgurl);
     }
-    // console.log('product_variations: ',product_variations);
+    //console.log('product_variations: ',product_variations);
     item.product_variation_names = product_variation_names;
     item.product_variation_imgurls = product_variation_imgurls;
-    console.log("Just finished grabbing product info: ", item);
+    //console.log("Just finished grabbing product info: ", item);
     return item;
 }
 
@@ -762,9 +762,9 @@ function fetchMoreBoughtProductInfoFromCart(response, item) {
             product_summary = product_summary.concat(summary_list[i].innerHTML);
         }
     }
-    console.log("item", item);
+    //console.log("item", item);
     item.product_summary = product_summary;
-    // console.log("product_summary: ", product_summary);
+    //console.log("product_summary: ", product_summary);
     let variation_imgs = page.querySelectorAll("button > div > div > img");
     let product_variation_names = [];
     let product_variation_imgurls = [];
@@ -774,7 +774,7 @@ function fetchMoreBoughtProductInfoFromCart(response, item) {
         product_variation_names.push(name);
         product_variation_imgurls.push(imgurl);
     }
-    // console.log('product_variations: ', product_variation_names);
+    //console.log('product_variations: ', product_variation_names);
     item.product_variation_names = product_variation_names;
     item.product_variation_imgurls = product_variation_imgurls;
     return item;
