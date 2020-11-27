@@ -44,6 +44,21 @@ ga('create', 'UA-184044017-1', 'auto');
 ga('set', 'checkProtocolTask', null);
 // ga('send', 'pageview', "userinfo_page");
 
+chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+    if (changeInfo.status == 'complete') {
+        chrome.tabs.query({ active: true }, function (tabs) {
+            const msg = "URL changes notice from background.";
+            chrome.tabs.sendMessage(tabs[0].id, { type: "onTabChange", data: msg },
+                function (response) {
+                    console.log('this is the response from the background page for onTabChange: ', response);
+                }
+            );
+        })
+    }
+});
+
+
+
 chrome.runtime.onMessage.addListener(
     function (message, sender, sendResponse) {
         if (userInfo == null) {
@@ -569,13 +584,35 @@ chrome.runtime.onMessage.addListener(
                         Promise.all(scrap_product_pages_promises).then((responses) => {
                             console.log("responses: ", responses.length);
                             for (let i = 0; i < responses.length; i++) {
-                                products.push(fetchMoreBoughtProductInfo(responses[i], items[i]));
+                                products.push(fetchMoreBoughtProductInfoFromCart(responses[i], items[i]));
                             }
                             setStorageItem("soonWillBuyProducts", products);
                             sendResponse("success");
                         });
                     });
-                    return true;
+                return true;
+
+            case "onClickBuyNow":
+                axios.get(message.data)
+                    .then(res => {
+                        console.log("res", res);
+                        let item = fetchProductInfoFromPage(res);
+                        setStorageItem("LastPurchase", [item]);
+                        sendResponse(item);
+                    });
+                return true;
+
+            case "onClickAddToCart":
+                axios.get(message.data)
+                    .then(res => {
+                        console.log("res", res);
+                        let item = fetchProductInfoFromPage(res);
+                        appendStorageItem("soonWillBuyProducts", [item]);
+                        sendResponse(getStorageItem("soonWillBuyProducts"));
+                    });
+                return true;
+
+
             default:
                 console.log('couldnt find matching case for ', message.type);
         }
@@ -596,13 +633,87 @@ function setStorageItem(message_type, data) {
     console.log("setStorage", message_type, ":", data);
     window.localStorage.setItem(message_type, JSON.stringify(data));
 }
+function appendStorageItem(message_type, data) {
+    console.log("appendStorageItem", message_type, " + ", data);
+    let list = JSON.parse(window.localStorage.getItem(message_type));
+    list = list.concat(data);
+    window.localStorage.setItem(message_type, JSON.stringify(list));
+    console.log("appendStorageItem", message_type, " -> ", list);
+}
+
 
 function getStorageItem(message_type) {
     return JSON.parse(window.localStorage.getItem(message_type));
 }
 
+function fetchProductInfoFromPage(res) {
+    console.log("fetchProductInfoFromPage ...");
+    let item = {}
+    let page = document.createElement('html');
+    page.innerHTML = res.data;
+    item.product_title = page.querySelector("#productTitle").innerText.trim();
+    console.log("product_title: ", item.product_title)
+    let cost_str = "";
+    if (page.querySelector("#priceblock_dealprice") !== null) {
+        cost_str = page.querySelector("#priceblock_dealprice").innerText;
+    } else if (page.querySelector("#priceblock_saleprice") !== null) {
+        cost_str = page.querySelector("#priceblock_saleprice").innerText;
+    } else if (page.querySelector("#priceblock_ourprice") !== null) {
+        cost_str = page.querySelector("#priceblock_ourprice").innerText;
+    } else if (page.querySelector("#price") !== null) {
+        cost_str = page.querySelector("#price").innerText;
+    }
 
-function fetchMoreBoughtProductInfo(response, item) {
+    cost_str = cost_str.substring(1);
+    item.product_cost = parseFloat(cost_str);
+    console.log("product_cost: ", item.product_cost);
+    item.product_link = res.config.url;
+    if (item.product_link.includes("ref=")) {
+        item.product_link = item.product_link.split('ref=')[0];
+    }
+    console.log("product_link:  ", item.product_link);
+
+    let img_element = page.querySelector("#main-image-container > ul > li.image.item.itemNo0.maintain-height.selected > span > span > div > img");
+    if (img_element != null) {
+        item.product_imgurl = img_element.src;
+    } else if (page.querySelector("#imgBlkFront") != null) {
+        img_element = page.querySelector("#imgBlkFront");
+        item.product_imgurl = img_element.src;
+    } else {
+        img_element = page.getElementsByClassName('a-dynamic-image')[0];
+        item.product_imgurl = img_element.src;
+    }
+
+    console.log("product_imgurl:  ", item.product_imgurl);
+    item.product_by = "Amazon";
+
+    let summary_list = page.querySelectorAll("#feature-bullets > ul > li > span");
+    let product_summary = "";
+    for (let i = 0; i < summary_list.length; i++) {
+        if (!summary_list[i].innerHTML.includes("</")) {
+            product_summary = product_summary.concat(summary_list[i].innerHTML.trim());
+        }
+    }
+    item.product_summary = product_summary;
+    // console.log("product_summary: ", product_summary);
+    let variation_imgs = page.querySelectorAll("button > div > div > img");
+    let product_variation_names = [];
+    let product_variation_imgurls = [];
+    for (let i = 0; i < variation_imgs.length; i++) {
+        let imgurl = variation_imgs[i].getAttribute('src');
+        let name = variation_imgs[i].getAttribute('alt');
+        product_variation_names.push(name);
+        product_variation_imgurls.push(imgurl);
+    }
+    // console.log('product_variations: ',product_variations);
+    item.product_variation_names = product_variation_names;
+    item.product_variation_imgurls = product_variation_imgurls;
+    console.log("Just finished grabbing product info: ", item);
+    return item;
+}
+
+
+function fetchMoreBoughtProductInfoFromCart(response, item) {
     let page = document.createElement('html');
     page.innerHTML = response.data;
     let summary_list = page.querySelectorAll("#feature-bullets > ul > li > span");

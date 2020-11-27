@@ -75,7 +75,6 @@ else if (url.includes('www.amazon.com/gp/buy/')) {
     // }
     // // ################ use this for testing in cart w/ actually buying ###################
 
-
     const after_placing_order_func = function () {
         console.log(
             "Clicked Place Your Order Button. Adding products in page to bought List"
@@ -104,37 +103,44 @@ else if (url.includes('www.amazon.com/gp/buy/')) {
     buy_button.addEventListener("click", after_placing_order_func);
     buy_button_bottom.addEventListener("click", after_placing_order_func);
 }
-else if (url.includes('www.amazon.com/') && (url.includes("ref=") || url.includes("/gp/product") || url.includes("/dp/")) && !url.includes('amazon.com/gp/huc') && !url.includes('amazon.com/gp/css') && !url.includes('amazon.com/gp/yourstore')) { //on a product page: Creating the side box
+else if (url.includes('www.amazon.com/') && !url.includes('amazon.com/gp/huc') &&
+    !url.includes('amazon.com/gp/css') && !url.includes('amazon.com/gp/yourstore') &&
+    (url.includes("ref=") || url.includes("/gp/product") || url.includes("/dp/"))) { //on a product page: Creating the side box
+
     console.log("Adding side box .....");
 
     ReactDOM.render(
         <SideBox />,
         document.body.appendChild(document.createElement("DIV"))
     )
-    // if user buy now, count as buying for now
-    document.getElementById("buy-now-button").addEventListener("click", function () {
-        let product = fetchLikedProductInfo();
-        console.log(
-            "Clicked Buy Now Button. Count this as buying for now", product
-        )
-        setStorageItem("LastPurchase", [product]);
-    });
-    // if user add to cart, add it to soonWillBuyProducts
 
-    document.getElementById("add-to-cart-button").addEventListener("click", function () {
-        console.log(
-            "Clicked Add to Cart Button.", product
-        )
-        let product = fetchLikedProductInfo();
-
-        let soonWillBuyProducts = getStorageItem("soonWillBuyProducts");
-        console.log("soonWillBuyProducts from storage", soonWillBuyProducts)
-        soonWillBuyProducts.push(product);
-        setStorageItem("soonWillBuyProducts", soonWillBuyProducts);
-        console.log("soonWillBuyProducts from storage AFTER", getStorageItem("soonWillBuyProducts"));
-
-    });
+    chrome.runtime.onMessage.addListener(
+        function (message, sender, sendResponse) {
+            if (message.type === "onTabChange") {
+                console.log("received ontabchange :", message.data);
+                // if user buy now, count as buying
+                document.getElementById("buy-now-button").addEventListener("click", function () {
+                    chrome.runtime.sendMessage({ type: "onClickBuyNow", data: document.URL },
+                        function (response) {
+                            console.log('this is the response from the background page for onClickBuyNow: ', response);
+                        }
+                    );
+                });
+                // if user add to cart, add it to soonWillBuyProducts
+                document.getElementById("add-to-cart-button").addEventListener("click", function () {
+                    console.log("add to cart clicked")
+                    chrome.runtime.sendMessage({ type: "onClickAddToCart", data: document.URL },
+                        function (response) {
+                            console.log('this is the response from the background page for onClickAddToCart: ', response);
+                        }
+                    );
+                });
+                sendResponse("Updated event listener.");
+            }
+            return true;
+        });
 }
+
 
 
 console.log("================================================================================================");

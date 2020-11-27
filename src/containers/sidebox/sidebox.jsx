@@ -31,33 +31,7 @@ class SideBox extends Component {
         this.setState({ [name]: value, });
         console.log("Update state-> ", this.state);
     }
-
-    componentDidMount = () => {
-        const handleUpdate = this.handleUpdate;
-        const curr_product = this.props.product;
-        chrome.runtime.sendMessage({ type: "onLoadUserLikedProductList" },
-            function (res) {
-                console.log('Userinfo Page receives reply from background for onLoadUserBoughtProductList ', res.data);
-                if (res === "User have not logged in") {
-                    console.log("User have not logged in");
-                    handleUpdate("logged_in", false);
-                }
-                else if (res.status === 200) {
-                    console.log("onLoadUserLikedProductList succeeded.");
-                    let match = res.data.liked_product_list.filter(p => p.product_link === curr_product.product_link)
-                    if (match.length > 0) {
-                        console.log("This product is already in user's liked product list.")
-                        handleUpdate("added_product", true);
-                    }
-                }
-                else {
-                    console.error(res.data + ", onLoadUserLikedProductList failed.");
-                }
-            }
-        );
-
-    }
-
+    
     onMouseOverIcon = () => {
 
         let product = fetchLikedProductInfo();
