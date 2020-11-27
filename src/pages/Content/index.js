@@ -30,78 +30,67 @@ else if (url.includes('www.amazon.com/s?k=')) {
 }
 
 else if (url.includes('www.amazon.com/gp/buy/thankyou/')) {
-    console.log("thank you for last purchase", getStorageItem("LastPurchase"));
-    let last_purchase_products = getStorageItem("LastPurchase");
-    if (last_purchase_products.length > 0) {
-        ReactDOM.render(
-            <ChoiceBox products={last_purchase_products} />,
-            document.body.appendChild(document.createElement("DIV"))
-        )
-    }
+    chrome.runtime.sendMessage({ type: "onPurchaseDone" },
+        function (response) {
+            console.log('this is the response from the background page for onPurchaseDone: ', response);
+            const last_purchase_products = response;
+            console.log("onPurchaseDone succeeded.", last_purchase_products);
+            if (last_purchase_products.length > 0) {
+                ReactDOM.render(
+                    <ChoiceBox products={last_purchase_products} />,
+                    document.body.appendChild(document.createElement("DIV"))
+                )
+            }
+
+        }
+    );
 }
 
 else if (url.includes('www.amazon.com/gp/buy/')) {
-    let buy_button = document.querySelector("#submitOrderButtonId > span > input");
-    let buy_button_bottom = document.querySelector("#bottomSubmitOrderButtonId > span > input");
-    let soonWillBuyProducts = getStorageItem("soonWillBuyProducts")
-    console.log("Before buy soonWillBuyProducts: ", soonWillBuyProducts);
-
-
-    // // ################ use this for testing in cart w/ actually buying ###################
-    let products_checkout = document.querySelectorAll("#spc-orders > div > div > div.a-row.shipment > div > div > div > div> div > div > div.a-row > div > div > div.a-fixed-left-grid-col.item-details-right-column.a-col-right > div.a-row.breakword > span")
-    let data = []
-    if (products_checkout !== null && products_checkout !== []) {
-        let product_names = [];
-        product_names = Array.from(products_checkout).map((a) => a.innerText);
-        console.log("product_names: ", product_names);
-
-        if (product_names.length > 0) {
-            for (let i = 0; i < soonWillBuyProducts.length; i++) {
-                for (let j = 0; j < product_names.length; j++) {
-                    if (product_names[j].includes(soonWillBuyProducts[i].product_title)) {
-                        data.push(soonWillBuyProducts[i]);
-                        console.log("Data added:", soonWillBuyProducts[i].product_title)
-                    }
-                }
-            }
-            setStorageItem("LastPurchase", data);
-        }
-    }
-    // if (data.length > 0) {
-    //     ReactDOM.render(
-    //         <ChoiceBox products={data} />,
-    //         document.body.appendChild(document.createElement("DIV"))
-    //     )
-    // }
-    // // ################ use this for testing in cart w/ actually buying ###################
-
     const after_placing_order_func = function () {
         console.log(
             "Clicked Place Your Order Button. Adding products in page to bought List"
         )
-        let products_checkout = document.querySelectorAll("#spc-orders > div > div > div.a-row.shipment > div > div > div > div> div > div > div.a-row > div > div > div.a-fixed-left-grid-col.item-details-right-column.a-col-right > div.a-row.breakword > span")
-        let data = []
-        if (products_checkout !== null && products_checkout !== []) {
-            let product_names = [];
-            product_names = Array.from(products_checkout).map((a) => a.innerText);
-            console.log("product_names: ", product_names);
-
-            if (product_names.length > 0) {
-                for (let i = 0; i < soonWillBuyProducts.length; i++) {
-                    for (let j = 0; j < product_names.length; j++) {
-                        if (product_names[j].includes(soonWillBuyProducts[i].product_title)) {
-                            data.push(soonWillBuyProducts[i]);
-                            console.log("Data added:", soonWillBuyProducts[i].product_title)
-                        }
-                    }
-                }
-                setStorageItem("LastPurchase", data);
+        chrome.runtime.sendMessage({ type: "onClickPlaceOrder", data: document.URL },
+            function (response) {
+                console.log('this is the response from the background page for onClickPlaceOrder: ', response);
             }
-        }
-        setStorageItem("soonWillBuyProducts", []);
+        );
+
     }
+    let buy_button = document.querySelector("#submitOrderButtonId > span > input");
+    let buy_button_bottom = document.querySelector("#bottomSubmitOrderButtonId > span > input");
     buy_button.addEventListener("click", after_placing_order_func);
     buy_button_bottom.addEventListener("click", after_placing_order_func);
+
+    // buy_button.addEventListener("mouseover",after_placing_order_func);
+    // buy_button_bottom.addEventListener("mouseover", () => {
+    //     chrome.runtime.sendMessage({ type: "onPurchaseDone" },
+    //         function (response) {
+    //             console.log('this is the response from the background page for onPurchaseDone: ', response);
+    //             const last_purchase_products = response;
+    //             console.log("onPurchaseDone succeeded.", last_purchase_products);
+    //             if (last_purchase_products.length > 0) {
+    //                 ReactDOM.render(
+    //                     <ChoiceBox products={last_purchase_products} />,
+    //                     document.body.appendChild(document.createElement("DIV"))
+    //                 )
+    //             }
+
+    //         }
+    //     );
+    // });
+
+    document.addEventListener('DOMNodeInserted', (e) => {
+        if (e.target.id === 'subtotals') {
+            console.log("DOMNodeInserted", e.target);
+            buy_button = document.querySelector("#submitOrderButtonId > span > input");
+            buy_button_bottom = document.querySelector("#bottomSubmitOrderButtonId > span > input");
+            buy_button.addEventListener("click", after_placing_order_func);
+            buy_button_bottom.addEventListener("click", after_placing_order_func);
+        }
+    });
+
 }
 else if (url.includes('www.amazon.com/') && !url.includes('amazon.com/gp/huc') &&
     !url.includes('amazon.com/gp/css') && !url.includes('amazon.com/gp/yourstore') &&
@@ -114,31 +103,45 @@ else if (url.includes('www.amazon.com/') && !url.includes('amazon.com/gp/huc') &
         document.body.appendChild(document.createElement("DIV"))
     )
 
-    chrome.runtime.onMessage.addListener(
-        function (message, sender, sendResponse) {
-            if (message.type === "onTabChange") {
-                console.log("received ontabchange :", message.data);
-                // if user buy now, count as buying
-                document.getElementById("buy-now-button").addEventListener("click", function () {
-                    chrome.runtime.sendMessage({ type: "onClickBuyNow", data: document.URL },
-                        function (response) {
-                            console.log('this is the response from the background page for onClickBuyNow: ', response);
-                        }
-                    );
-                });
-                // if user add to cart, add it to soonWillBuyProducts
-                document.getElementById("add-to-cart-button").addEventListener("click", function () {
-                    console.log("add to cart clicked")
-                    chrome.runtime.sendMessage({ type: "onClickAddToCart", data: document.URL },
-                        function (response) {
-                            console.log('this is the response from the background page for onClickAddToCart: ', response);
-                        }
-                    );
-                });
-                sendResponse("Updated event listener.");
+    document.getElementById("buy-now-button").addEventListener("click", function () {
+        chrome.runtime.sendMessage({ type: "onClickBuyNow", data: document.URL },
+            function (response) {
+                console.log('this is the response from the background page for onClickBuyNow: ', response);
             }
-            return true;
-        });
+        );
+    });
+    // if user add to cart, add it to soonWillBuyProducts
+    document.getElementById("add-to-cart-button").addEventListener("click", function () {
+        console.log("add to cart clicked")
+        chrome.runtime.sendMessage({ type: "onClickAddToCart", data: document.URL },
+            function (response) {
+                console.log('this is the response from the background page for onClickAddToCart: ', response);
+            }
+        );
+    });
+
+    document.addEventListener('DOMNodeInserted', (e) => {
+        if (e.target.id === "buybox") {
+            console.log("DOMNodeInserted", e.target);
+            document.getElementById("buy-now-button").addEventListener("click", function () {
+                chrome.runtime.sendMessage({ type: "onClickBuyNow", data: document.URL },
+                    function (response) {
+                        console.log('this is the response from the background page for onClickBuyNow: ', response);
+                    }
+                );
+            });
+            // if user add to cart, add it to soonWillBuyProducts
+            document.getElementById("add-to-cart-button").addEventListener("click", function () {
+                console.log("add to cart clicked")
+                chrome.runtime.sendMessage({ type: "onClickAddToCart", data: document.URL },
+                    function (response) {
+                        console.log('this is the response from the background page for onClickAddToCart: ', response);
+                    }
+                );
+            });
+
+        }
+    });
 }
 
 

@@ -44,19 +44,14 @@ ga('create', 'UA-184044017-1', 'auto');
 ga('set', 'checkProtocolTask', null);
 // ga('send', 'pageview', "userinfo_page");
 
-chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-    if (changeInfo.status == 'complete') {
-        chrome.tabs.query({ active: true }, function (tabs) {
-            const msg = "URL changes notice from background.";
-            chrome.tabs.sendMessage(tabs[0].id, { type: "onTabChange", data: msg },
-                function (response) {
-                    console.log('this is the response from the background page for onTabChange: ', response);
-                }
-            );
-        })
-    }
-});
-
+// chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+//     if (changeInfo.status == 'complete') {
+//         chrome.tabs.query({ active: true }, function (tabs) {
+//             const msg = "URL changes notice from background.";
+//             chrome.tabs.sendMessage(tabs[0].id, { type: "onTabChange", data: msg });
+//         })
+//     }
+// });
 
 
 chrome.runtime.onMessage.addListener(
@@ -556,13 +551,13 @@ chrome.runtime.onMessage.addListener(
                         let items = [];
                         for (let i = 0; i < content.length - 1; i++) { //content.length - 1 because last block is alexa ads
                             let product = content[i];
-                            // console.log('product ', i);
                             let cleanedUpValues = product.innerText.split(/\n+/).map(p => p.trim()).filter(Boolean);
                             // cleanedUpValues = cleanedUpValues.filter(p => p.trim().length !== 0).map;
                             console.log("cleanedUpValues", cleanedUpValues);
 
                             let item = {};
-                            item.product_title = cleanedUpValues[0];
+                            item.product_title = cleanedUpValues[0].split('...')[0];
+
                             // console.log("product_title: ", item.product_title)
                             let cost_str = cleanedUpValues.filter(value => value.startsWith("$"))[0];
                             cost_str = cost_str.substring(1);
@@ -595,9 +590,10 @@ chrome.runtime.onMessage.addListener(
             case "onClickBuyNow":
                 axios.get(message.data)
                     .then(res => {
-                        console.log("res", res);
                         let item = fetchProductInfoFromPage(res);
-                        setStorageItem("LastPurchase", [item]);
+                        if(!getStorageItem("LastPurchase").includes(item)){
+                            setStorageItem("LastPurchase", [item]);
+                        }
                         sendResponse(item);
                     });
                 return true;
@@ -605,14 +601,28 @@ chrome.runtime.onMessage.addListener(
             case "onClickAddToCart":
                 axios.get(message.data)
                     .then(res => {
-                        console.log("res", res);
                         let item = fetchProductInfoFromPage(res);
-                        appendStorageItem("soonWillBuyProducts", [item]);
+                        if(!getStorageItem("soonWillBuyProducts").includes(item)){
+                            appendStorageItem("soonWillBuyProducts", [item]);
+                        }
                         sendResponse(getStorageItem("soonWillBuyProducts"));
                     });
                 return true;
 
+            case "onClickPlaceOrder":
+                axios.get(message.data)
+                    .then(res => {
+                        console.log("res", res);
+                        fetchPreCheckoutProducts(res);
+                        sendResponse(getStorageItem("LastPurchase"));
+                    });
+                return true;
 
+            case "onPurchaseDone":
+                console.log("onPurchaseDone received");
+                let items = getStorageItem("LastPurchase");
+                sendResponse(items); 
+                return true;
             default:
                 console.log('couldnt find matching case for ', message.type);
         }
@@ -644,6 +654,33 @@ function appendStorageItem(message_type, data) {
 
 function getStorageItem(message_type) {
     return JSON.parse(window.localStorage.getItem(message_type));
+}
+
+function fetchPreCheckoutProducts(res) {
+    console.log("fetchPreCheckoutProducts ...");
+    let page = document.createElement('html');
+    page.innerHTML = res.data;
+    const soonWillBuyProducts = getStorageItem("soonWillBuyProducts");
+    console.log("soonWillBuyProducts BEFORE", soonWillBuyProducts);
+    let products_checkout = page.querySelectorAll("#spc-orders > div > div > div.a-row.shipment > div > div > div > div> div > div > div.a-row > div > div > div.a-fixed-left-grid-col.item-details-right-column.a-col-right > div.a-row.breakword > span");
+    let items = [];
+    if (products_checkout !== null && products_checkout !== []) {
+        let product_names = [];
+        product_names = Array.from(products_checkout).map((a) => a.innerText.trim());
+        console.log("product_names: ", product_names);
+        if (product_names.length > 0) {
+            for (let i = 0; i < soonWillBuyProducts.length; i++) {
+                for (let j = 0; j < product_names.length; j++) {
+                    if (product_names[j].includes(soonWillBuyProducts[i].product_title)) {
+                        items.push(soonWillBuyProducts[i]);
+                        console.log("Data added:", soonWillBuyProducts[i].product_title)
+                    }
+                }
+            }
+        }
+    }
+    setStorageItem("LastPurchase", items);
+    setStorageItem("soonWillBuyProducts", []);
 }
 
 function fetchProductInfoFromPage(res) {
@@ -712,10 +749,12 @@ function fetchProductInfoFromPage(res) {
     return item;
 }
 
-
 function fetchMoreBoughtProductInfoFromCart(response, item) {
     let page = document.createElement('html');
     page.innerHTML = response.data;
+
+
+
     let summary_list = page.querySelectorAll("#feature-bullets > ul > li > span");
     let product_summary = "";
     for (let i = 0; i < summary_list.length; i++) {
