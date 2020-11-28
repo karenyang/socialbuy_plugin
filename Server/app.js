@@ -65,7 +65,7 @@ app.use(session({
 app.get('/friends_productlist/:user_id', function (request, response) {
     console.log('server receives Get request /friends_productlist/ ');
     let user_id = request.params.user_id;
-    if (user_id) {
+    if (user_id!== null && user_id!== undefined) {
         console.log('request.session.user_id: ', user_id);
         User.findOne({
             _id: user_id,
@@ -167,7 +167,7 @@ app.get('/friends_productlist/:user_id', function (request, response) {
 app.get('/friendslist/:user_id', function (request, response) {
     console.log('server receives Get request /friendslist ');
     let user_id = request.params.user_id;
-    if (user_id) {
+    if (user_id!== null && user_id!== undefined) {
         console.log('request.session.user_id: ', user_id);
         User.findOne({
             _id: user_id,
@@ -210,7 +210,7 @@ app.get('/friendslist/:user_id', function (request, response) {
 app.get('/receivedfriendrequests/:user_id', function (request, response) {
     console.log('server receives Get request /receivedfriendrequests ');
     let user_id = request.params.user_id;
-    if (user_id) {
+    if (user_id!== undefined && user_id !== null) {
         console.log('request.session.user_id: ', user_id);
         User.findOne({
             _id: user_id,
@@ -255,7 +255,7 @@ app.post('/deletefriend/:user_id', function (request, response) {
     console.log('server receives POST request /deletefriend ', request.body, request.params);
     const friend_id = request.body.friend_id;
     let user_id = request.params.user_id;
-    if (user_id) {
+    if (user_id!== null && user_id!== undefined) {
         console.log('request.session.user_id: ', user_id);
         User.findOne({
             _id: user_id,
@@ -337,7 +337,7 @@ app.post('/unfollowfriend/:user_id', function (request, response) {
     console.log('server receives POST request /unfollowfriend ', request.body, request.params);
     const friend_id = request.body.friend_id;
     let user_id = request.params.user_id;
-    if (user_id) {
+    if (user_id!== null && user_id!== undefined) {
         console.log('request.session.user_id: ', user_id);
         User.findOne({
             _id: user_id,
@@ -401,7 +401,7 @@ app.post('/respondfriendrequest/:user_id', function (request, response) {
 
     console.log('friend_username: ', friend_username);
     let user_id = request.params.user_id;
-    if (user_id) {
+    if (user_id!== null && user_id!== undefined) {
         console.log('request.session.user_id: ', user_id);
         User.findOne({
             _id: user_id,
@@ -466,7 +466,7 @@ app.post('/requestfriend/:user_id', function (request, response) {
     const friend_username = request.body.friend_username;
     console.log('friend_username: ', friend_username);
     let user_id = request.params.user_id;
-    if (user_id) {
+    if (user_id!== null && user_id!== undefined) {
         console.log('request.session.user_id: ', user_id);
         User.findOne({
             _id: user_id,
@@ -508,7 +508,7 @@ app.post('/search/:user_id', function (request, response) {
     const search_key = request.body.search_key;
     console.log('search_category: ', search_category, "search_key: ", search_key);
     let user_id = request.params.user_id;
-    if (user_id) {
+    if (user_id!== null && user_id!== undefined) {
         console.log('request.session.user_id: ', user_id);
         User.findOne({
             _id: user_id,
@@ -665,7 +665,7 @@ app.get('/user_liked_product_list/:user_id', function (request, response) {
     console.log('server receives Get request /user_liked_product_list/ ');
 
     let user_id = request.params.user_id;
-    if (user_id) {
+    if (user_id!== null && user_id!== undefined) {
         console.log('request.session.user_id: ', user_id);
         User.findOne({
             _id: user_id,
@@ -761,7 +761,7 @@ app.get('/user_bought_product_list/:user_id', function (request, response) {
     console.log('server receives Get request /user_bought_product_list/ ');
 
     let user_id = request.params.user_id;
-    if (user_id) {
+    if (user_id!== null && user_id!== undefined) {
         console.log('request.session.user_id: ', user_id);
         User.findOne({
             _id: user_id,
@@ -855,7 +855,7 @@ app.get('/user_bought_product_list/:user_id', function (request, response) {
 app.post('/delete_bought_product/:user_id', function (request, response) {
     console.log('server receives POST request /delete_product ');
     let user_id = request.params.user_id;
-    if (user_id) {
+    if (user_id!== null && user_id!== undefined) {
         console.log('user_id: ', user_id);
         let product_id = request.body["product_id"];
         User.findOne({
@@ -911,7 +911,7 @@ app.post('/delete_bought_product/:user_id', function (request, response) {
 app.post('/delete_liked_product/:user_id', function (request, response) {
     console.log('server receives POST request /delete_liked_product ', request.body);
     let user_id = request.params.user_id;
-    if (user_id) {
+    if (user_id!== null && user_id!== undefined) {
         console.log('user_id: ', user_id);
         User.findOne({
             _id: user_id,
@@ -1003,7 +1003,7 @@ app.post('/delete_liked_product/:user_id', function (request, response) {
 app.post('/add_liked_products/:user_id', function (request, response) {
     console.log('server receives POST request /add_liked_products ');
     let user_id = request.params.user_id;
-    if (user_id) {
+    if (user_id!== null && user_id!== undefined) {
         console.log('user_id: ', user_id);
         let item = request.body;
         User.findOne({
@@ -1068,7 +1068,7 @@ app.post('/add_liked_products/:user_id', function (request, response) {
 app.post('/add_bought_products/:user_id', function (request, response) {
     // console.log('server receives POST request /add_bought_products ');
     let user_id = request.params.user_id;
-    if (user_id) {
+    if (user_id!== null && user_id!== undefined) {
         console.log('user_id: ', user_id);
         let products = request.body;
         User.findOne({
