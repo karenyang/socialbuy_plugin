@@ -15,7 +15,7 @@ chrome.browserAction.setBadgeBackgroundColor({ color: [255, 0, 0, 255] });
 
 console.log("Done Creating Google Analytics .... ");
 
-if (userInfo !== null) {
+if (userInfo !== null && userInfo.user_id !== undefined) {
     console.log("grabbing friend requests.")
     axios.get(DOMAIN + 'receivedfriendrequests/' + userInfo.user_id)
         .then(res => {
@@ -56,7 +56,7 @@ ga('set', 'checkProtocolTask', null);
 
 chrome.runtime.onMessage.addListener(
     function (message, sender, sendResponse) {
-        if (userInfo == null) {
+        if (userInfo === null) {
             userInfo = getStorageItem('user');
         }
         switch (message.type) {
@@ -68,7 +68,7 @@ chrome.runtime.onMessage.addListener(
             case "onPopupInit":
                 console.log("onPopupInit");
                 sendResponse(userInfo);
-                if (userInfo !== undefined) {
+                if (userInfo !== null && userInfo.user_id !== undefined) {
                     axios.get(DOMAIN + 'receivedfriendrequests/' + userInfo.user_id)
                         .then(res => {
                             printResponse('onLoadFriendRequestsList', res);
