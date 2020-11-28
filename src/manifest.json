@@ -14,7 +14,7 @@
         "128": "icon-128.png"
     },
     "content_scripts": [{
-        "matches": ["<all_urls>"],
+        "matches": ["https://*.amazon.com/*", "http://*.compute.amazonaws.com/*"],
         "js": ["contentScript.bundle.js"],
         "css": ["content.styles.css"]
     }],
@@ -27,11 +27,8 @@
     "content_security_policy": "script-src 'self' https://www.google-analytics.com/analytics.js 'sha256-tqBkxcARnGE+nMHDdA6LouxcAYCpa9mPuMHntrOa6o0=' 'unsafe-inline' 'unsafe-eval' ; object-src 'self'",
     "permissions": [
         "cookies",
-        "*://*.google.com",
         "tabs",
         "storage",
-        "identity",
-        "https://www.facebook.com/",
-        "https://graph.facebook.com/"
+        "identity"
     ]
 }
