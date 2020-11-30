@@ -19,7 +19,7 @@ class ChoiceBox extends Component {
         this.state = {
             products: this.props.products,
             close: false,
-            shared_products: [],
+            shared_products: this.props.products, //initially everything is checked
         }
 
     }
@@ -39,7 +39,7 @@ class ChoiceBox extends Component {
         return title.slice(0, 10).join(" ");
     }
 
-    handleCheckBox = (product_link, checked) => {
+    handleCheckBox = (product, checked) => {
         let action = checked ? "ProductUnCheck" : "ProductCheck"
         chrome.runtime.sendMessage({ type: "onGAEvent", data: { "category": "ChoiceBox", "action": action, "tag": product_link } },
             function (res) {
@@ -48,16 +48,17 @@ class ChoiceBox extends Component {
                 }
             }
         )
-
         let new_shared_products = this.state.shared_products;
-        if (checked && !this.state.shared_products.includes(product_link)) {
-            new_shared_products.push(product_link)
+        // if it will be checked and not shared already,  share it.
+        if (checked && !this.state.shared_products.includes(product)) {
+            new_shared_products.push(product)
             this.setState({
                 shared_products: new_shared_products
             })
         }
-        else if (!checked && this.state.shared_products.includes(product_link)) {
-            let idx = new_shared_products.indexOf(product_link);
+        // if it will be unchecked and shared already, unshare it.
+        else if (!checked && this.state.shared_products.includes(product)) {
+            let idx = new_shared_products.indexOf(product);
             new_shared_products.splice(idx, 1);
             this.setState({
                 shared_products: new_shared_products
@@ -79,10 +80,12 @@ class ChoiceBox extends Component {
                 }
             }
         )
+        // console.log("BEFORE: this.state.products", this.state.products);
+        // console.log("BEFORE: this.state.shared_products", this.state.shared_products);
 
-        let data = this.state.products.filter(p => this.state.shared_products.includes(p.product_link));
+
         const updateState = this.updateState;
-        chrome.runtime.sendMessage({ type: "onBoughtProductsToBeAdded", data: data },
+        chrome.runtime.sendMessage({ type: "onBoughtProductsToBeAdded", data: this.state.shared_products},
             function (response) {
                 console.log('this is the response from the background page for the onBoughtProductsToBeAdded Event: ', response);
                 if (response.status === 200) {

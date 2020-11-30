@@ -83,7 +83,7 @@ class MyProductCard extends Component {
 
     handleCheckBox = (event) => {
         console.log("check!", this.state.checked)
-        this.props.checkbox_func(this.state.product.product_link, !this.state.checked);
+        this.props.checkbox_func(this.state.product, !this.state.checked);
         this.setState({
             checked: !this.state.checked,
         })

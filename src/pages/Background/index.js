@@ -89,7 +89,7 @@ chrome.runtime.onMessage.addListener(
 
 
             case "onRegister":
-                console.log("About to register: ", message.data);
+                // console.log("About to register: ", message.data);
                 axios.post(DOMAIN + 'admin/register', message.data, {
                     headers: {
                         'content-type': 'application/json',
@@ -105,7 +105,7 @@ chrome.runtime.onMessage.addListener(
                 return true;
 
             case "onLogin":
-                console.log("About to login: ", message.data);
+                // console.log("About to login: ", message.data);
                 axios.post(DOMAIN + 'admin/login', message.data, {
                     headers: {
                         'content-type': 'application/json',
@@ -115,14 +115,20 @@ chrome.runtime.onMessage.addListener(
                         userInfo = null;
                         window.localStorage.clear();
                         printResponse('onLogin', res);
-                        setStorageItem('user', res.data);
-                        sendResponse(res);
-                        // upon login, check whether there are new friend requests.
-                        let friend_requests = res.data.received_friend_requests;
-                        num_requests = friend_requests !== undefined ? friend_requests.length : num_requests;
-                        console.log("there are friend requests:", num_requests, friend_requests);
-                        if (num_requests > 0) {
-                            chrome.browserAction.setBadgeText({ text: num_requests.toString() });
+                        if (res.status === 200) {
+                            setStorageItem('user', res.data);
+                            sendResponse(res);
+                            console.log("onLogin succeeded. Proceed.");
+                            // upon login, check whether there are new friend requests.
+                            let friend_requests = res.data.received_friend_requests;
+                            num_requests = friend_requests !== undefined ? friend_requests.length : num_requests;
+                            console.log("there are friend requests:", num_requests, friend_requests);
+                            if (num_requests > 0) {
+                                chrome.browserAction.setBadgeText({ text: num_requests.toString() });
+                            }
+                        } else {
+                            console.error(res);
+                            sendResponse(res);
                         }
                     })
                     .catch(err => {
